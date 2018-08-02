@@ -3,7 +3,7 @@ package boltdb
 import (
 	"net/url"
 
-	"github.com/kleister/kleister-api/pkg/store"
+	"github.com/gopad/gopad-api/pkg/store"
 )
 
 type boltdb struct {
