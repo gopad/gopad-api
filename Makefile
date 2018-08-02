@@ -76,6 +76,14 @@ generate:
 test:
 	retool do goverage -v -coverprofile coverage.out $(PACKAGES)
 
+.PHONY: test-mysql
+test-mysql:
+	@echo "Not integrated yet!"
+
+.PHONY: test-pgsql
+test-pgsql:
+	@echo "Not integrated yet!"
+
 .PHONY: install
 install: $(SOURCES)
 	go install -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' ./cmd/$(NAME)
