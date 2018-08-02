@@ -10,7 +10,7 @@ endif
 
 PACKAGES ?= $(shell go list ./... | grep -v /vendor/ | grep -v /_tools/)
 SOURCES ?= $(shell find . -name "*.go" -type f -not -path "./vendor/*" -not -path "./_tools/*")
-GENERATE ?= $(IMPORT)/pkg/assets $(IMPORT)/pkg/templates $(IMPORT)/pkg/swagger
+GENERATE ?= $(IMPORT)/pkg/swagger
 
 TAGS ?=
 
@@ -70,7 +70,7 @@ lint:
 
 .PHONY: generate
 generate:
-	retool do go generate $(PACKAGES)
+	retool do go generate $(GENERATE)
 
 .PHONY: test
 test:
