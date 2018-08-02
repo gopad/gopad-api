@@ -164,7 +164,7 @@ pipeline:
     detach_sign: true
     files:
       - dist/release/*
-    exludes:
+    excludes:
       - dist/release/*.sha256
     when:
       event: [ push, tag ]
