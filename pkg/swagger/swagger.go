@@ -1,6 +1,7 @@
 package swagger
 
 import (
+	// Dummy import to get it known to go dep.
 	_ "golang.org/x/net/webdav"
 )
 
