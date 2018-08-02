@@ -1,6 +1,6 @@
 # Gopad: API server
 
-[![Build Status](http://github.dronehippie.de/api/badges/gopad/gopad-api/status.svg)](http://github.dronehippie.de/gopad/gopad-api)
+[![Build Status](http://drone.gopad.tech/api/badges/gopad/gopad-api/status.svg)](http://drone.gopad.tech/gopad/gopad-api)
 [![Stories in Ready](https://badge.waffle.io/gopad/gopad-api.svg?label=ready&title=Ready)](http://waffle.io/gopad/gopad-api)
 [![Join the Matrix chat at https://matrix.to/#/#gopad:matrix.org](https://img.shields.io/badge/matrix-%23gopad%3Amatrix.org-7bc9a4.svg)](https://matrix.to/#/#gopad:matrix.org)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8592cd6c200d4e0cb2564c82498aaee1)](https://www.codacy.com/app/gopad/gopad-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gopad/gopad-api&amp;utm_campaign=Badge_Grade)
@@ -16,7 +16,7 @@ TBD
 
 ## Install
 
-You can download prebuilt binaries from the GitHub releases or from our [download site](http://dl.webhippie.de/gopad/api). You are a Mac user? Just take a look at our [homebrew formula](https://github.com/gopad/homebrew-gopad).
+You can download prebuilt binaries from the GitHub releases or from our [download site](http://dl.gopad.tech/api). You are a Mac user? Just take a look at our [homebrew formula](https://github.com/gopad/homebrew-gopad).
 
 
 ## Development
@@ -34,7 +34,7 @@ make clean build
 
 ## Security
 
-If you find a security issue please contact thomas@webhippie.de first.
+If you find a security issue please contact gopad@webhippie.de first.
 
 
 ## Contributing
