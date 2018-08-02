@@ -7,7 +7,7 @@ LABEL maintainer="Thomas Boerger <thomas@webhippie.de>" `
   org.label-schema.schema-version="1.0"
 
 EXPOSE 8080 8090
-VOLUME ["c:\gopad"]
+VOLUME c:\gopad
 
 ENTRYPOINT ["c:\\gopad-api.exe"]
 CMD ["server"]
