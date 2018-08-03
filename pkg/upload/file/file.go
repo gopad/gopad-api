@@ -23,7 +23,7 @@ func (u *file) Info() string {
 // Prepare simply prepares the upload handler.
 func (u *file) Prepare() (upload.Upload, error) {
 	if _, err := os.Stat(u.path()); os.IsNotExist(err) {
-		if err := os.MkdirAll(u.path(), 0755); err != nil {
+		if err := os.MkdirAll(u.path(), u.perms()); err != nil {
 			return nil, err
 		}
 	}
