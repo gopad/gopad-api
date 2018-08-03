@@ -49,16 +49,16 @@ func (u *file) Handler(root string) http.Handler {
 // perms retrieves the dir perms from dsn or fallback.
 func (u *file) perms() os.FileMode {
 	if val := u.dsn.Query().Get("perms"); val != "" {
-		u, err := strconv.ParseUint(val, 10, 32)
+		u, err := strconv.ParseUint(val, 8, 32)
 
 		if err != nil {
 			return 0755
 		}
 
-		return os.FileMode(uint32(u))
-	} else {
-		return 0755
+		return os.FileMode(u)
 	}
+
+	return 0755
 }
 
 // path cleans the dsn and returns a valid path.

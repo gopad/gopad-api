@@ -3,6 +3,7 @@ package router
 import (
 	"io"
 	"net/http"
+	"path"
 	"time"
 
 	"github.com/go-chi/chi"
