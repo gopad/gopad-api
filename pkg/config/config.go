@@ -13,6 +13,7 @@ type Upload struct {
 // Server defines the webserver configuration.
 type Server struct {
 	Host  string
+	Root  string
 	Addr  string
 	Pprof bool
 }

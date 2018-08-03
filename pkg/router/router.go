@@ -46,7 +46,7 @@ func Server(cfg *config.Config, storage store.Store, uploads upload.Upload) http
 	mux.Use(header.Secure)
 	mux.Use(header.Options)
 
-	mux.Route("/", func(root chi.Router) {
+	mux.Route(cfg.Server.Root, func(root chi.Router) {
 		root.Route("/api", func(base chi.Router) {
 			base.Get("/swagger.json", func(w http.ResponseWriter, r *http.Request) {
 				content, err := swagger.ReadFile("swagger.json")
@@ -70,7 +70,13 @@ func Server(cfg *config.Config, storage store.Store, uploads upload.Upload) http
 				base.Mount("/debug", middleware.Profiler())
 			}
 
-			base.Mount("/storage", uploads.Handler())
+			base.Handle("/storage/*", uploads.Handler(
+				path.Join(
+					cfg.Server.Root,
+					"api",
+					"storage",
+				),
+			))
 		})
 	})
 

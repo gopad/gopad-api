@@ -14,7 +14,8 @@ VOLUME ["/var/lib/gopad"]
 ENTRYPOINT ["/usr/bin/gopad-api"]
 CMD ["server"]
 
-ENV GOPAD_API_UPLOAD_DSN file://var/lib/gopad/
+ENV GOPAD_API_DB_DSN boltdb:///var/lib/gopad/database.db
+ENV GOPAD_API_UPLOAD_DSN file:///var/lib/gopad/uploads
 
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /etc/mime.types /etc/

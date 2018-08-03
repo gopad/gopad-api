@@ -63,6 +63,13 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Server.Host,
 		},
 		&cli.StringFlag{
+			Name:        "server-root",
+			Value:       "/",
+			Usage:       "path to access the server",
+			EnvVars:     []string{"GOPAD_API_SERVER_ROOT"},
+			Destination: &cfg.Server.Root,
+		},
+		&cli.StringFlag{
 			Name:        "db-dsn",
 			Value:       "boltdb://gopad.db",
 			Usage:       "database dsn",
@@ -161,6 +168,9 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 				Err(err).
 				Msg("failed to setup uploads")
 		}
+
+		log.Info().
+			Msg(uploads.Info())
 
 		if uploads != nil {
 			defer uploads.Close()

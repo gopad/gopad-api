@@ -12,6 +12,7 @@ VOLUME c:\gopad
 ENTRYPOINT ["c:\\gopad-api.exe"]
 CMD ["server"]
 
-ENV GOPAD_API_UPLOAD_DSN file://gopad/
+ENV GOPAD_API_DB_DSN boltdb:///gopad/database.db
+ENV GOPAD_API_UPLOAD_DSN file:///gopad/uploads
 
 COPY bin/gopad-api.exe c:\gopad-api.exe

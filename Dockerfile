@@ -11,7 +11,8 @@ VOLUME ["/var/lib/gopad"]
 ENTRYPOINT ["/usr/bin/gopad-api"]
 CMD ["server"]
 
-ENV GOPAD_API_UPLOAD_DSN file://var/lib/gopad/
+ENV GOPAD_API_DB_DSN boltdb:///var/lib/gopad/database.db
+ENV GOPAD_API_UPLOAD_DSN file:///var/lib/gopad/uploads
 
 RUN apk add --no-cache ca-certificates mailcap bash
 
