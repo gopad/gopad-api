@@ -26,6 +26,17 @@
   version = "v0.2.0"
 
 [[projects]]
+  digest = "1:638fd0a9521c96e512ace1658ba7052a09459a62514f45133dcfcb579ffe7c85"
+  name = "github.com/dgrijalva/jwt-go"
+  packages = [
+    ".",
+    "request",
+  ]
+  pruneopts = "UT"
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
   digest = "1:343620e06188e0f76464f6524e3db6fa2da8e1c2a0b04eb2267bd91736097f51"
   name = "github.com/go-chi/chi"
   packages = [
@@ -196,6 +207,14 @@
   version = "v1.5.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:d2bf4e0ddb66fa4ec8b0c844264640735cd51c6c1f1b5f9791bec9fc5ee3b29a"
+  name = "github.com/webhippie/fail"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "579e16d581f0b5a35a7639107c9fc3ebac2c5b52"
+
+[[projects]]
   digest = "1:f23222558887a5919f8e9021ecb205395de463f031dd0c049e6e8e547b57c3f4"
   name = "github.com/zenazn/goji"
   packages = ["web/mutil"]
@@ -205,22 +224,26 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:76ee51c3f468493aff39dbacc401e8831fbb765104cbf613b89bef01cf4bad70"
+  digest = "1:6c65053c1d2a1109132128facff540f53cdd30b68d7cac9e62d9daab70ed280f"
   name = "golang.org/x/net"
-  packages = ["context"]
+  packages = [
+    "context",
+    "webdav",
+    "webdav/internal/xml",
+  ]
   pruneopts = "UT"
   revision = "f4c29de78a2a91c00474a2e689954305c350adf9"
 
 [[projects]]
   branch = "master"
-  digest = "1:02f4fb87952cf2a3da4277bb01b69430b227a67fb1e53fbaf834ff4a9a5b6563"
+  digest = "1:1fc10d19ed0f295d8a8275e4f7a2f85a39a26be0796503f1a1fb3cd0ffacbdc5"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "3dc4335d56c789b04b0ba99b7a37249d9b614314"
+  revision = "0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe"
 
 [[projects]]
   branch = "v2"
@@ -235,6 +258,8 @@
   analyzer-version = 1
   input-imports = [
     "github.com/coreos/go-semver/semver",
+    "github.com/dgrijalva/jwt-go",
+    "github.com/dgrijalva/jwt-go/request",
     "github.com/go-chi/chi",
     "github.com/go-chi/chi/middleware",
     "github.com/joho/godotenv",
@@ -246,6 +271,8 @@
     "github.com/rs/zerolog/log",
     "github.com/uber/jaeger-client-go",
     "github.com/uber/jaeger-client-go/config",
+    "github.com/webhippie/fail",
+    "golang.org/x/net/webdav",
     "gopkg.in/urfave/cli.v2",
   ]
   solver-name = "gps-cdcl"

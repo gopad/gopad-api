@@ -30,6 +30,10 @@
   version = "0.2.0"
 
 [[constraint]]
+  name = "github.com/dgrijalva/jwt-go"
+  version = "3.2.0"
+
+[[constraint]]
   name = "github.com/go-chi/chi"
   version = "3.3.2"
 
@@ -56,6 +60,14 @@
 [[constraint]]
   name = "github.com/uber/jaeger-client-go"
   version = "2.14.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/webhippie/fail"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/net"
 
 [[constraint]]
   branch = "v2"
