@@ -6,9 +6,9 @@ clone_folder: 'c:\gopath\src\github.com\gopad\gopad-api'
 environment:
   GOPATH: c:\gopath
   DOCKER_USERNAME:
-    secure: '4YzzahbEiMZQJpOCOd1LAw=='
+    secure: 'NNXSKPexXrgkFtU8lFTLxg=='
   DOCKER_PASSWORD:
-    secure: 'VqO/G3Zfslu6zSLdwHKO+Q=='
+    secure: 'I4nO04vJWbZs8rXkeohe8tEvnF8UXfbBgZX2ptz6V9Q='
 
 install:
   - ps: |

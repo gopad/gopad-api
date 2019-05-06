@@ -1,5 +1,5 @@
 # escape=`
-FROM microsoft/nanoserver:10.0.14393.1593
+FROM microsoft/nanoserver:10.0.14393.2430
 
 LABEL maintainer="Thomas Boerger <thomas@webhippie.de>" `
   org.label-schema.name="Gopad API" `
@@ -9,10 +9,10 @@ LABEL maintainer="Thomas Boerger <thomas@webhippie.de>" `
 EXPOSE 8080 8090
 VOLUME c:\gopad
 
-ENTRYPOINT ["c:\\gopad-api.exe"]
-CMD ["server"]
-
 ENV GOPAD_API_DB_DSN boltdb:///gopad/database.db
 ENV GOPAD_API_UPLOAD_DSN file:///gopad/uploads
+
+ENTRYPOINT ["c:\\gopad-api.exe"]
+CMD ["server"]
 
 COPY bin/gopad-api.exe c:\gopad-api.exe

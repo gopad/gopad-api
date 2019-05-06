@@ -1,4 +1,7 @@
-FROM webhippie/alpine:latest
+FROM webhippie/alpine:latest AS build
+RUN apk add --no-cache ca-certificates mailcap
+
+FROM scratch
 
 LABEL maintainer="Thomas Boerger <thomas@webhippie.de>" \
   org.label-schema.name="Gopad API" \
@@ -8,12 +11,13 @@ LABEL maintainer="Thomas Boerger <thomas@webhippie.de>" \
 EXPOSE 8080 8090
 VOLUME ["/var/lib/gopad"]
 
-ENTRYPOINT ["/usr/bin/gopad-api"]
-CMD ["server"]
-
 ENV GOPAD_API_DB_DSN boltdb:///var/lib/gopad/database.db
 ENV GOPAD_API_UPLOAD_DSN file:///var/lib/gopad/uploads
 
-RUN apk add --no-cache ca-certificates mailcap bash
+ENTRYPOINT ["/usr/bin/gopad-api"]
+CMD ["server"]
 
-COPY dist/binaries/gopad-api-*-linux-amd64 /usr/bin/
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=build /etc/mime.types /etc/
+
+COPY dist/binaries/gopad-api-*-linux-arm64 /usr/bin/gopad-api
