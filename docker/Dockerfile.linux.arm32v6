@@ -11,13 +11,13 @@ LABEL maintainer="Thomas Boerger <thomas@webhippie.de>" \
 EXPOSE 8080 8090
 VOLUME ["/var/lib/gopad"]
 
-ENTRYPOINT ["/usr/bin/gopad-api"]
-CMD ["server"]
-
 ENV GOPAD_API_DB_DSN boltdb:///var/lib/gopad/database.db
 ENV GOPAD_API_UPLOAD_DSN file:///var/lib/gopad/uploads
+
+ENTRYPOINT ["/usr/bin/gopad-api"]
+CMD ["server"]
 
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /etc/mime.types /etc/
 
-COPY dist/binaries/gopad-api-*-linux-arm64 /usr/bin/
+COPY dist/binaries/gopad-api-*-linux-arm /usr/bin/gopad-api

@@ -8,11 +8,11 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/gopad/gopad-api/pkg/assets"
 	"github.com/gopad/gopad-api/pkg/config"
 	"github.com/gopad/gopad-api/pkg/middleware/header"
 	"github.com/gopad/gopad-api/pkg/middleware/prometheus"
 	"github.com/gopad/gopad-api/pkg/store"
-	"github.com/gopad/gopad-api/pkg/swagger"
 	"github.com/gopad/gopad-api/pkg/upload"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
@@ -49,19 +49,19 @@ func Server(cfg *config.Config, storage store.Store, uploads upload.Upload) http
 
 	mux.Route(cfg.Server.Root, func(root chi.Router) {
 		root.Route("/api", func(base chi.Router) {
-			base.Get("/swagger.json", func(w http.ResponseWriter, r *http.Request) {
-				content, err := swagger.ReadFile("swagger.json")
+			base.Get("/v1.yml", func(w http.ResponseWriter, r *http.Request) {
+				content, err := assets.ReadFile("apiv1.yml")
 
 				if err != nil {
 					log.Error().
 						Err(err).
-						Msg("failed to read swagger.json")
+						Msg("failed to read openapi definition")
 
 					fail.ErrorJSON(w, fail.Unexpected())
 					return
 				}
 
-				w.Header().Set("Content-Type", "application/json")
+				w.Header().Set("Content-Type", "text/vnd.yaml")
 				w.WriteHeader(http.StatusOK)
 
 				io.WriteString(w, string(content))
