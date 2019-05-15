@@ -1,7 +1,6 @@
 # Gopad: API server
 
-[![Build Status](http://drone.gopad.tech/api/badges/gopad/gopad-api/status.svg)](http://drone.gopad.tech/gopad/gopad-api)
-[![Build Status](https://ci.appveyor.com/api/projects/status/wt7yx98bxh1bumti?svg=true)](https://ci.appveyor.com/project/gopadz/gopad-api)
+[![Build Status](https://cloud.drone.io/api/badges/gopad/gopad-api/status.svg)](https://cloud.drone.io/gopad/gopad-api)
 [![Stories in Ready](https://badge.waffle.io/gopad/gopad-api.svg?label=ready&title=Ready)](http://waffle.io/gopad/gopad-api)
 [![Join the Matrix chat at https://matrix.to/#/#gopad:matrix.org](https://img.shields.io/badge/matrix-%23gopad-7bc9a4.svg)](https://matrix.to/#/#gopad:matrix.org)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8592cd6c200d4e0cb2564c82498aaee1)](https://www.codacy.com/app/gopad/gopad-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gopad/gopad-api&amp;utm_campaign=Badge_Grade)
@@ -21,23 +20,13 @@ You can download prebuilt binaries from the GitHub releases or from our [downloa
 
 ## Development
 
-Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). This project requires Go >= v1.8. It is possible to just execute `go get github.com/gopad/gopad-api/cmd/gopad-api`, but we prefer to use our `Makefile`:
+Make sure you have a working Go environment, for further reference or a guide take a look at the [install instructions](http://golang.org/doc/install.html). This project requires Go >= v1.11.
 
 ```bash
-go get -d github.com/gopad/gopad-api
-cd $GOPATH/src/github.com/gopad/gopad-api
+git clone https://github.com/gopad/gopad-api.git
+cd gopad-api
 
-# install retool
-make retool
-
-# sync dependencies
-make sync
-
-# generate code
-make generate
-
-# build binary
-make build
+make sync generate build
 
 ./bin/gopad-api -h
 ```

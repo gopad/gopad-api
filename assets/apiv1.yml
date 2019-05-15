@@ -1,0 +1,953 @@
+swagger: "2.0"
+
+info:
+  description: "API definition for Gopad"
+  title: "Gopad OpenAPI"
+  version: "1.0.0"
+  license:
+    name: "Apache-2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+
+consumes:
+  - "application/json"
+
+produces:
+  - "application/json"
+
+schemes:
+  - "http"
+  - "https"
+
+basePath: "/api/v1"
+
+paths:
+  /auth/verify/{token}:
+    get:
+      summary: "Verify validity for an authentication token"
+      operationId: "AuthVerify"
+      tags:
+        - "auth"
+      parameters:
+        - in: "path"
+          name: "token"
+          description: "A token that have to be checked"
+          type: "string"
+          required: true
+      responses:
+        200:
+          description: "Meta data of the provided token"
+          schema:
+            $ref: "#/definitions/auth_verify"
+        401:
+          description: "Unauthorized if token is invalid"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+  /auth/refresh:
+    get:
+      summary: "Refresh an auth token before it expires"
+      operationId: "AuthRefresh"
+      tags:
+        - "auth"
+      responses:
+        200:
+          description: "A refreshed token with expire"
+          schema:
+            $ref: "#/definitions/auth_token"
+        401:
+          description: "Unauthorized if failed to generate"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+  /auth/login:
+    post:
+      summary: "Authenticate an user by credentials"
+      operationId: "AuthLogin"
+      tags:
+        - "auth"
+      parameters:
+        - in: "body"
+          name: "auth"
+          description: "The credentials to authenticate"
+          required: true
+          schema:
+            type: "object"
+            required:
+              - "username"
+              - "password"
+            properties:
+              username:
+                type: "string"
+              password:
+                type: "string"
+      responses:
+        200:
+          description: "A generated token with expire"
+          schema:
+            $ref: "#/definitions/auth_token"
+        401:
+          description: "Unauthorized if wrong credentials"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+  /profile/token:
+    get:
+      summary: "Retrieve an unlimited auth token"
+      operationId: "ProfileToken"
+      tags:
+        - "profile"
+      responses:
+        200:
+          description: "The unlimited auth token"
+          schema:
+            $ref: "#/definitions/auth_token"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        500:
+          description: "Failed to generate a token"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+  /profile/self:
+    get:
+      summary: "Retrieve an unlimited auth token"
+      operationId: "ProfileShow"
+      tags:
+        - profile
+      responses:
+        200:
+          description: "The current profile data"
+          schema:
+            $ref: "#/definitions/profile"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    put:
+      summary: "Retrieve an unlimited auth token"
+      operationId: "ProfileUpdate"
+      tags:
+        - "profile"
+      parameters:
+        - in: "body"
+          name: "profile"
+          description: "The profile data to update"
+          required: true
+          schema:
+            $ref: "#/definitions/profile"
+      responses:
+        200:
+          description: "The updated profile data"
+          schema:
+            $ref: "#/definitions/profile"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "Failed to validate request"
+          schema:
+            $ref: "#/definitions/validation_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+  /teams:
+    get:
+      summary: "Fetch all available teams"
+      operationId: "TeamIndex"
+      tags:
+        - "team"
+      responses:
+        200:
+          description: "A collection of teams"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/team"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    post:
+      summary: "Create a new team"
+      operationId: "TeamCreate"
+      tags:
+        - "team"
+      parameters:
+        - in: "body"
+          name: "team"
+          description: "The team data to create"
+          required: true
+          schema:
+            $ref: "#/definitions/team"
+      responses:
+        200:
+          description: "The created team data"
+          schema:
+            $ref: "#/definitions/team"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "Failed to validate request"
+          schema:
+            $ref: "#/definitions/validation_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+  /teams/{team}:
+    get:
+      summary: "Fetch a specific team"
+      operationId: "TeamShow"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team"
+          description: "A team UUID or slug"
+          type: "string"
+          required: true
+      responses:
+        200:
+          description: "The fetched team details"
+          schema:
+            $ref: "#/definitions/team"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    put:
+      summary: "Update a specific team"
+      operationId: "TeamUpdate"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team"
+          description: "A team UUID or slug"
+          type: "string"
+          required: true
+        - in: "body"
+          name: "team"
+          description: "The team data to update"
+          required: true
+          schema:
+            $ref: "#/definitions/team"
+      responses:
+        200:
+          description: "The updated team details"
+          schema:
+            $ref: "#/definitions/team"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "Failed to validate request"
+          schema:
+            $ref: "#/definitions/validation_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    delete:
+      summary: "Delete a specific team"
+      operationId: "TeamDelete"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team"
+          description: "A team UUID or slug"
+          type: "string"
+          required: true
+      responses:
+        200:
+          description: "Plain success message"
+          schema:
+            $ref: "#/definitions/general_error"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        400:
+          description: "Failed to delete the team"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+  /teams/{team}/users:
+    get:
+      summary: "Fetch all users assigned to team"
+      operationId: "TeamUserIndex"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team"
+          description: "A team UUID or slug"
+          type: "string"
+          required: true
+      responses:
+        200:
+          description: "A collection of team users"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/team_user"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    post:
+      summary: "Assign a user to team"
+      operationId: "TeamUserAppend"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team"
+          description: "A team UUID or slug"
+          type: "string"
+          required: true
+        - in: "body"
+          name: "team_user"
+          description: "The team user data to assign"
+          required: true
+          schema:
+            $ref: "#/definitions/team_user_params"
+      responses:
+        200:
+          description: "Plain success message"
+          schema:
+            $ref: "#/definitions/general_error"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "User is already assigned"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    put:
+      summary: "Update user perms for team"
+      operationId: "TeamUserPerm"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team"
+          description: "A team UUID or slug"
+          type: "string"
+          required: true
+        - in: "body"
+          name: "team_user"
+          description: "The team user data to update"
+          required: true
+          schema:
+            $ref: "#/definitions/team_user_params"
+      responses:
+        200:
+          description: "Plain success message"
+          schema:
+            $ref: "#/definitions/general_error"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "User is not assigned"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    delete:
+      summary: "Remove a user from team"
+      operationId: "TeamUserDelete"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team"
+          description: "A team UUID or slug"
+          type: "string"
+          required: true
+        - in: "body"
+          name: "team_user"
+          description: "The team user data to delete"
+          required: true
+          schema:
+            $ref: "#/definitions/team_user_params"
+      responses:
+        200:
+          description: "Plain success message"
+          schema:
+            $ref: "#/definitions/general_error"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "User is not assigned"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+  /users:
+    get:
+      summary: "Fetch all available users"
+      operationId: "UserIndex"
+      tags:
+        - "user"
+      responses:
+        200:
+          description: "A collection of users"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/user"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    post:
+      summary: "Create a new user"
+      operationId: "UserCreate"
+      tags:
+        - "user"
+      parameters:
+        - in: "body"
+          name: "user"
+          description: "The user data to create"
+          required: true
+          schema:
+            $ref: "#/definitions/user"
+      responses:
+        200:
+          description: "The created user data"
+          schema:
+            $ref: "#/definitions/user"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "Failed to validate request"
+          schema:
+            $ref: "#/definitions/validation_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+  /users/{user}:
+    get:
+      summary: "Fetch a specific user"
+      operationId: "UserShow"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user"
+          description: "A user UUID or slug"
+          type: "string"
+          required: true
+      responses:
+        200:
+          description: "The fetched user details"
+          schema:
+            $ref: "#/definitions/user"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    put:
+      summary: "Update a specific user"
+      operationId: "UserUpdate"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user"
+          description: "A user UUID or slug"
+          type: "string"
+          required: true
+        - in: "body"
+          name: "user"
+          description: "The user data to update"
+          required: true
+          schema:
+            $ref: "#/definitions/user"
+      responses:
+        200:
+          description: "The updated user details"
+          schema:
+            $ref: "#/definitions/user"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "Failed to validate request"
+          schema:
+            $ref: "#/definitions/validation_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    delete:
+      summary: "Delete a specific user"
+      operationId: "UserDelete"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user"
+          description: "A user UUID or slug"
+          type: "string"
+          required: true
+      responses:
+        200:
+          description: "Plain success message"
+          schema:
+            $ref: "#/definitions/general_error"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        400:
+          description: "Failed to delete the user"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+  /users/{user}/teams:
+    get:
+      summary: "Fetch all teams assigned to user"
+      operationId: "UserTeamIndex"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user"
+          description: "A user UUID or slug"
+          type: "string"
+          required: true
+      responses:
+        200:
+          description: "A collection of user teams"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/team_user"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    post:
+      summary: "Assign a team to user"
+      operationId: "UserTeamAppend"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user"
+          description: "A user UUID or slug"
+          type: "string"
+          required: true
+        - in: "body"
+          name: "user_team"
+          description: "The user team data to assign"
+          required: true
+          schema:
+            $ref: "#/definitions/user_team_params"
+      responses:
+        200:
+          description: "Plain success message"
+          schema:
+            $ref: "#/definitions/general_error"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "Team is already assigned"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    put:
+      summary: "Update team perms for user"
+      operationId: "UserTeamPerm"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user"
+          description: "A user UUID or slug"
+          type: "string"
+          required: true
+        - in: "body"
+          name: "user_team"
+          description: "The user team data to update"
+          required: true
+          schema:
+            $ref: "#/definitions/user_team_params"
+      responses:
+        200:
+          description: "Plain success message"
+          schema:
+            $ref: "#/definitions/general_error"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "Team is not assigned"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+    delete:
+      summary: "Remove a team from user"
+      operationId: "UserTeamDelete"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user"
+          description: "A user UUID or slug"
+          type: "string"
+          required: true
+        - in: "body"
+          name: "user_team"
+          description: "The user team data to delete"
+          required: true
+          schema:
+            $ref: "#/definitions/user_team_params"
+      responses:
+        200:
+          description: "Plain success message"
+          schema:
+            $ref: "#/definitions/general_error"
+        403:
+          description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        412:
+          description: "Failed to parse request body"
+          schema:
+            $ref: "#/definitions/general_error"
+        422:
+          description: "Team is not assigned"
+          schema:
+            $ref: "#/definitions/general_error"
+        default:
+          description: "Some error unrelated to the handler"
+          schema:
+            $ref: "#/definitions/general_error"
+
+definitions:
+  auth_verify:
+    type: "object"
+    required:
+      - "username"
+      - "created_at"
+    properties:
+      username:
+        type: "string"
+      created_at:
+        type: "string"
+        format: "date-time"
+
+  auth_token:
+    type: "object"
+    required:
+      - "token"
+      - "expires_at"
+    properties:
+      token:
+        type: "string"
+      expires_at:
+        type: "string"
+        format: "date-time"
+
+  profile:
+    type: "object"
+    required:
+      - "username"
+      - "email"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        readOnly: true
+      slug:
+        type: "string"
+      username:
+        type: "string"
+      email:
+        type: "string"
+      admin:
+        type: "boolean"
+      active:
+        type: "boolean"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+
+  team:
+    type: "object"
+    required:
+      - "name"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        readOnly: true
+      slug:
+        type: "string"
+      name:
+        type: "string"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+
+  team_user:
+    type: "object"
+    required:
+      - "team_id"
+      - "user_id"
+      - "perm"
+    properties:
+      team_id:
+        type: "string"
+        format: "uuid"
+      # team:
+      #   type: "object"
+      #   schema:
+      #     $ref: "#/definitions/team"
+      user_id:
+        type: "string"
+        format: "uuid"
+      # user:
+      #   type: "object"
+      #   schema:
+      #     $ref: "#/definitions/user"
+      perm:
+        type: "string"
+
+  user:
+    type: "object"
+    required:
+      - "username"
+      - "email"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        readOnly: true
+      slug:
+        type: "string"
+      username:
+        type: "string"
+      email:
+        type: "string"
+      admin:
+        type: "boolean"
+      active:
+        type: "boolean"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+
+  team_user_params:
+    type: "object"
+    required:
+      - "team"
+      - "user"
+      - "perm"
+    properties:
+      team:
+        type: "string"
+      user:
+        type: "string"
+      perm:
+        type: "string"
+
+  user_team_params:
+    type: "object"
+    required:
+      - "user"
+      - "team"
+      - "perm"
+    properties:
+      user:
+        type: "string"
+      team:
+        type: "string"
+      perm:
+        type: "string"
+
+  general_error:
+    type: "object"
+    required:
+      - "status"
+      - "message"
+    properties:
+      status:
+        type: "integer"
+      message:
+        type: "string"
+
+  validation_error:
+    type: "object"
+    required:
+      - "status"
+      - "message"
+    properties:
+      status:
+        type: "integer"
+      message:
+        type: "string"
+      errors:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            field:
+              type: "string"
+            message:
+              type: "string"
