@@ -75,7 +75,7 @@ paths:
         - "auth"
       parameters:
         - in: "body"
-          name: "auth"
+          name: "params"
           description: "The credentials to authenticate"
           required: true
           schema:
@@ -153,7 +153,7 @@ paths:
         - "profile"
       parameters:
         - in: "body"
-          name: "profile"
+          name: "params"
           description: "The profile data to update"
           required: true
           schema:
@@ -209,7 +209,7 @@ paths:
         - "team"
       parameters:
         - in: "body"
-          name: "team"
+          name: "params"
           description: "The team data to create"
           required: true
           schema:
@@ -236,7 +236,7 @@ paths:
           schema:
             $ref: "#/definitions/general_error"
 
-  /teams/{team}:
+  /teams/{teamID}:
     get:
       summary: "Fetch a specific team"
       operationId: "TeamShow"
@@ -244,7 +244,7 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "team"
+          name: "teamID"
           description: "A team UUID or slug"
           type: "string"
           required: true
@@ -269,12 +269,12 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "team"
+          name: "teamID"
           description: "A team UUID or slug"
           type: "string"
           required: true
         - in: "body"
-          name: "team"
+          name: "params"
           description: "The team data to update"
           required: true
           schema:
@@ -308,7 +308,7 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "team"
+          name: "teamID"
           description: "A team UUID or slug"
           type: "string"
           required: true
@@ -330,7 +330,7 @@ paths:
           schema:
             $ref: "#/definitions/general_error"
 
-  /teams/{team}/users:
+  /teams/{teamID}/users:
     get:
       summary: "Fetch all users assigned to team"
       operationId: "TeamUserIndex"
@@ -338,7 +338,7 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "team"
+          name: "teamID"
           description: "A team UUID or slug"
           type: "string"
           required: true
@@ -365,12 +365,12 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "team"
+          name: "teamID"
           description: "A team UUID or slug"
           type: "string"
           required: true
         - in: "body"
-          name: "team_user"
+          name: "params"
           description: "The team user data to assign"
           required: true
           schema:
@@ -404,12 +404,12 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "team"
+          name: "teamID"
           description: "A team UUID or slug"
           type: "string"
           required: true
         - in: "body"
-          name: "team_user"
+          name: "params"
           description: "The team user data to update"
           required: true
           schema:
@@ -443,12 +443,12 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "team"
+          name: "teamID"
           description: "A team UUID or slug"
           type: "string"
           required: true
         - in: "body"
-          name: "team_user"
+          name: "params"
           description: "The team user data to delete"
           required: true
           schema:
@@ -504,7 +504,7 @@ paths:
         - "user"
       parameters:
         - in: "body"
-          name: "user"
+          name: "params"
           description: "The user data to create"
           required: true
           schema:
@@ -531,7 +531,7 @@ paths:
           schema:
             $ref: "#/definitions/general_error"
 
-  /users/{user}:
+  /users/{userID}:
     get:
       summary: "Fetch a specific user"
       operationId: "UserShow"
@@ -539,7 +539,7 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "user"
+          name: "userID"
           description: "A user UUID or slug"
           type: "string"
           required: true
@@ -564,12 +564,12 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "user"
+          name: "userID"
           description: "A user UUID or slug"
           type: "string"
           required: true
         - in: "body"
-          name: "user"
+          name: "params"
           description: "The user data to update"
           required: true
           schema:
@@ -603,7 +603,7 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "user"
+          name: "userID"
           description: "A user UUID or slug"
           type: "string"
           required: true
@@ -625,7 +625,7 @@ paths:
           schema:
             $ref: "#/definitions/general_error"
 
-  /users/{user}/teams:
+  /users/{userID}/teams:
     get:
       summary: "Fetch all teams assigned to user"
       operationId: "UserTeamIndex"
@@ -633,7 +633,7 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "user"
+          name: "userID"
           description: "A user UUID or slug"
           type: "string"
           required: true
@@ -660,12 +660,12 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "user"
+          name: "userID"
           description: "A user UUID or slug"
           type: "string"
           required: true
         - in: "body"
-          name: "user_team"
+          name: "params"
           description: "The user team data to assign"
           required: true
           schema:
@@ -699,12 +699,12 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "user"
+          name: "userID"
           description: "A user UUID or slug"
           type: "string"
           required: true
         - in: "body"
-          name: "user_team"
+          name: "params"
           description: "The user team data to update"
           required: true
           schema:
@@ -738,12 +738,12 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "user"
+          name: "userID"
           description: "A user UUID or slug"
           type: "string"
           required: true
         - in: "body"
-          name: "user_team"
+          name: "params"
           description: "The user team data to delete"
           required: true
           schema:
