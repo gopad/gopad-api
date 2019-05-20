@@ -37,124 +37,124 @@ func configureAPI(api *operations.GopadAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	if api.AuthAuthLoginHandler == nil {
-		api.AuthAuthLoginHandler = auth.AuthLoginHandlerFunc(func(params auth.AuthLoginParams) middleware.Responder {
-			return middleware.NotImplemented("operation auth.AuthLogin has not yet been implemented")
+	if api.TeamAppendTeamToUserHandler == nil {
+		api.TeamAppendTeamToUserHandler = team.AppendTeamToUserHandlerFunc(func(params team.AppendTeamToUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation team.AppendTeamToUser has not yet been implemented")
 		})
 	}
-	if api.AuthAuthRefreshHandler == nil {
-		api.AuthAuthRefreshHandler = auth.AuthRefreshHandlerFunc(func(params auth.AuthRefreshParams) middleware.Responder {
-			return middleware.NotImplemented("operation auth.AuthRefresh has not yet been implemented")
+	if api.UserAppendUserToTeamHandler == nil {
+		api.UserAppendUserToTeamHandler = user.AppendUserToTeamHandlerFunc(func(params user.AppendUserToTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation user.AppendUserToTeam has not yet been implemented")
 		})
 	}
-	if api.AuthAuthVerifyHandler == nil {
-		api.AuthAuthVerifyHandler = auth.AuthVerifyHandlerFunc(func(params auth.AuthVerifyParams) middleware.Responder {
-			return middleware.NotImplemented("operation auth.AuthVerify has not yet been implemented")
+	if api.TeamCreateTeamHandler == nil {
+		api.TeamCreateTeamHandler = team.CreateTeamHandlerFunc(func(params team.CreateTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation team.CreateTeam has not yet been implemented")
 		})
 	}
-	if api.ProfileProfileShowHandler == nil {
-		api.ProfileProfileShowHandler = profile.ProfileShowHandlerFunc(func(params profile.ProfileShowParams) middleware.Responder {
-			return middleware.NotImplemented("operation profile.ProfileShow has not yet been implemented")
+	if api.UserCreateUserHandler == nil {
+		api.UserCreateUserHandler = user.CreateUserHandlerFunc(func(params user.CreateUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation user.CreateUser has not yet been implemented")
 		})
 	}
-	if api.ProfileProfileTokenHandler == nil {
-		api.ProfileProfileTokenHandler = profile.ProfileTokenHandlerFunc(func(params profile.ProfileTokenParams) middleware.Responder {
-			return middleware.NotImplemented("operation profile.ProfileToken has not yet been implemented")
+	if api.TeamDeleteTeamHandler == nil {
+		api.TeamDeleteTeamHandler = team.DeleteTeamHandlerFunc(func(params team.DeleteTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation team.DeleteTeam has not yet been implemented")
 		})
 	}
-	if api.ProfileProfileUpdateHandler == nil {
-		api.ProfileProfileUpdateHandler = profile.ProfileUpdateHandlerFunc(func(params profile.ProfileUpdateParams) middleware.Responder {
-			return middleware.NotImplemented("operation profile.ProfileUpdate has not yet been implemented")
+	if api.UserDeleteUserHandler == nil {
+		api.UserDeleteUserHandler = user.DeleteUserHandlerFunc(func(params user.DeleteUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation user.DeleteUser has not yet been implemented")
 		})
 	}
-	if api.TeamTeamCreateHandler == nil {
-		api.TeamTeamCreateHandler = team.TeamCreateHandlerFunc(func(params team.TeamCreateParams) middleware.Responder {
-			return middleware.NotImplemented("operation team.TeamCreate has not yet been implemented")
+	if api.UserDeleteUserFromTeamHandler == nil {
+		api.UserDeleteUserFromTeamHandler = user.DeleteUserFromTeamHandlerFunc(func(params user.DeleteUserFromTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation user.DeleteUserFromTeam has not yet been implemented")
 		})
 	}
-	if api.TeamTeamDeleteHandler == nil {
-		api.TeamTeamDeleteHandler = team.TeamDeleteHandlerFunc(func(params team.TeamDeleteParams) middleware.Responder {
-			return middleware.NotImplemented("operation team.TeamDelete has not yet been implemented")
+	if api.TeamDelteTeamFromUserHandler == nil {
+		api.TeamDelteTeamFromUserHandler = team.DelteTeamFromUserHandlerFunc(func(params team.DelteTeamFromUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation team.DelteTeamFromUser has not yet been implemented")
 		})
 	}
-	if api.TeamTeamIndexHandler == nil {
-		api.TeamTeamIndexHandler = team.TeamIndexHandlerFunc(func(params team.TeamIndexParams) middleware.Responder {
-			return middleware.NotImplemented("operation team.TeamIndex has not yet been implemented")
+	if api.TeamListTeamUsersHandler == nil {
+		api.TeamListTeamUsersHandler = team.ListTeamUsersHandlerFunc(func(params team.ListTeamUsersParams) middleware.Responder {
+			return middleware.NotImplemented("operation team.ListTeamUsers has not yet been implemented")
 		})
 	}
-	if api.TeamTeamShowHandler == nil {
-		api.TeamTeamShowHandler = team.TeamShowHandlerFunc(func(params team.TeamShowParams) middleware.Responder {
-			return middleware.NotImplemented("operation team.TeamShow has not yet been implemented")
+	if api.TeamListTeamsHandler == nil {
+		api.TeamListTeamsHandler = team.ListTeamsHandlerFunc(func(params team.ListTeamsParams) middleware.Responder {
+			return middleware.NotImplemented("operation team.ListTeams has not yet been implemented")
 		})
 	}
-	if api.TeamTeamUpdateHandler == nil {
-		api.TeamTeamUpdateHandler = team.TeamUpdateHandlerFunc(func(params team.TeamUpdateParams) middleware.Responder {
-			return middleware.NotImplemented("operation team.TeamUpdate has not yet been implemented")
+	if api.UserListUserTeamsHandler == nil {
+		api.UserListUserTeamsHandler = user.ListUserTeamsHandlerFunc(func(params user.ListUserTeamsParams) middleware.Responder {
+			return middleware.NotImplemented("operation user.ListUserTeams has not yet been implemented")
 		})
 	}
-	if api.TeamTeamUserAppendHandler == nil {
-		api.TeamTeamUserAppendHandler = team.TeamUserAppendHandlerFunc(func(params team.TeamUserAppendParams) middleware.Responder {
-			return middleware.NotImplemented("operation team.TeamUserAppend has not yet been implemented")
+	if api.UserListUsersHandler == nil {
+		api.UserListUsersHandler = user.ListUsersHandlerFunc(func(params user.ListUsersParams) middleware.Responder {
+			return middleware.NotImplemented("operation user.ListUsers has not yet been implemented")
 		})
 	}
-	if api.TeamTeamUserDeleteHandler == nil {
-		api.TeamTeamUserDeleteHandler = team.TeamUserDeleteHandlerFunc(func(params team.TeamUserDeleteParams) middleware.Responder {
-			return middleware.NotImplemented("operation team.TeamUserDelete has not yet been implemented")
+	if api.AuthLoginUserHandler == nil {
+		api.AuthLoginUserHandler = auth.LoginUserHandlerFunc(func(params auth.LoginUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation auth.LoginUser has not yet been implemented")
 		})
 	}
-	if api.TeamTeamUserIndexHandler == nil {
-		api.TeamTeamUserIndexHandler = team.TeamUserIndexHandlerFunc(func(params team.TeamUserIndexParams) middleware.Responder {
-			return middleware.NotImplemented("operation team.TeamUserIndex has not yet been implemented")
+	if api.TeamPermitTeamUserHandler == nil {
+		api.TeamPermitTeamUserHandler = team.PermitTeamUserHandlerFunc(func(params team.PermitTeamUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation team.PermitTeamUser has not yet been implemented")
 		})
 	}
-	if api.TeamTeamUserPermHandler == nil {
-		api.TeamTeamUserPermHandler = team.TeamUserPermHandlerFunc(func(params team.TeamUserPermParams) middleware.Responder {
-			return middleware.NotImplemented("operation team.TeamUserPerm has not yet been implemented")
+	if api.UserPermitUserTeamHandler == nil {
+		api.UserPermitUserTeamHandler = user.PermitUserTeamHandlerFunc(func(params user.PermitUserTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation user.PermitUserTeam has not yet been implemented")
 		})
 	}
-	if api.UserUserCreateHandler == nil {
-		api.UserUserCreateHandler = user.UserCreateHandlerFunc(func(params user.UserCreateParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.UserCreate has not yet been implemented")
+	if api.AuthRefreshAuthHandler == nil {
+		api.AuthRefreshAuthHandler = auth.RefreshAuthHandlerFunc(func(params auth.RefreshAuthParams) middleware.Responder {
+			return middleware.NotImplemented("operation auth.RefreshAuth has not yet been implemented")
 		})
 	}
-	if api.UserUserDeleteHandler == nil {
-		api.UserUserDeleteHandler = user.UserDeleteHandlerFunc(func(params user.UserDeleteParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.UserDelete has not yet been implemented")
+	if api.ProfileShowProfileHandler == nil {
+		api.ProfileShowProfileHandler = profile.ShowProfileHandlerFunc(func(params profile.ShowProfileParams) middleware.Responder {
+			return middleware.NotImplemented("operation profile.ShowProfile has not yet been implemented")
 		})
 	}
-	if api.UserUserIndexHandler == nil {
-		api.UserUserIndexHandler = user.UserIndexHandlerFunc(func(params user.UserIndexParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.UserIndex has not yet been implemented")
+	if api.TeamShowTeamHandler == nil {
+		api.TeamShowTeamHandler = team.ShowTeamHandlerFunc(func(params team.ShowTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation team.ShowTeam has not yet been implemented")
 		})
 	}
-	if api.UserUserShowHandler == nil {
-		api.UserUserShowHandler = user.UserShowHandlerFunc(func(params user.UserShowParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.UserShow has not yet been implemented")
+	if api.UserShowUserHandler == nil {
+		api.UserShowUserHandler = user.ShowUserHandlerFunc(func(params user.ShowUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation user.ShowUser has not yet been implemented")
 		})
 	}
-	if api.UserUserTeamAppendHandler == nil {
-		api.UserUserTeamAppendHandler = user.UserTeamAppendHandlerFunc(func(params user.UserTeamAppendParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.UserTeamAppend has not yet been implemented")
+	if api.ProfileTokenProfileHandler == nil {
+		api.ProfileTokenProfileHandler = profile.TokenProfileHandlerFunc(func(params profile.TokenProfileParams) middleware.Responder {
+			return middleware.NotImplemented("operation profile.TokenProfile has not yet been implemented")
 		})
 	}
-	if api.UserUserTeamDeleteHandler == nil {
-		api.UserUserTeamDeleteHandler = user.UserTeamDeleteHandlerFunc(func(params user.UserTeamDeleteParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.UserTeamDelete has not yet been implemented")
+	if api.ProfileUpdateProfileHandler == nil {
+		api.ProfileUpdateProfileHandler = profile.UpdateProfileHandlerFunc(func(params profile.UpdateProfileParams) middleware.Responder {
+			return middleware.NotImplemented("operation profile.UpdateProfile has not yet been implemented")
 		})
 	}
-	if api.UserUserTeamIndexHandler == nil {
-		api.UserUserTeamIndexHandler = user.UserTeamIndexHandlerFunc(func(params user.UserTeamIndexParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.UserTeamIndex has not yet been implemented")
+	if api.TeamUpdateTeamHandler == nil {
+		api.TeamUpdateTeamHandler = team.UpdateTeamHandlerFunc(func(params team.UpdateTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation team.UpdateTeam has not yet been implemented")
 		})
 	}
-	if api.UserUserTeamPermHandler == nil {
-		api.UserUserTeamPermHandler = user.UserTeamPermHandlerFunc(func(params user.UserTeamPermParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.UserTeamPerm has not yet been implemented")
+	if api.UserUpdateUserHandler == nil {
+		api.UserUpdateUserHandler = user.UpdateUserHandlerFunc(func(params user.UpdateUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation user.UpdateUser has not yet been implemented")
 		})
 	}
-	if api.UserUserUpdateHandler == nil {
-		api.UserUserUpdateHandler = user.UserUpdateHandlerFunc(func(params user.UserUpdateParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.UserUpdate has not yet been implemented")
+	if api.AuthVerifyAuthHandler == nil {
+		api.AuthVerifyAuthHandler = auth.VerifyAuthHandlerFunc(func(params auth.VerifyAuthParams) middleware.Responder {
+			return middleware.NotImplemented("operation auth.VerifyAuth has not yet been implemented")
 		})
 	}
 

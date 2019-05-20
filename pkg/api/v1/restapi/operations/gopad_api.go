@@ -42,77 +42,77 @@ func NewGopadAPI(spec *loads.Document) *GopadAPI {
 		BearerAuthenticator: security.BearerAuth,
 		JSONConsumer:        runtime.JSONConsumer(),
 		JSONProducer:        runtime.JSONProducer(),
-		AuthAuthLoginHandler: auth.AuthLoginHandlerFunc(func(params auth.AuthLoginParams) middleware.Responder {
-			return middleware.NotImplemented("operation AuthAuthLogin has not yet been implemented")
+		TeamAppendTeamToUserHandler: team.AppendTeamToUserHandlerFunc(func(params team.AppendTeamToUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation TeamAppendTeamToUser has not yet been implemented")
 		}),
-		AuthAuthRefreshHandler: auth.AuthRefreshHandlerFunc(func(params auth.AuthRefreshParams) middleware.Responder {
-			return middleware.NotImplemented("operation AuthAuthRefresh has not yet been implemented")
+		UserAppendUserToTeamHandler: user.AppendUserToTeamHandlerFunc(func(params user.AppendUserToTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation UserAppendUserToTeam has not yet been implemented")
 		}),
-		AuthAuthVerifyHandler: auth.AuthVerifyHandlerFunc(func(params auth.AuthVerifyParams) middleware.Responder {
-			return middleware.NotImplemented("operation AuthAuthVerify has not yet been implemented")
+		TeamCreateTeamHandler: team.CreateTeamHandlerFunc(func(params team.CreateTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation TeamCreateTeam has not yet been implemented")
 		}),
-		ProfileProfileShowHandler: profile.ProfileShowHandlerFunc(func(params profile.ProfileShowParams) middleware.Responder {
-			return middleware.NotImplemented("operation ProfileProfileShow has not yet been implemented")
+		UserCreateUserHandler: user.CreateUserHandlerFunc(func(params user.CreateUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation UserCreateUser has not yet been implemented")
 		}),
-		ProfileProfileTokenHandler: profile.ProfileTokenHandlerFunc(func(params profile.ProfileTokenParams) middleware.Responder {
-			return middleware.NotImplemented("operation ProfileProfileToken has not yet been implemented")
+		TeamDeleteTeamHandler: team.DeleteTeamHandlerFunc(func(params team.DeleteTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation TeamDeleteTeam has not yet been implemented")
 		}),
-		ProfileProfileUpdateHandler: profile.ProfileUpdateHandlerFunc(func(params profile.ProfileUpdateParams) middleware.Responder {
-			return middleware.NotImplemented("operation ProfileProfileUpdate has not yet been implemented")
+		UserDeleteUserHandler: user.DeleteUserHandlerFunc(func(params user.DeleteUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation UserDeleteUser has not yet been implemented")
 		}),
-		TeamTeamCreateHandler: team.TeamCreateHandlerFunc(func(params team.TeamCreateParams) middleware.Responder {
-			return middleware.NotImplemented("operation TeamTeamCreate has not yet been implemented")
+		UserDeleteUserFromTeamHandler: user.DeleteUserFromTeamHandlerFunc(func(params user.DeleteUserFromTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation UserDeleteUserFromTeam has not yet been implemented")
 		}),
-		TeamTeamDeleteHandler: team.TeamDeleteHandlerFunc(func(params team.TeamDeleteParams) middleware.Responder {
-			return middleware.NotImplemented("operation TeamTeamDelete has not yet been implemented")
+		TeamDelteTeamFromUserHandler: team.DelteTeamFromUserHandlerFunc(func(params team.DelteTeamFromUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation TeamDelteTeamFromUser has not yet been implemented")
 		}),
-		TeamTeamIndexHandler: team.TeamIndexHandlerFunc(func(params team.TeamIndexParams) middleware.Responder {
-			return middleware.NotImplemented("operation TeamTeamIndex has not yet been implemented")
+		TeamListTeamUsersHandler: team.ListTeamUsersHandlerFunc(func(params team.ListTeamUsersParams) middleware.Responder {
+			return middleware.NotImplemented("operation TeamListTeamUsers has not yet been implemented")
 		}),
-		TeamTeamShowHandler: team.TeamShowHandlerFunc(func(params team.TeamShowParams) middleware.Responder {
-			return middleware.NotImplemented("operation TeamTeamShow has not yet been implemented")
+		TeamListTeamsHandler: team.ListTeamsHandlerFunc(func(params team.ListTeamsParams) middleware.Responder {
+			return middleware.NotImplemented("operation TeamListTeams has not yet been implemented")
 		}),
-		TeamTeamUpdateHandler: team.TeamUpdateHandlerFunc(func(params team.TeamUpdateParams) middleware.Responder {
-			return middleware.NotImplemented("operation TeamTeamUpdate has not yet been implemented")
+		UserListUserTeamsHandler: user.ListUserTeamsHandlerFunc(func(params user.ListUserTeamsParams) middleware.Responder {
+			return middleware.NotImplemented("operation UserListUserTeams has not yet been implemented")
 		}),
-		TeamTeamUserAppendHandler: team.TeamUserAppendHandlerFunc(func(params team.TeamUserAppendParams) middleware.Responder {
-			return middleware.NotImplemented("operation TeamTeamUserAppend has not yet been implemented")
+		UserListUsersHandler: user.ListUsersHandlerFunc(func(params user.ListUsersParams) middleware.Responder {
+			return middleware.NotImplemented("operation UserListUsers has not yet been implemented")
 		}),
-		TeamTeamUserDeleteHandler: team.TeamUserDeleteHandlerFunc(func(params team.TeamUserDeleteParams) middleware.Responder {
-			return middleware.NotImplemented("operation TeamTeamUserDelete has not yet been implemented")
+		AuthLoginUserHandler: auth.LoginUserHandlerFunc(func(params auth.LoginUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation AuthLoginUser has not yet been implemented")
 		}),
-		TeamTeamUserIndexHandler: team.TeamUserIndexHandlerFunc(func(params team.TeamUserIndexParams) middleware.Responder {
-			return middleware.NotImplemented("operation TeamTeamUserIndex has not yet been implemented")
+		TeamPermitTeamUserHandler: team.PermitTeamUserHandlerFunc(func(params team.PermitTeamUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation TeamPermitTeamUser has not yet been implemented")
 		}),
-		TeamTeamUserPermHandler: team.TeamUserPermHandlerFunc(func(params team.TeamUserPermParams) middleware.Responder {
-			return middleware.NotImplemented("operation TeamTeamUserPerm has not yet been implemented")
+		UserPermitUserTeamHandler: user.PermitUserTeamHandlerFunc(func(params user.PermitUserTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation UserPermitUserTeam has not yet been implemented")
 		}),
-		UserUserCreateHandler: user.UserCreateHandlerFunc(func(params user.UserCreateParams) middleware.Responder {
-			return middleware.NotImplemented("operation UserUserCreate has not yet been implemented")
+		AuthRefreshAuthHandler: auth.RefreshAuthHandlerFunc(func(params auth.RefreshAuthParams) middleware.Responder {
+			return middleware.NotImplemented("operation AuthRefreshAuth has not yet been implemented")
 		}),
-		UserUserDeleteHandler: user.UserDeleteHandlerFunc(func(params user.UserDeleteParams) middleware.Responder {
-			return middleware.NotImplemented("operation UserUserDelete has not yet been implemented")
+		ProfileShowProfileHandler: profile.ShowProfileHandlerFunc(func(params profile.ShowProfileParams) middleware.Responder {
+			return middleware.NotImplemented("operation ProfileShowProfile has not yet been implemented")
 		}),
-		UserUserIndexHandler: user.UserIndexHandlerFunc(func(params user.UserIndexParams) middleware.Responder {
-			return middleware.NotImplemented("operation UserUserIndex has not yet been implemented")
+		TeamShowTeamHandler: team.ShowTeamHandlerFunc(func(params team.ShowTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation TeamShowTeam has not yet been implemented")
 		}),
-		UserUserShowHandler: user.UserShowHandlerFunc(func(params user.UserShowParams) middleware.Responder {
-			return middleware.NotImplemented("operation UserUserShow has not yet been implemented")
+		UserShowUserHandler: user.ShowUserHandlerFunc(func(params user.ShowUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation UserShowUser has not yet been implemented")
 		}),
-		UserUserTeamAppendHandler: user.UserTeamAppendHandlerFunc(func(params user.UserTeamAppendParams) middleware.Responder {
-			return middleware.NotImplemented("operation UserUserTeamAppend has not yet been implemented")
+		ProfileTokenProfileHandler: profile.TokenProfileHandlerFunc(func(params profile.TokenProfileParams) middleware.Responder {
+			return middleware.NotImplemented("operation ProfileTokenProfile has not yet been implemented")
 		}),
-		UserUserTeamDeleteHandler: user.UserTeamDeleteHandlerFunc(func(params user.UserTeamDeleteParams) middleware.Responder {
-			return middleware.NotImplemented("operation UserUserTeamDelete has not yet been implemented")
+		ProfileUpdateProfileHandler: profile.UpdateProfileHandlerFunc(func(params profile.UpdateProfileParams) middleware.Responder {
+			return middleware.NotImplemented("operation ProfileUpdateProfile has not yet been implemented")
 		}),
-		UserUserTeamIndexHandler: user.UserTeamIndexHandlerFunc(func(params user.UserTeamIndexParams) middleware.Responder {
-			return middleware.NotImplemented("operation UserUserTeamIndex has not yet been implemented")
+		TeamUpdateTeamHandler: team.UpdateTeamHandlerFunc(func(params team.UpdateTeamParams) middleware.Responder {
+			return middleware.NotImplemented("operation TeamUpdateTeam has not yet been implemented")
 		}),
-		UserUserTeamPermHandler: user.UserTeamPermHandlerFunc(func(params user.UserTeamPermParams) middleware.Responder {
-			return middleware.NotImplemented("operation UserUserTeamPerm has not yet been implemented")
+		UserUpdateUserHandler: user.UpdateUserHandlerFunc(func(params user.UpdateUserParams) middleware.Responder {
+			return middleware.NotImplemented("operation UserUpdateUser has not yet been implemented")
 		}),
-		UserUserUpdateHandler: user.UserUpdateHandlerFunc(func(params user.UserUpdateParams) middleware.Responder {
-			return middleware.NotImplemented("operation UserUserUpdate has not yet been implemented")
+		AuthVerifyAuthHandler: auth.VerifyAuthHandlerFunc(func(params auth.VerifyAuthParams) middleware.Responder {
+			return middleware.NotImplemented("operation AuthVerifyAuth has not yet been implemented")
 		}),
 	}
 }
@@ -145,54 +145,54 @@ type GopadAPI struct {
 	// JSONProducer registers a producer for a "application/json" mime type
 	JSONProducer runtime.Producer
 
-	// AuthAuthLoginHandler sets the operation handler for the auth login operation
-	AuthAuthLoginHandler auth.AuthLoginHandler
-	// AuthAuthRefreshHandler sets the operation handler for the auth refresh operation
-	AuthAuthRefreshHandler auth.AuthRefreshHandler
-	// AuthAuthVerifyHandler sets the operation handler for the auth verify operation
-	AuthAuthVerifyHandler auth.AuthVerifyHandler
-	// ProfileProfileShowHandler sets the operation handler for the profile show operation
-	ProfileProfileShowHandler profile.ProfileShowHandler
-	// ProfileProfileTokenHandler sets the operation handler for the profile token operation
-	ProfileProfileTokenHandler profile.ProfileTokenHandler
-	// ProfileProfileUpdateHandler sets the operation handler for the profile update operation
-	ProfileProfileUpdateHandler profile.ProfileUpdateHandler
-	// TeamTeamCreateHandler sets the operation handler for the team create operation
-	TeamTeamCreateHandler team.TeamCreateHandler
-	// TeamTeamDeleteHandler sets the operation handler for the team delete operation
-	TeamTeamDeleteHandler team.TeamDeleteHandler
-	// TeamTeamIndexHandler sets the operation handler for the team index operation
-	TeamTeamIndexHandler team.TeamIndexHandler
-	// TeamTeamShowHandler sets the operation handler for the team show operation
-	TeamTeamShowHandler team.TeamShowHandler
-	// TeamTeamUpdateHandler sets the operation handler for the team update operation
-	TeamTeamUpdateHandler team.TeamUpdateHandler
-	// TeamTeamUserAppendHandler sets the operation handler for the team user append operation
-	TeamTeamUserAppendHandler team.TeamUserAppendHandler
-	// TeamTeamUserDeleteHandler sets the operation handler for the team user delete operation
-	TeamTeamUserDeleteHandler team.TeamUserDeleteHandler
-	// TeamTeamUserIndexHandler sets the operation handler for the team user index operation
-	TeamTeamUserIndexHandler team.TeamUserIndexHandler
-	// TeamTeamUserPermHandler sets the operation handler for the team user perm operation
-	TeamTeamUserPermHandler team.TeamUserPermHandler
-	// UserUserCreateHandler sets the operation handler for the user create operation
-	UserUserCreateHandler user.UserCreateHandler
-	// UserUserDeleteHandler sets the operation handler for the user delete operation
-	UserUserDeleteHandler user.UserDeleteHandler
-	// UserUserIndexHandler sets the operation handler for the user index operation
-	UserUserIndexHandler user.UserIndexHandler
-	// UserUserShowHandler sets the operation handler for the user show operation
-	UserUserShowHandler user.UserShowHandler
-	// UserUserTeamAppendHandler sets the operation handler for the user team append operation
-	UserUserTeamAppendHandler user.UserTeamAppendHandler
-	// UserUserTeamDeleteHandler sets the operation handler for the user team delete operation
-	UserUserTeamDeleteHandler user.UserTeamDeleteHandler
-	// UserUserTeamIndexHandler sets the operation handler for the user team index operation
-	UserUserTeamIndexHandler user.UserTeamIndexHandler
-	// UserUserTeamPermHandler sets the operation handler for the user team perm operation
-	UserUserTeamPermHandler user.UserTeamPermHandler
-	// UserUserUpdateHandler sets the operation handler for the user update operation
-	UserUserUpdateHandler user.UserUpdateHandler
+	// TeamAppendTeamToUserHandler sets the operation handler for the append team to user operation
+	TeamAppendTeamToUserHandler team.AppendTeamToUserHandler
+	// UserAppendUserToTeamHandler sets the operation handler for the append user to team operation
+	UserAppendUserToTeamHandler user.AppendUserToTeamHandler
+	// TeamCreateTeamHandler sets the operation handler for the create team operation
+	TeamCreateTeamHandler team.CreateTeamHandler
+	// UserCreateUserHandler sets the operation handler for the create user operation
+	UserCreateUserHandler user.CreateUserHandler
+	// TeamDeleteTeamHandler sets the operation handler for the delete team operation
+	TeamDeleteTeamHandler team.DeleteTeamHandler
+	// UserDeleteUserHandler sets the operation handler for the delete user operation
+	UserDeleteUserHandler user.DeleteUserHandler
+	// UserDeleteUserFromTeamHandler sets the operation handler for the delete user from team operation
+	UserDeleteUserFromTeamHandler user.DeleteUserFromTeamHandler
+	// TeamDelteTeamFromUserHandler sets the operation handler for the delte team from user operation
+	TeamDelteTeamFromUserHandler team.DelteTeamFromUserHandler
+	// TeamListTeamUsersHandler sets the operation handler for the list team users operation
+	TeamListTeamUsersHandler team.ListTeamUsersHandler
+	// TeamListTeamsHandler sets the operation handler for the list teams operation
+	TeamListTeamsHandler team.ListTeamsHandler
+	// UserListUserTeamsHandler sets the operation handler for the list user teams operation
+	UserListUserTeamsHandler user.ListUserTeamsHandler
+	// UserListUsersHandler sets the operation handler for the list users operation
+	UserListUsersHandler user.ListUsersHandler
+	// AuthLoginUserHandler sets the operation handler for the login user operation
+	AuthLoginUserHandler auth.LoginUserHandler
+	// TeamPermitTeamUserHandler sets the operation handler for the permit team user operation
+	TeamPermitTeamUserHandler team.PermitTeamUserHandler
+	// UserPermitUserTeamHandler sets the operation handler for the permit user team operation
+	UserPermitUserTeamHandler user.PermitUserTeamHandler
+	// AuthRefreshAuthHandler sets the operation handler for the refresh auth operation
+	AuthRefreshAuthHandler auth.RefreshAuthHandler
+	// ProfileShowProfileHandler sets the operation handler for the show profile operation
+	ProfileShowProfileHandler profile.ShowProfileHandler
+	// TeamShowTeamHandler sets the operation handler for the show team operation
+	TeamShowTeamHandler team.ShowTeamHandler
+	// UserShowUserHandler sets the operation handler for the show user operation
+	UserShowUserHandler user.ShowUserHandler
+	// ProfileTokenProfileHandler sets the operation handler for the token profile operation
+	ProfileTokenProfileHandler profile.TokenProfileHandler
+	// ProfileUpdateProfileHandler sets the operation handler for the update profile operation
+	ProfileUpdateProfileHandler profile.UpdateProfileHandler
+	// TeamUpdateTeamHandler sets the operation handler for the update team operation
+	TeamUpdateTeamHandler team.UpdateTeamHandler
+	// UserUpdateUserHandler sets the operation handler for the update user operation
+	UserUpdateUserHandler user.UpdateUserHandler
+	// AuthVerifyAuthHandler sets the operation handler for the verify auth operation
+	AuthVerifyAuthHandler auth.VerifyAuthHandler
 
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
@@ -256,100 +256,100 @@ func (o *GopadAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.AuthAuthLoginHandler == nil {
-		unregistered = append(unregistered, "auth.AuthLoginHandler")
+	if o.TeamAppendTeamToUserHandler == nil {
+		unregistered = append(unregistered, "team.AppendTeamToUserHandler")
 	}
 
-	if o.AuthAuthRefreshHandler == nil {
-		unregistered = append(unregistered, "auth.AuthRefreshHandler")
+	if o.UserAppendUserToTeamHandler == nil {
+		unregistered = append(unregistered, "user.AppendUserToTeamHandler")
 	}
 
-	if o.AuthAuthVerifyHandler == nil {
-		unregistered = append(unregistered, "auth.AuthVerifyHandler")
+	if o.TeamCreateTeamHandler == nil {
+		unregistered = append(unregistered, "team.CreateTeamHandler")
 	}
 
-	if o.ProfileProfileShowHandler == nil {
-		unregistered = append(unregistered, "profile.ProfileShowHandler")
+	if o.UserCreateUserHandler == nil {
+		unregistered = append(unregistered, "user.CreateUserHandler")
 	}
 
-	if o.ProfileProfileTokenHandler == nil {
-		unregistered = append(unregistered, "profile.ProfileTokenHandler")
+	if o.TeamDeleteTeamHandler == nil {
+		unregistered = append(unregistered, "team.DeleteTeamHandler")
 	}
 
-	if o.ProfileProfileUpdateHandler == nil {
-		unregistered = append(unregistered, "profile.ProfileUpdateHandler")
+	if o.UserDeleteUserHandler == nil {
+		unregistered = append(unregistered, "user.DeleteUserHandler")
 	}
 
-	if o.TeamTeamCreateHandler == nil {
-		unregistered = append(unregistered, "team.TeamCreateHandler")
+	if o.UserDeleteUserFromTeamHandler == nil {
+		unregistered = append(unregistered, "user.DeleteUserFromTeamHandler")
 	}
 
-	if o.TeamTeamDeleteHandler == nil {
-		unregistered = append(unregistered, "team.TeamDeleteHandler")
+	if o.TeamDelteTeamFromUserHandler == nil {
+		unregistered = append(unregistered, "team.DelteTeamFromUserHandler")
 	}
 
-	if o.TeamTeamIndexHandler == nil {
-		unregistered = append(unregistered, "team.TeamIndexHandler")
+	if o.TeamListTeamUsersHandler == nil {
+		unregistered = append(unregistered, "team.ListTeamUsersHandler")
 	}
 
-	if o.TeamTeamShowHandler == nil {
-		unregistered = append(unregistered, "team.TeamShowHandler")
+	if o.TeamListTeamsHandler == nil {
+		unregistered = append(unregistered, "team.ListTeamsHandler")
 	}
 
-	if o.TeamTeamUpdateHandler == nil {
-		unregistered = append(unregistered, "team.TeamUpdateHandler")
+	if o.UserListUserTeamsHandler == nil {
+		unregistered = append(unregistered, "user.ListUserTeamsHandler")
 	}
 
-	if o.TeamTeamUserAppendHandler == nil {
-		unregistered = append(unregistered, "team.TeamUserAppendHandler")
+	if o.UserListUsersHandler == nil {
+		unregistered = append(unregistered, "user.ListUsersHandler")
 	}
 
-	if o.TeamTeamUserDeleteHandler == nil {
-		unregistered = append(unregistered, "team.TeamUserDeleteHandler")
+	if o.AuthLoginUserHandler == nil {
+		unregistered = append(unregistered, "auth.LoginUserHandler")
 	}
 
-	if o.TeamTeamUserIndexHandler == nil {
-		unregistered = append(unregistered, "team.TeamUserIndexHandler")
+	if o.TeamPermitTeamUserHandler == nil {
+		unregistered = append(unregistered, "team.PermitTeamUserHandler")
 	}
 
-	if o.TeamTeamUserPermHandler == nil {
-		unregistered = append(unregistered, "team.TeamUserPermHandler")
+	if o.UserPermitUserTeamHandler == nil {
+		unregistered = append(unregistered, "user.PermitUserTeamHandler")
 	}
 
-	if o.UserUserCreateHandler == nil {
-		unregistered = append(unregistered, "user.UserCreateHandler")
+	if o.AuthRefreshAuthHandler == nil {
+		unregistered = append(unregistered, "auth.RefreshAuthHandler")
 	}
 
-	if o.UserUserDeleteHandler == nil {
-		unregistered = append(unregistered, "user.UserDeleteHandler")
+	if o.ProfileShowProfileHandler == nil {
+		unregistered = append(unregistered, "profile.ShowProfileHandler")
 	}
 
-	if o.UserUserIndexHandler == nil {
-		unregistered = append(unregistered, "user.UserIndexHandler")
+	if o.TeamShowTeamHandler == nil {
+		unregistered = append(unregistered, "team.ShowTeamHandler")
 	}
 
-	if o.UserUserShowHandler == nil {
-		unregistered = append(unregistered, "user.UserShowHandler")
+	if o.UserShowUserHandler == nil {
+		unregistered = append(unregistered, "user.ShowUserHandler")
 	}
 
-	if o.UserUserTeamAppendHandler == nil {
-		unregistered = append(unregistered, "user.UserTeamAppendHandler")
+	if o.ProfileTokenProfileHandler == nil {
+		unregistered = append(unregistered, "profile.TokenProfileHandler")
 	}
 
-	if o.UserUserTeamDeleteHandler == nil {
-		unregistered = append(unregistered, "user.UserTeamDeleteHandler")
+	if o.ProfileUpdateProfileHandler == nil {
+		unregistered = append(unregistered, "profile.UpdateProfileHandler")
 	}
 
-	if o.UserUserTeamIndexHandler == nil {
-		unregistered = append(unregistered, "user.UserTeamIndexHandler")
+	if o.TeamUpdateTeamHandler == nil {
+		unregistered = append(unregistered, "team.UpdateTeamHandler")
 	}
 
-	if o.UserUserTeamPermHandler == nil {
-		unregistered = append(unregistered, "user.UserTeamPermHandler")
+	if o.UserUpdateUserHandler == nil {
+		unregistered = append(unregistered, "user.UpdateUserHandler")
 	}
 
-	if o.UserUserUpdateHandler == nil {
-		unregistered = append(unregistered, "user.UserUpdateHandler")
+	if o.AuthVerifyAuthHandler == nil {
+		unregistered = append(unregistered, "auth.VerifyAuthHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -453,122 +453,122 @@ func (o *GopadAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/auth/login"] = auth.NewAuthLogin(o.context, o.AuthAuthLoginHandler)
-
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/auth/refresh"] = auth.NewAuthRefresh(o.context, o.AuthAuthRefreshHandler)
-
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/auth/verify/{token}"] = auth.NewAuthVerify(o.context, o.AuthAuthVerifyHandler)
-
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/profile/self"] = profile.NewProfileShow(o.context, o.ProfileProfileShowHandler)
-
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/profile/token"] = profile.NewProfileToken(o.context, o.ProfileProfileTokenHandler)
-
-	if o.handlers["PUT"] == nil {
-		o.handlers["PUT"] = make(map[string]http.Handler)
-	}
-	o.handlers["PUT"]["/profile/self"] = profile.NewProfileUpdate(o.context, o.ProfileProfileUpdateHandler)
+	o.handlers["POST"]["/teams/{teamID}/users"] = team.NewAppendTeamToUser(o.context, o.TeamAppendTeamToUserHandler)
 
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/teams"] = team.NewTeamCreate(o.context, o.TeamTeamCreateHandler)
-
-	if o.handlers["DELETE"] == nil {
-		o.handlers["DELETE"] = make(map[string]http.Handler)
-	}
-	o.handlers["DELETE"]["/teams/{teamID}"] = team.NewTeamDelete(o.context, o.TeamTeamDeleteHandler)
-
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/teams"] = team.NewTeamIndex(o.context, o.TeamTeamIndexHandler)
-
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/teams/{teamID}"] = team.NewTeamShow(o.context, o.TeamTeamShowHandler)
-
-	if o.handlers["PUT"] == nil {
-		o.handlers["PUT"] = make(map[string]http.Handler)
-	}
-	o.handlers["PUT"]["/teams/{teamID}"] = team.NewTeamUpdate(o.context, o.TeamTeamUpdateHandler)
+	o.handlers["POST"]["/users/{userID}/teams"] = user.NewAppendUserToTeam(o.context, o.UserAppendUserToTeamHandler)
 
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/teams/{teamID}/users"] = team.NewTeamUserAppend(o.context, o.TeamTeamUserAppendHandler)
-
-	if o.handlers["DELETE"] == nil {
-		o.handlers["DELETE"] = make(map[string]http.Handler)
-	}
-	o.handlers["DELETE"]["/teams/{teamID}/users"] = team.NewTeamUserDelete(o.context, o.TeamTeamUserDeleteHandler)
-
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/teams/{teamID}/users"] = team.NewTeamUserIndex(o.context, o.TeamTeamUserIndexHandler)
-
-	if o.handlers["PUT"] == nil {
-		o.handlers["PUT"] = make(map[string]http.Handler)
-	}
-	o.handlers["PUT"]["/teams/{teamID}/users"] = team.NewTeamUserPerm(o.context, o.TeamTeamUserPermHandler)
+	o.handlers["POST"]["/teams"] = team.NewCreateTeam(o.context, o.TeamCreateTeamHandler)
 
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/users"] = user.NewUserCreate(o.context, o.UserUserCreateHandler)
+	o.handlers["POST"]["/users"] = user.NewCreateUser(o.context, o.UserCreateUserHandler)
 
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
-	o.handlers["DELETE"]["/users/{userID}"] = user.NewUserDelete(o.context, o.UserUserDeleteHandler)
+	o.handlers["DELETE"]["/teams/{teamID}"] = team.NewDeleteTeam(o.context, o.TeamDeleteTeamHandler)
+
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/users/{userID}"] = user.NewDeleteUser(o.context, o.UserDeleteUserHandler)
+
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/users/{userID}/teams"] = user.NewDeleteUserFromTeam(o.context, o.UserDeleteUserFromTeamHandler)
+
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/teams/{teamID}/users"] = team.NewDelteTeamFromUser(o.context, o.TeamDelteTeamFromUserHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/users"] = user.NewUserIndex(o.context, o.UserUserIndexHandler)
+	o.handlers["GET"]["/teams/{teamID}/users"] = team.NewListTeamUsers(o.context, o.TeamListTeamUsersHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/users/{userID}"] = user.NewUserShow(o.context, o.UserUserShowHandler)
+	o.handlers["GET"]["/teams"] = team.NewListTeams(o.context, o.TeamListTeamsHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/users/{userID}/teams"] = user.NewListUserTeams(o.context, o.UserListUserTeamsHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/users"] = user.NewListUsers(o.context, o.UserListUsersHandler)
 
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/users/{userID}/teams"] = user.NewUserTeamAppend(o.context, o.UserUserTeamAppendHandler)
+	o.handlers["POST"]["/auth/login"] = auth.NewLoginUser(o.context, o.AuthLoginUserHandler)
 
-	if o.handlers["DELETE"] == nil {
-		o.handlers["DELETE"] = make(map[string]http.Handler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
-	o.handlers["DELETE"]["/users/{userID}/teams"] = user.NewUserTeamDelete(o.context, o.UserUserTeamDeleteHandler)
+	o.handlers["PUT"]["/teams/{teamID}/users"] = team.NewPermitTeamUser(o.context, o.TeamPermitTeamUserHandler)
+
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/users/{userID}/teams"] = user.NewPermitUserTeam(o.context, o.UserPermitUserTeamHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/users/{userID}/teams"] = user.NewUserTeamIndex(o.context, o.UserUserTeamIndexHandler)
+	o.handlers["GET"]["/auth/refresh"] = auth.NewRefreshAuth(o.context, o.AuthRefreshAuthHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/profile/self"] = profile.NewShowProfile(o.context, o.ProfileShowProfileHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/teams/{teamID}"] = team.NewShowTeam(o.context, o.TeamShowTeamHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/users/{userID}"] = user.NewShowUser(o.context, o.UserShowUserHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/profile/token"] = profile.NewTokenProfile(o.context, o.ProfileTokenProfileHandler)
 
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
-	o.handlers["PUT"]["/users/{userID}/teams"] = user.NewUserTeamPerm(o.context, o.UserUserTeamPermHandler)
+	o.handlers["PUT"]["/profile/self"] = profile.NewUpdateProfile(o.context, o.ProfileUpdateProfileHandler)
 
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
-	o.handlers["PUT"]["/users/{userID}"] = user.NewUserUpdate(o.context, o.UserUserUpdateHandler)
+	o.handlers["PUT"]["/teams/{teamID}"] = team.NewUpdateTeam(o.context, o.TeamUpdateTeamHandler)
+
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/users/{userID}"] = user.NewUpdateUser(o.context, o.UserUpdateUserHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/auth/verify/{token}"] = auth.NewVerifyAuth(o.context, o.AuthVerifyAuthHandler)
 
 }
 

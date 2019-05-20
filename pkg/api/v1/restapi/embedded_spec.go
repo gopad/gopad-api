@@ -46,11 +46,11 @@ func init() {
           "auth"
         ],
         "summary": "Authenticate an user by credentials",
-        "operationId": "AuthLogin",
+        "operationId": "LoginUser",
         "parameters": [
           {
             "description": "The credentials to authenticate",
-            "name": "params",
+            "name": "auth",
             "in": "body",
             "required": true,
             "schema": {
@@ -98,7 +98,7 @@ func init() {
           "auth"
         ],
         "summary": "Refresh an auth token before it expires",
-        "operationId": "AuthRefresh",
+        "operationId": "RefreshAuth",
         "responses": {
           "200": {
             "description": "A refreshed token with expire",
@@ -127,7 +127,7 @@ func init() {
           "auth"
         ],
         "summary": "Verify validity for an authentication token",
-        "operationId": "AuthVerify",
+        "operationId": "VerifyAuth",
         "parameters": [
           {
             "type": "string",
@@ -165,7 +165,7 @@ func init() {
           "profile"
         ],
         "summary": "Retrieve an unlimited auth token",
-        "operationId": "ProfileShow",
+        "operationId": "ShowProfile",
         "responses": {
           "200": {
             "description": "The current profile data",
@@ -192,11 +192,11 @@ func init() {
           "profile"
         ],
         "summary": "Retrieve an unlimited auth token",
-        "operationId": "ProfileUpdate",
+        "operationId": "UpdateProfile",
         "parameters": [
           {
             "description": "The profile data to update",
-            "name": "params",
+            "name": "profile",
             "in": "body",
             "required": true,
             "schema": {
@@ -244,7 +244,7 @@ func init() {
           "profile"
         ],
         "summary": "Retrieve an unlimited auth token",
-        "operationId": "ProfileToken",
+        "operationId": "TokenProfile",
         "responses": {
           "200": {
             "description": "The unlimited auth token",
@@ -279,7 +279,7 @@ func init() {
           "team"
         ],
         "summary": "Fetch all available teams",
-        "operationId": "TeamIndex",
+        "operationId": "ListTeams",
         "responses": {
           "200": {
             "description": "A collection of teams",
@@ -309,11 +309,11 @@ func init() {
           "team"
         ],
         "summary": "Create a new team",
-        "operationId": "TeamCreate",
+        "operationId": "CreateTeam",
         "parameters": [
           {
             "description": "The team data to create",
-            "name": "params",
+            "name": "team",
             "in": "body",
             "required": true,
             "schema": {
@@ -361,7 +361,7 @@ func init() {
           "team"
         ],
         "summary": "Fetch a specific team",
-        "operationId": "TeamShow",
+        "operationId": "ShowTeam",
         "parameters": [
           {
             "type": "string",
@@ -397,7 +397,7 @@ func init() {
           "team"
         ],
         "summary": "Update a specific team",
-        "operationId": "TeamUpdate",
+        "operationId": "UpdateTeam",
         "parameters": [
           {
             "type": "string",
@@ -408,7 +408,7 @@ func init() {
           },
           {
             "description": "The team data to update",
-            "name": "params",
+            "name": "team",
             "in": "body",
             "required": true,
             "schema": {
@@ -454,7 +454,7 @@ func init() {
           "team"
         ],
         "summary": "Delete a specific team",
-        "operationId": "TeamDelete",
+        "operationId": "DeleteTeam",
         "parameters": [
           {
             "type": "string",
@@ -498,7 +498,7 @@ func init() {
           "team"
         ],
         "summary": "Fetch all users assigned to team",
-        "operationId": "TeamUserIndex",
+        "operationId": "ListTeamUsers",
         "parameters": [
           {
             "type": "string",
@@ -537,7 +537,7 @@ func init() {
           "team"
         ],
         "summary": "Update user perms for team",
-        "operationId": "TeamUserPerm",
+        "operationId": "PermitTeamUser",
         "parameters": [
           {
             "type": "string",
@@ -548,7 +548,7 @@ func init() {
           },
           {
             "description": "The team user data to update",
-            "name": "params",
+            "name": "team_user",
             "in": "body",
             "required": true,
             "schema": {
@@ -594,7 +594,7 @@ func init() {
           "team"
         ],
         "summary": "Assign a user to team",
-        "operationId": "TeamUserAppend",
+        "operationId": "AppendTeamToUser",
         "parameters": [
           {
             "type": "string",
@@ -605,7 +605,7 @@ func init() {
           },
           {
             "description": "The team user data to assign",
-            "name": "params",
+            "name": "team_user",
             "in": "body",
             "required": true,
             "schema": {
@@ -651,7 +651,7 @@ func init() {
           "team"
         ],
         "summary": "Remove a user from team",
-        "operationId": "TeamUserDelete",
+        "operationId": "DelteTeamFromUser",
         "parameters": [
           {
             "type": "string",
@@ -662,7 +662,7 @@ func init() {
           },
           {
             "description": "The team user data to delete",
-            "name": "params",
+            "name": "team_user",
             "in": "body",
             "required": true,
             "schema": {
@@ -710,7 +710,7 @@ func init() {
           "user"
         ],
         "summary": "Fetch all available users",
-        "operationId": "UserIndex",
+        "operationId": "ListUsers",
         "responses": {
           "200": {
             "description": "A collection of users",
@@ -740,11 +740,11 @@ func init() {
           "user"
         ],
         "summary": "Create a new user",
-        "operationId": "UserCreate",
+        "operationId": "CreateUser",
         "parameters": [
           {
             "description": "The user data to create",
-            "name": "params",
+            "name": "user",
             "in": "body",
             "required": true,
             "schema": {
@@ -792,7 +792,7 @@ func init() {
           "user"
         ],
         "summary": "Fetch a specific user",
-        "operationId": "UserShow",
+        "operationId": "ShowUser",
         "parameters": [
           {
             "type": "string",
@@ -828,7 +828,7 @@ func init() {
           "user"
         ],
         "summary": "Update a specific user",
-        "operationId": "UserUpdate",
+        "operationId": "UpdateUser",
         "parameters": [
           {
             "type": "string",
@@ -839,7 +839,7 @@ func init() {
           },
           {
             "description": "The user data to update",
-            "name": "params",
+            "name": "user",
             "in": "body",
             "required": true,
             "schema": {
@@ -885,7 +885,7 @@ func init() {
           "user"
         ],
         "summary": "Delete a specific user",
-        "operationId": "UserDelete",
+        "operationId": "DeleteUser",
         "parameters": [
           {
             "type": "string",
@@ -929,7 +929,7 @@ func init() {
           "user"
         ],
         "summary": "Fetch all teams assigned to user",
-        "operationId": "UserTeamIndex",
+        "operationId": "ListUserTeams",
         "parameters": [
           {
             "type": "string",
@@ -968,7 +968,7 @@ func init() {
           "user"
         ],
         "summary": "Update team perms for user",
-        "operationId": "UserTeamPerm",
+        "operationId": "PermitUserTeam",
         "parameters": [
           {
             "type": "string",
@@ -979,7 +979,7 @@ func init() {
           },
           {
             "description": "The user team data to update",
-            "name": "params",
+            "name": "user_team",
             "in": "body",
             "required": true,
             "schema": {
@@ -1025,7 +1025,7 @@ func init() {
           "user"
         ],
         "summary": "Assign a team to user",
-        "operationId": "UserTeamAppend",
+        "operationId": "AppendUserToTeam",
         "parameters": [
           {
             "type": "string",
@@ -1036,7 +1036,7 @@ func init() {
           },
           {
             "description": "The user team data to assign",
-            "name": "params",
+            "name": "user_team",
             "in": "body",
             "required": true,
             "schema": {
@@ -1082,7 +1082,7 @@ func init() {
           "user"
         ],
         "summary": "Remove a team from user",
-        "operationId": "UserTeamDelete",
+        "operationId": "DeleteUserFromTeam",
         "parameters": [
           {
             "type": "string",
@@ -1093,7 +1093,7 @@ func init() {
           },
           {
             "description": "The user team data to delete",
-            "name": "params",
+            "name": "user_team",
             "in": "body",
             "required": true,
             "schema": {
@@ -1404,11 +1404,11 @@ func init() {
           "auth"
         ],
         "summary": "Authenticate an user by credentials",
-        "operationId": "AuthLogin",
+        "operationId": "LoginUser",
         "parameters": [
           {
             "description": "The credentials to authenticate",
-            "name": "params",
+            "name": "auth",
             "in": "body",
             "required": true,
             "schema": {
@@ -1456,7 +1456,7 @@ func init() {
           "auth"
         ],
         "summary": "Refresh an auth token before it expires",
-        "operationId": "AuthRefresh",
+        "operationId": "RefreshAuth",
         "responses": {
           "200": {
             "description": "A refreshed token with expire",
@@ -1485,7 +1485,7 @@ func init() {
           "auth"
         ],
         "summary": "Verify validity for an authentication token",
-        "operationId": "AuthVerify",
+        "operationId": "VerifyAuth",
         "parameters": [
           {
             "type": "string",
@@ -1523,7 +1523,7 @@ func init() {
           "profile"
         ],
         "summary": "Retrieve an unlimited auth token",
-        "operationId": "ProfileShow",
+        "operationId": "ShowProfile",
         "responses": {
           "200": {
             "description": "The current profile data",
@@ -1550,11 +1550,11 @@ func init() {
           "profile"
         ],
         "summary": "Retrieve an unlimited auth token",
-        "operationId": "ProfileUpdate",
+        "operationId": "UpdateProfile",
         "parameters": [
           {
             "description": "The profile data to update",
-            "name": "params",
+            "name": "profile",
             "in": "body",
             "required": true,
             "schema": {
@@ -1602,7 +1602,7 @@ func init() {
           "profile"
         ],
         "summary": "Retrieve an unlimited auth token",
-        "operationId": "ProfileToken",
+        "operationId": "TokenProfile",
         "responses": {
           "200": {
             "description": "The unlimited auth token",
@@ -1637,7 +1637,7 @@ func init() {
           "team"
         ],
         "summary": "Fetch all available teams",
-        "operationId": "TeamIndex",
+        "operationId": "ListTeams",
         "responses": {
           "200": {
             "description": "A collection of teams",
@@ -1667,11 +1667,11 @@ func init() {
           "team"
         ],
         "summary": "Create a new team",
-        "operationId": "TeamCreate",
+        "operationId": "CreateTeam",
         "parameters": [
           {
             "description": "The team data to create",
-            "name": "params",
+            "name": "team",
             "in": "body",
             "required": true,
             "schema": {
@@ -1719,7 +1719,7 @@ func init() {
           "team"
         ],
         "summary": "Fetch a specific team",
-        "operationId": "TeamShow",
+        "operationId": "ShowTeam",
         "parameters": [
           {
             "type": "string",
@@ -1755,7 +1755,7 @@ func init() {
           "team"
         ],
         "summary": "Update a specific team",
-        "operationId": "TeamUpdate",
+        "operationId": "UpdateTeam",
         "parameters": [
           {
             "type": "string",
@@ -1766,7 +1766,7 @@ func init() {
           },
           {
             "description": "The team data to update",
-            "name": "params",
+            "name": "team",
             "in": "body",
             "required": true,
             "schema": {
@@ -1812,7 +1812,7 @@ func init() {
           "team"
         ],
         "summary": "Delete a specific team",
-        "operationId": "TeamDelete",
+        "operationId": "DeleteTeam",
         "parameters": [
           {
             "type": "string",
@@ -1856,7 +1856,7 @@ func init() {
           "team"
         ],
         "summary": "Fetch all users assigned to team",
-        "operationId": "TeamUserIndex",
+        "operationId": "ListTeamUsers",
         "parameters": [
           {
             "type": "string",
@@ -1895,7 +1895,7 @@ func init() {
           "team"
         ],
         "summary": "Update user perms for team",
-        "operationId": "TeamUserPerm",
+        "operationId": "PermitTeamUser",
         "parameters": [
           {
             "type": "string",
@@ -1906,7 +1906,7 @@ func init() {
           },
           {
             "description": "The team user data to update",
-            "name": "params",
+            "name": "team_user",
             "in": "body",
             "required": true,
             "schema": {
@@ -1952,7 +1952,7 @@ func init() {
           "team"
         ],
         "summary": "Assign a user to team",
-        "operationId": "TeamUserAppend",
+        "operationId": "AppendTeamToUser",
         "parameters": [
           {
             "type": "string",
@@ -1963,7 +1963,7 @@ func init() {
           },
           {
             "description": "The team user data to assign",
-            "name": "params",
+            "name": "team_user",
             "in": "body",
             "required": true,
             "schema": {
@@ -2009,7 +2009,7 @@ func init() {
           "team"
         ],
         "summary": "Remove a user from team",
-        "operationId": "TeamUserDelete",
+        "operationId": "DelteTeamFromUser",
         "parameters": [
           {
             "type": "string",
@@ -2020,7 +2020,7 @@ func init() {
           },
           {
             "description": "The team user data to delete",
-            "name": "params",
+            "name": "team_user",
             "in": "body",
             "required": true,
             "schema": {
@@ -2068,7 +2068,7 @@ func init() {
           "user"
         ],
         "summary": "Fetch all available users",
-        "operationId": "UserIndex",
+        "operationId": "ListUsers",
         "responses": {
           "200": {
             "description": "A collection of users",
@@ -2098,11 +2098,11 @@ func init() {
           "user"
         ],
         "summary": "Create a new user",
-        "operationId": "UserCreate",
+        "operationId": "CreateUser",
         "parameters": [
           {
             "description": "The user data to create",
-            "name": "params",
+            "name": "user",
             "in": "body",
             "required": true,
             "schema": {
@@ -2150,7 +2150,7 @@ func init() {
           "user"
         ],
         "summary": "Fetch a specific user",
-        "operationId": "UserShow",
+        "operationId": "ShowUser",
         "parameters": [
           {
             "type": "string",
@@ -2186,7 +2186,7 @@ func init() {
           "user"
         ],
         "summary": "Update a specific user",
-        "operationId": "UserUpdate",
+        "operationId": "UpdateUser",
         "parameters": [
           {
             "type": "string",
@@ -2197,7 +2197,7 @@ func init() {
           },
           {
             "description": "The user data to update",
-            "name": "params",
+            "name": "user",
             "in": "body",
             "required": true,
             "schema": {
@@ -2243,7 +2243,7 @@ func init() {
           "user"
         ],
         "summary": "Delete a specific user",
-        "operationId": "UserDelete",
+        "operationId": "DeleteUser",
         "parameters": [
           {
             "type": "string",
@@ -2287,7 +2287,7 @@ func init() {
           "user"
         ],
         "summary": "Fetch all teams assigned to user",
-        "operationId": "UserTeamIndex",
+        "operationId": "ListUserTeams",
         "parameters": [
           {
             "type": "string",
@@ -2326,7 +2326,7 @@ func init() {
           "user"
         ],
         "summary": "Update team perms for user",
-        "operationId": "UserTeamPerm",
+        "operationId": "PermitUserTeam",
         "parameters": [
           {
             "type": "string",
@@ -2337,7 +2337,7 @@ func init() {
           },
           {
             "description": "The user team data to update",
-            "name": "params",
+            "name": "user_team",
             "in": "body",
             "required": true,
             "schema": {
@@ -2383,7 +2383,7 @@ func init() {
           "user"
         ],
         "summary": "Assign a team to user",
-        "operationId": "UserTeamAppend",
+        "operationId": "AppendUserToTeam",
         "parameters": [
           {
             "type": "string",
@@ -2394,7 +2394,7 @@ func init() {
           },
           {
             "description": "The user team data to assign",
-            "name": "params",
+            "name": "user_team",
             "in": "body",
             "required": true,
             "schema": {
@@ -2440,7 +2440,7 @@ func init() {
           "user"
         ],
         "summary": "Remove a team from user",
-        "operationId": "UserTeamDelete",
+        "operationId": "DeleteUserFromTeam",
         "parameters": [
           {
             "type": "string",
@@ -2451,7 +2451,7 @@ func init() {
           },
           {
             "description": "The user team data to delete",
-            "name": "params",
+            "name": "user_team",
             "in": "body",
             "required": true,
             "schema": {
