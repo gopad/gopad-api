@@ -26,7 +26,7 @@ Make sure you have a working Go environment, for further reference or a guide ta
 git clone https://github.com/gopad/gopad-api.git
 cd gopad-api
 
-make sync generate build
+make generate build
 
 ./bin/gopad-api -h
 ```

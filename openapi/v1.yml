@@ -3,7 +3,7 @@ swagger: "2.0"
 info:
   description: "API definition for Gopad"
   title: "Gopad OpenAPI"
-  version: "1.0.0"
+  version: "1.0.0-alpha1"
   license:
     name: "Apache-2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -13,10 +13,6 @@ consumes:
 
 produces:
   - "application/json"
-
-schemes:
-  - "http"
-  - "https"
 
 basePath: "/api/v1"
 
@@ -41,11 +37,11 @@ paths:
         401:
           description: "Unauthorized if token is invalid"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
   /auth/refresh:
     get:
@@ -61,11 +57,11 @@ paths:
         401:
           description: "Unauthorized if failed to generate"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
   /auth/login:
     post:
@@ -96,11 +92,11 @@ paths:
         401:
           description: "Unauthorized if wrong credentials"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
   /profile/token:
     get:
@@ -116,15 +112,15 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         500:
           description: "Failed to generate a token"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
   /profile/self:
     get:
@@ -140,11 +136,11 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     put:
       summary: "Retrieve an unlimited auth token"
@@ -166,19 +162,19 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "Failed to validate request"
           schema:
-            $ref: "#/definitions/validation_error"
+            $ref: "#/responses/validation_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
   /teams:
     get:
@@ -196,11 +192,11 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     post:
       summary: "Create a new team"
@@ -222,21 +218,21 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "Failed to validate request"
           schema:
-            $ref: "#/definitions/validation_error"
+            $ref: "#/responses/validation_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
-  /teams/{teamID}:
+  /teams/{team_id}:
     get:
       summary: "Fetch a specific team"
       operationId: "ShowTeam"
@@ -244,7 +240,7 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "teamID"
+          name: "team_id"
           description: "A team UUID or slug"
           type: "string"
           required: true
@@ -256,11 +252,11 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     put:
       summary: "Update a specific team"
@@ -269,7 +265,7 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "teamID"
+          name: "team_id"
           description: "A team UUID or slug"
           type: "string"
           required: true
@@ -287,19 +283,19 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "Failed to validate request"
           schema:
-            $ref: "#/definitions/validation_error"
+            $ref: "#/responses/validation_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     delete:
       summary: "Delete a specific team"
@@ -308,7 +304,7 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "teamID"
+          name: "team_id"
           description: "A team UUID or slug"
           type: "string"
           required: true
@@ -316,21 +312,21 @@ paths:
         200:
           description: "Plain success message"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         400:
           description: "Failed to delete the team"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
-  /teams/{teamID}/users:
+  /teams/{team_id}/users:
     get:
       summary: "Fetch all users assigned to team"
       operationId: "ListTeamUsers"
@@ -338,7 +334,7 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "teamID"
+          name: "team_id"
           description: "A team UUID or slug"
           type: "string"
           required: true
@@ -352,11 +348,11 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     post:
       summary: "Assign a user to team"
@@ -365,7 +361,7 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "teamID"
+          name: "team_id"
           description: "A team UUID or slug"
           type: "string"
           required: true
@@ -379,23 +375,23 @@ paths:
         200:
           description: "Plain success message"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "User is already assigned"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     put:
       summary: "Update user perms for team"
@@ -404,7 +400,7 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "teamID"
+          name: "team_id"
           description: "A team UUID or slug"
           type: "string"
           required: true
@@ -418,23 +414,23 @@ paths:
         200:
           description: "Plain success message"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "User is not assigned"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     delete:
       summary: "Remove a user from team"
@@ -443,7 +439,7 @@ paths:
         - "team"
       parameters:
         - in: "path"
-          name: "teamID"
+          name: "team_id"
           description: "A team UUID or slug"
           type: "string"
           required: true
@@ -457,23 +453,23 @@ paths:
         200:
           description: "Plain success message"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "User is not assigned"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
   /users:
     get:
@@ -491,11 +487,11 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     post:
       summary: "Create a new user"
@@ -517,21 +513,21 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "Failed to validate request"
           schema:
-            $ref: "#/definitions/validation_error"
+            $ref: "#/responses/validation_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
-  /users/{userID}:
+  /users/{user_id}:
     get:
       summary: "Fetch a specific user"
       operationId: "ShowUser"
@@ -539,7 +535,7 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "userID"
+          name: "user_id"
           description: "A user UUID or slug"
           type: "string"
           required: true
@@ -551,11 +547,11 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     put:
       summary: "Update a specific user"
@@ -564,7 +560,7 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "userID"
+          name: "user_id"
           description: "A user UUID or slug"
           type: "string"
           required: true
@@ -582,19 +578,19 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "Failed to validate request"
           schema:
-            $ref: "#/definitions/validation_error"
+            $ref: "#/responses/validation_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     delete:
       summary: "Delete a specific user"
@@ -603,7 +599,7 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "userID"
+          name: "user_id"
           description: "A user UUID or slug"
           type: "string"
           required: true
@@ -611,21 +607,21 @@ paths:
         200:
           description: "Plain success message"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         400:
           description: "Failed to delete the user"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
-  /users/{userID}/teams:
+  /users/{user_id}/teams:
     get:
       summary: "Fetch all teams assigned to user"
       operationId: "ListUserTeams"
@@ -633,7 +629,7 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "userID"
+          name: "user_id"
           description: "A user UUID or slug"
           type: "string"
           required: true
@@ -647,11 +643,11 @@ paths:
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     post:
       summary: "Assign a team to user"
@@ -660,7 +656,7 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "userID"
+          name: "user_id"
           description: "A user UUID or slug"
           type: "string"
           required: true
@@ -674,23 +670,23 @@ paths:
         200:
           description: "Plain success message"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "Team is already assigned"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     put:
       summary: "Update team perms for user"
@@ -699,7 +695,7 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "userID"
+          name: "user_id"
           description: "A user UUID or slug"
           type: "string"
           required: true
@@ -713,23 +709,23 @@ paths:
         200:
           description: "Plain success message"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "Team is not assigned"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
     delete:
       summary: "Remove a team from user"
@@ -738,7 +734,7 @@ paths:
         - "user"
       parameters:
         - in: "path"
-          name: "userID"
+          name: "user_id"
           description: "A user UUID or slug"
           type: "string"
           required: true
@@ -752,23 +748,23 @@ paths:
         200:
           description: "Plain success message"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         403:
           description: "User is not authorized"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         412:
           description: "Failed to parse request body"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         422:
           description: "Team is not assigned"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
-            $ref: "#/definitions/general_error"
+            $ref: "#/responses/general_error"
 
 definitions:
   auth_verify:
@@ -921,33 +917,38 @@ definitions:
       perm:
         type: "string"
 
+responses:
   general_error:
-    type: "object"
-    required:
-      - "status"
-      - "message"
-    properties:
-      status:
-        type: "integer"
-      message:
-        type: "string"
+    description: General error for regular HTTP status codes
+    schema:
+      type: "object"
+      required:
+        - "status"
+        - "message"
+      properties:
+        status:
+          type: "integer"
+        message:
+          type: "string"
 
   validation_error:
-    type: "object"
-    required:
-      - "status"
-      - "message"
-    properties:
-      status:
-        type: "integer"
-      message:
-        type: "string"
-      errors:
-        type: "array"
-        items:
-          type: "object"
-          properties:
-            field:
-              type: "string"
-            message:
-              type: "string"
+    description: Validation error which shows failed fields
+    schema:
+      type: "object"
+      required:
+        - "status"
+        - "message"
+      properties:
+        status:
+          type: "integer"
+        message:
+          type: "string"
+        errors:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              field:
+                type: "string"
+              message:
+                type: "string"

@@ -10,6 +10,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+//go:generate gorunpkg github.com/go-swagger/go-swagger/cmd/swagger generate server --target . --name Gopad --spec ../../../openapi/v1.yml --exclude-main --regenerate-configureapi
+
 // API provides the http.Handler for the OpenAPI implementation.
 type API struct {
 	Handler http.Handler

@@ -16,6 +16,7 @@ type Server struct {
 	Root  string
 	Addr  string
 	Pprof bool
+	Docs  bool
 }
 
 // Metrics defines the metrics server configuration.
