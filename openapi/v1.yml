@@ -86,7 +86,7 @@ paths:
         - "auth"
       parameters:
         - in: "body"
-          name: "params"
+          name: "auth_login"
           description: "The credentials to authenticate"
           required: true
           schema:
@@ -442,7 +442,7 @@ paths:
 
     delete:
       summary: "Remove a user from team"
-      operationId: "DelteTeamFromUser"
+      operationId: "DeleteTeamFromUser"
       tags:
         - "team"
       parameters:
@@ -825,6 +825,9 @@ definitions:
         type: "string"
       username:
         type: "string"
+      password:
+        type: "string"
+        format: "password"
       email:
         type: "string"
       admin:
@@ -868,19 +871,15 @@ definitions:
       team_id:
         type: "string"
         format: "uuid"
-      # team:
-      #   type: "object"
-      #   schema:
-      #     $ref: "#/definitions/team"
       user_id:
         type: "string"
         format: "uuid"
-      # user:
-      #   type: "object"
-      #   schema:
-      #     $ref: "#/definitions/user"
       perm:
         type: "string"
+        enum:
+          - "user"
+          - "admin"
+          - "owner"
 
   user:
     type: "object"
@@ -896,6 +895,9 @@ definitions:
         type: "string"
       username:
         type: "string"
+      password:
+        type: "string"
+        format: "password"
       email:
         type: "string"
       admin:
@@ -912,30 +914,32 @@ definitions:
   team_user_params:
     type: "object"
     required:
-      - "team"
       - "user"
       - "perm"
     properties:
-      team:
-        type: "string"
       user:
         type: "string"
       perm:
         type: "string"
+        enum:
+          - "user"
+          - "admin"
+          - "owner"
 
   user_team_params:
     type: "object"
     required:
-      - "user"
       - "team"
       - "perm"
     properties:
-      user:
-        type: "string"
       team:
         type: "string"
       perm:
         type: "string"
+        enum:
+          - "user"
+          - "admin"
+          - "owner"
 
   general_error:
     description: General error for regular HTTP status codes
