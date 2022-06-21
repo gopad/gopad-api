@@ -17,6 +17,7 @@ endif
 GOBUILD ?= CGO_ENABLED=0 go build
 PACKAGES ?= $(shell go list ./...)
 SOURCES ?= $(shell find . -name "*.go" -type f)
+GENERATE ?= $(IMPORT)/pkg/api/v1
 
 TAGS ?= netgo
 
@@ -76,11 +77,8 @@ lint: $(GOLINT)
 	for PKG in $(PACKAGES); do $(GOLINT) -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate: openapi
-
-.PHONY: openapi
-openapi: $(SWAGGER)
-	$(SWAGGER) generate server --target pkg/api/v1 --name Gopad --spec openapi/v1.yml -P models.User --exclude-main --regenerate-configureapi
+generate:
+	go generate $(GENERATE)
 
 .PHONY: changelog
 changelog: $(CALENS)

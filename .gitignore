@@ -1,8 +1,5 @@
 coverage.out
 
-/pkg/api/v1/models/
-/pkg/api/v1/restapi/
-
 /bin
 /dist
 
