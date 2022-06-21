@@ -10,7 +10,7 @@ First of all we need the base definition and we need to decide if we want to bui
 
 This simply takes the currently cloned source and builds a new Docker image including all local changes.
 
-```
+```console
 docker-compose -f hack/compose/base.yml -f hack/compose/build.yml up
 ```
 
@@ -18,7 +18,7 @@ docker-compose -f hack/compose/base.yml -f hack/compose/build.yml up
 
 This simply downloads the defined Docker image from Docker Hub and starts/configures it properly.
 
-```
+```console
 docker-compose -f hack/compose/base.yml -f hack/compose/image.yml up
 ```
 
@@ -30,7 +30,7 @@ After deciding the base of it you should choose one of the supported databases. 
 
 This simply configures a named volume for the embedded BoltDB storage used as a database backend.
 
-```
+```console
 docker-compose <base from above> -f hack/compose/db/boltdb.yml up
 ```
 
@@ -38,7 +38,7 @@ docker-compose <base from above> -f hack/compose/db/boltdb.yml up
 
 This simply starts an additional container for a MariaDB instance used as a database backend.
 
-```
+```console
 docker-compose <base from above> -f hack/compose/db/mariadb.yml up
 ```
 
@@ -46,7 +46,7 @@ docker-compose <base from above> -f hack/compose/db/mariadb.yml up
 
 This simply starts an additional container for a PostgreSQL instance used as a database backend.
 
-```
+```console
 docker-compose <base from above> -f hack/compose/db/postgres.yml up
 ```
 
@@ -58,7 +58,7 @@ Finally you should also decide how to handle file uploads within the API server.
 
 This simply configures a named volume to store uploads just on a filesystem without any additional service.
 
-```
+```console
 docker-compose <db from above> -f hack/compose/upload/file.yml up
 ```
 
@@ -66,6 +66,6 @@ docker-compose <db from above> -f hack/compose/upload/file.yml up
 
 This simply starts an additional container for a Minio instance to store uploads in a S3 compatible storage.
 
-```
+```console
 docker-compose <db from above> -f hack/compose/upload/minio.yml up
 ```
