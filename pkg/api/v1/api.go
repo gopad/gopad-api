@@ -20,8 +20,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-//go:generate go run github.com/go-swagger/go-swagger/cmd/swagger generate server --target . --name Gopad --spec ../../../openapi/v1.yml -P models.User --default-scheme https --exclude-main --regenerate-configureapi
-
 // API provides the http.Handler for the OpenAPI implementation.
 type API struct {
 	Handler http.Handler
