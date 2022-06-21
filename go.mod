@@ -29,7 +29,7 @@ require (
 	github.com/rs/zerolog v1.27.0
 	github.com/spf13/viper v1.12.0
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
-	github.com/urfave/cli/v2 v2.10.1
+	github.com/urfave/cli/v2 v2.10.2
 	github.com/utahta/swagger-doc v0.0.1
 	go.etcd.io/bbolt v1.3.6
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
