@@ -1,0 +1,11 @@
+version: '3.4'
+
+volumes:
+  boltdb:
+
+services:
+  api:
+    environment:
+      - GOPAD_API_DATABASE_DSN=boltdb:///var/lib/database/gopad.db
+    volumes:
+      - boltdb:/var/lib/database

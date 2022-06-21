@@ -6,51 +6,62 @@ import (
 	"path"
 	"time"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gopad/gopad-api/pkg/config"
+	"github.com/gopad/gopad-api/pkg/metrics"
 	"github.com/gopad/gopad-api/pkg/middleware/header"
 	"github.com/gopad/gopad-api/pkg/middleware/prometheus"
-	"github.com/gopad/gopad-api/pkg/store"
+	"github.com/gopad/gopad-api/pkg/middleware/requestid"
+	"github.com/gopad/gopad-api/pkg/service/teams"
+	"github.com/gopad/gopad-api/pkg/service/users"
 	"github.com/gopad/gopad-api/pkg/upload"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
-	"github.com/utahta/swagger-doc"
+	doc "github.com/utahta/swagger-doc"
 
 	apiv1 "github.com/gopad/gopad-api/pkg/api/v1"
 	restapiv1 "github.com/gopad/gopad-api/pkg/api/v1/restapi"
 )
 
 // Server initializes the routing of the server.
-func Server(cfg *config.Config, storage store.Store, uploads upload.Upload) http.Handler {
+func Server(
+	cfg *config.Config,
+	uploads upload.Upload,
+	usersService users.Service,
+	teamsService teams.Service,
+) http.Handler {
 	mux := chi.NewRouter()
+
+	mux.Use(requestid.Handler)
+	mux.Use(middleware.Timeout(60 * time.Second))
+	mux.Use(middleware.RealIP)
+	mux.Use(header.Version)
+	mux.Use(header.Cache)
+	mux.Use(header.Secure)
+	mux.Use(header.Options)
 
 	mux.Use(hlog.NewHandler(log.Logger))
 	mux.Use(hlog.RemoteAddrHandler("ip"))
 	mux.Use(hlog.URLHandler("path"))
 	mux.Use(hlog.MethodHandler("method"))
-	mux.Use(hlog.RequestIDHandler("request_id", "Request-Id"))
 
 	mux.Use(hlog.AccessHandler(func(r *http.Request, status, size int, duration time.Duration) {
 		hlog.FromRequest(r).Debug().
+			Str("request", requestid.Get(r.Context())).
 			Str("method", r.Method).
-			Str("url", r.URL.String()).
 			Int("status", status).
 			Int("size", size).
 			Dur("duration", duration).
 			Msg("")
 	}))
 
-	mux.Use(middleware.Timeout(60 * time.Second))
-	mux.Use(middleware.RealIP)
-
-	mux.Use(header.Version)
-	mux.Use(header.Cache)
-	mux.Use(header.Secure)
-	mux.Use(header.Options)
-
 	mux.Route(cfg.Server.Root, func(root chi.Router) {
 		root.Route("/api", func(base chi.Router) {
+			if cfg.Server.Pprof {
+				base.Mount("/debug", middleware.Profiler())
+			}
+
 			base.Route("/v1", func(v1 chi.Router) {
 				if cfg.Server.Docs {
 					v1.Get("/swagger", func(w http.ResponseWriter, r *http.Request) {
@@ -67,18 +78,22 @@ func Server(cfg *config.Config, storage store.Store, uploads upload.Upload) http
 							"v1",
 							"swagger",
 						),
-						"/api/v1/docs",
+						path.Join(
+							cfg.Server.Root,
+							"/api/v1/docs",
+						),
 					))
 				}
 
-				if api := apiv1.New(); api != nil {
+				if api := apiv1.New(
+					cfg,
+					uploads,
+					usersService,
+					teamsService,
+				); api != nil {
 					v1.Mount("/", middleware.NoCache(api.Handler))
 				}
 			})
-
-			if cfg.Server.Pprof {
-				base.Mount("/debug", middleware.Profiler())
-			}
 
 			base.Handle("/storage/*", uploads.Handler(
 				path.Join(
@@ -93,8 +108,8 @@ func Server(cfg *config.Config, storage store.Store, uploads upload.Upload) http
 	return mux
 }
 
-// Metrics initializes the routing of the metrics.
-func Metrics(cfg *config.Config, storage store.Store, uploads upload.Upload) http.Handler {
+// Metrics initializes the routing of metrics and health.
+func Metrics(cfg *config.Config, metrics *metrics.Metrics) http.Handler {
 	mux := chi.NewRouter()
 
 	mux.Use(hlog.NewHandler(log.Logger))
@@ -103,16 +118,16 @@ func Metrics(cfg *config.Config, storage store.Store, uploads upload.Upload) htt
 	mux.Use(hlog.MethodHandler("method"))
 	mux.Use(hlog.RequestIDHandler("request_id", "Request-Id"))
 
+	mux.Use(requestid.Handler)
 	mux.Use(middleware.Timeout(60 * time.Second))
 	mux.Use(middleware.RealIP)
-
 	mux.Use(header.Version)
 	mux.Use(header.Cache)
 	mux.Use(header.Secure)
 	mux.Use(header.Options)
 
 	mux.Route("/", func(root chi.Router) {
-		root.Get("/metrics", prometheus.Handler(cfg.Metrics.Token))
+		root.Get("/metrics", prometheus.Handler(metrics.Registry, cfg.Metrics.Token))
 
 		root.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "text/plain")

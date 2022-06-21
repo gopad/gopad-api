@@ -1,0 +1,17 @@
+FROM arm32v6/alpine:3.16 AS build
+RUN apk add --no-cache ca-certificates mailcap
+
+FROM scratch
+
+EXPOSE 8080 8090
+VOLUME ["/var/lib/gopad"]
+ENTRYPOINT ["/usr/bin/gopad-api"]
+CMD ["server"]
+
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=build /etc/mime.types /etc/
+
+ENV GOPAD_API_DATABASE_DSN boltdb:///var/lib/gopad/database.db
+ENV GOPAD_API_UPLOAD_DSN file:///var/lib/gopad/uploads
+
+COPY bin/gopad-api /usr/bin/gopad-api

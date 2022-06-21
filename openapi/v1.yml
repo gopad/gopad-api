@@ -18,38 +18,43 @@ schemes:
   - "http"
   - "https"
 
-host: "try.gopad.tech"
+host: "try.gopad.eu"
 basePath: "/api/v1"
 
 securityDefinitions:
-  BasicAuth:
+  Basic:
     type: basic
-  HeaderAuth:
+  Header:
     type: apiKey
     in: header
     name: X-API-Key
 
+security:
+  - Basic: []
+  - Header: []
+
 paths:
-  /auth/verify/{token}:
-    get:
-      summary: "Verify validity for an authentication token"
-      operationId: "VerifyAuth"
+  /auth/login:
+    post:
+      summary: "Authenticate an user by credentials"
+      operationId: "LoginUser"
       tags:
         - "auth"
-      parameters:
-        - in: "path"
-          name: "token"
-          description: "A token that have to be checked"
-          type: "string"
-          required: true
       security: []
+      parameters:
+        - in: "body"
+          name: "auth_login"
+          description: "The credentials to authenticate"
+          required: true
+          schema:
+            $ref: "#/definitions/auth_login"
       responses:
         200:
-          description: "Meta data of the provided token"
+          description: "A generated token with expire"
           schema:
-            $ref: "#/definitions/auth_verify"
+            $ref: "#/definitions/auth_token"
         401:
-          description: "Unauthorized if token is invalid"
+          description: "Unauthorized if wrong credentials"
           schema:
             $ref: "#/definitions/general_error"
         default:
@@ -63,7 +68,6 @@ paths:
       operationId: "RefreshAuth"
       tags:
         - "auth"
-      security: []
       responses:
         200:
           description: "A refreshed token with expire"
@@ -78,27 +82,19 @@ paths:
           schema:
             $ref: "#/definitions/general_error"
 
-  /auth/login:
-    post:
-      summary: "Authenticate an user by credentials"
-      operationId: "LoginUser"
+  /auth/verify:
+    get:
+      summary: "Verify validity for an authentication token"
+      operationId: "VerifyAuth"
       tags:
         - "auth"
-      parameters:
-        - in: "body"
-          name: "auth_login"
-          description: "The credentials to authenticate"
-          required: true
-          schema:
-            $ref: "#/definitions/auth_login"
-      security: []
       responses:
         200:
-          description: "A generated token with expire"
+          description: "Meta data of the provided token"
           schema:
-            $ref: "#/definitions/auth_token"
+            $ref: "#/definitions/auth_verify"
         401:
-          description: "Unauthorized if wrong credentials"
+          description: "Unauthorized if token is invalid"
           schema:
             $ref: "#/definitions/general_error"
         default:
@@ -132,10 +128,10 @@ paths:
 
   /profile/self:
     get:
-      summary: "Retrieve an unlimited auth token"
+      summary: "Fetch profile details of the personal account"
       operationId: "ShowProfile"
       tags:
-        - profile
+        - "profile"
       responses:
         200:
           description: "The current profile data"
@@ -151,7 +147,7 @@ paths:
             $ref: "#/definitions/general_error"
 
     put:
-      summary: "Retrieve an unlimited auth token"
+      summary: "Update your own profile information"
       operationId: "UpdateProfile"
       tags:
         - "profile"
@@ -169,10 +165,6 @@ paths:
             $ref: "#/definitions/profile"
         403:
           description: "User is not authorized"
-          schema:
-            $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
           schema:
             $ref: "#/definitions/general_error"
         422:
@@ -218,6 +210,8 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/team"
+            required:
+              - "name"
       responses:
         200:
           description: "The created team data"
@@ -225,10 +219,6 @@ paths:
             $ref: "#/definitions/team"
         403:
           description: "User is not authorized"
-          schema:
-            $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
           schema:
             $ref: "#/definitions/general_error"
         422:
@@ -259,6 +249,10 @@ paths:
             $ref: "#/definitions/team"
         403:
           description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        404:
+          description: "Team not found"
           schema:
             $ref: "#/definitions/general_error"
         default:
@@ -292,8 +286,8 @@ paths:
           description: "User is not authorized"
           schema:
             $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
+        404:
+          description: "Team not found"
           schema:
             $ref: "#/definitions/general_error"
         422:
@@ -323,6 +317,10 @@ paths:
             $ref: "#/definitions/general_error"
         403:
           description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        404:
+          description: "Team not found"
           schema:
             $ref: "#/definitions/general_error"
         400:
@@ -357,6 +355,10 @@ paths:
           description: "User is not authorized"
           schema:
             $ref: "#/definitions/general_error"
+        404:
+          description: "Team not found"
+          schema:
+            $ref: "#/definitions/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
@@ -388,14 +390,18 @@ paths:
           description: "User is not authorized"
           schema:
             $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
+        404:
+          description: "Team or user not found"
           schema:
             $ref: "#/definitions/general_error"
-        422:
+        412:
           description: "User is already assigned"
           schema:
             $ref: "#/definitions/general_error"
+        422:
+          description: "Failed to validate request"
+          schema:
+            $ref: "#/definitions/validation_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
@@ -427,14 +433,18 @@ paths:
           description: "User is not authorized"
           schema:
             $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
+        404:
+          description: "Team or user not found"
           schema:
             $ref: "#/definitions/general_error"
-        422:
+        412:
           description: "User is not assigned"
           schema:
             $ref: "#/definitions/general_error"
+        422:
+          description: "Failed to validate request"
+          schema:
+            $ref: "#/definitions/validation_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
@@ -457,6 +467,8 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/team_user_params"
+            required:
+              - "user_id"
       responses:
         200:
           description: "Plain success message"
@@ -466,11 +478,11 @@ paths:
           description: "User is not authorized"
           schema:
             $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
+        404:
+          description: "Team or user not found"
           schema:
             $ref: "#/definitions/general_error"
-        422:
+        412:
           description: "User is not assigned"
           schema:
             $ref: "#/definitions/general_error"
@@ -513,6 +525,10 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/user"
+            required:
+              - "username"
+              - "password"
+              - "email"
       responses:
         200:
           description: "The created user data"
@@ -520,10 +536,6 @@ paths:
             $ref: "#/definitions/user"
         403:
           description: "User is not authorized"
-          schema:
-            $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
           schema:
             $ref: "#/definitions/general_error"
         422:
@@ -554,6 +566,10 @@ paths:
             $ref: "#/definitions/user"
         403:
           description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        404:
+          description: "User not found"
           schema:
             $ref: "#/definitions/general_error"
         default:
@@ -587,8 +603,8 @@ paths:
           description: "User is not authorized"
           schema:
             $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
+        404:
+          description: "User not found"
           schema:
             $ref: "#/definitions/general_error"
         422:
@@ -618,6 +634,10 @@ paths:
             $ref: "#/definitions/general_error"
         403:
           description: "User is not authorized"
+          schema:
+            $ref: "#/definitions/general_error"
+        404:
+          description: "User not found"
           schema:
             $ref: "#/definitions/general_error"
         400:
@@ -652,6 +672,10 @@ paths:
           description: "User is not authorized"
           schema:
             $ref: "#/definitions/general_error"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/general_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
@@ -683,14 +707,18 @@ paths:
           description: "User is not authorized"
           schema:
             $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
+        404:
+          description: "User or team not found"
           schema:
             $ref: "#/definitions/general_error"
-        422:
+        412:
           description: "Team is already assigned"
           schema:
             $ref: "#/definitions/general_error"
+        422:
+          description: "Failed to validate request"
+          schema:
+            $ref: "#/definitions/validation_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
@@ -722,14 +750,18 @@ paths:
           description: "User is not authorized"
           schema:
             $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
+        404:
+          description: "User or team not found"
           schema:
             $ref: "#/definitions/general_error"
-        422:
+        412:
           description: "Team is not assigned"
           schema:
             $ref: "#/definitions/general_error"
+        422:
+          description: "Failed to validate request"
+          schema:
+            $ref: "#/definitions/validation_error"
         default:
           description: "Some error unrelated to the handler"
           schema:
@@ -752,6 +784,8 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/user_team_params"
+            required:
+              - "team_id"
       responses:
         200:
           description: "Plain success message"
@@ -761,11 +795,11 @@ paths:
           description: "User is not authorized"
           schema:
             $ref: "#/definitions/general_error"
-        412:
-          description: "Failed to parse request body"
+        404:
+          description: "User or team not found"
           schema:
             $ref: "#/definitions/general_error"
-        422:
+        412:
           description: "Team is not assigned"
           schema:
             $ref: "#/definitions/general_error"
@@ -791,31 +825,34 @@ definitions:
     type: "object"
     required:
       - "username"
-      - "created_at"
     properties:
       username:
         type: "string"
+        readOnly: true
       created_at:
         type: "string"
         format: "date-time"
+        x-omitempty: true
+        x-nullable: true
+        readOnly: true
 
   auth_token:
     type: "object"
     required:
       - "token"
-      - "expires_at"
     properties:
       token:
         type: "string"
+        readOnly: true
       expires_at:
         type: "string"
         format: "date-time"
+        x-omitempty: true
+        x-nullable: true
+        readOnly: true
 
   profile:
     type: "object"
-    required:
-      - "username"
-      - "email"
     properties:
       id:
         type: "string"
@@ -823,28 +860,45 @@ definitions:
         readOnly: true
       slug:
         type: "string"
+        x-omitempty: true
+        x-nullable: true
       username:
         type: "string"
+        x-omitempty: true
+        x-nullable: true
       password:
         type: "string"
         format: "password"
+        x-omitempty: true
+        x-nullable: true
       email:
         type: "string"
+        x-omitempty: true
+        x-nullable: true
       admin:
         type: "boolean"
+        readOnly: true
       active:
         type: "boolean"
+        readOnly: true
       created_at:
         type: "string"
         format: "date-time"
+        readOnly: true
       updated_at:
         type: "string"
         format: "date-time"
+        readOnly: true
+      teams:
+        type: "array"
+        x-omitempty: true
+        x-nullable: true
+        readOnly: true
+        items:
+          $ref: "#/definitions/team_user"
 
   team:
     type: "object"
-    required:
-      - "name"
     properties:
       id:
         type: "string"
@@ -852,14 +906,27 @@ definitions:
         readOnly: true
       slug:
         type: "string"
+        x-omitempty: true
+        x-nullable: true
       name:
         type: "string"
+        x-omitempty: true
+        x-nullable: true
       created_at:
         type: "string"
         format: "date-time"
+        readOnly: true
       updated_at:
         type: "string"
         format: "date-time"
+        readOnly: true
+      users:
+        type: "array"
+        x-omitempty: true
+        x-nullable: true
+        readOnly: true
+        items:
+          $ref: "#/definitions/team_user"
 
   team_user:
     type: "object"
@@ -871,21 +938,34 @@ definitions:
       team_id:
         type: "string"
         format: "uuid"
+      team:
+        type: "object"
+        $ref: "#/definitions/team"
+        readOnly: true
       user_id:
         type: "string"
         format: "uuid"
+      user:
+        type: "object"
+        $ref: "#/definitions/user"
+        readOnly: true
       perm:
         type: "string"
         enum:
           - "user"
           - "admin"
           - "owner"
+      created_at:
+        type: "string"
+        format: "date-time"
+        readOnly: true
+      updated_at:
+        type: "string"
+        format: "date-time"
+        readOnly: true
 
   user:
     type: "object"
-    required:
-      - "username"
-      - "email"
     properties:
       id:
         type: "string"
@@ -893,23 +973,44 @@ definitions:
         readOnly: true
       slug:
         type: "string"
+        x-omitempty: true
+        x-nullable: true
       username:
         type: "string"
+        x-omitempty: true
+        x-nullable: true
       password:
         type: "string"
         format: "password"
+        x-omitempty: true
+        x-nullable: true
       email:
         type: "string"
+        x-omitempty: true
+        x-nullable: true
       admin:
         type: "boolean"
+        x-omitempty: true
+        x-nullable: true
       active:
         type: "boolean"
+        x-omitempty: true
+        x-nullable: true
       created_at:
         type: "string"
         format: "date-time"
+        readOnly: true
       updated_at:
         type: "string"
         format: "date-time"
+        readOnly: true
+      teams:
+        type: "array"
+        x-omitempty: true
+        x-nullable: true
+        readOnly: true
+        items:
+          $ref: "#/definitions/team_user"
 
   team_user_params:
     type: "object"
