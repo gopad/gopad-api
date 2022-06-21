@@ -58,7 +58,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: |
@@ -124,7 +124,7 @@ jobs:
 
       - name: Hub tags
         id: hubTags
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: gopad/gopad-api
@@ -147,7 +147,7 @@ jobs:
 
       - name: Quay tags
         id: quayTags
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: quay.io/gopad/gopad-api
