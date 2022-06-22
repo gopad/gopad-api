@@ -112,12 +112,6 @@ func Server(
 func Metrics(cfg *config.Config, metrics *metrics.Metrics) http.Handler {
 	mux := chi.NewRouter()
 
-	mux.Use(hlog.NewHandler(log.Logger))
-	mux.Use(hlog.RemoteAddrHandler("ip"))
-	mux.Use(hlog.URLHandler("path"))
-	mux.Use(hlog.MethodHandler("method"))
-	mux.Use(hlog.RequestIDHandler("request_id", "Request-Id"))
-
 	mux.Use(requestid.Handler)
 	mux.Use(middleware.Timeout(60 * time.Second))
 	mux.Use(middleware.RealIP)
