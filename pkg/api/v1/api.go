@@ -54,7 +54,7 @@ func New(
 	api.AuthRefreshAuthHandler = RefreshAuthHandler(cfg)
 	api.AuthVerifyAuthHandler = VerifyAuthHandler()
 
-	api.ProfileTokenProfileHandler = TokenProfileHandler(cfg, uploads)
+	api.ProfileTokenProfileHandler = TokenProfileHandler(cfg)
 	api.ProfileUpdateProfileHandler = UpdateProfileHandler(usersService)
 	api.ProfileShowProfileHandler = ShowProfileHandler(usersService)
 

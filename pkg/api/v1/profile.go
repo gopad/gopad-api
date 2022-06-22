@@ -9,12 +9,11 @@ import (
 	"github.com/gopad/gopad-api/pkg/config"
 	"github.com/gopad/gopad-api/pkg/service/users"
 	"github.com/gopad/gopad-api/pkg/token"
-	"github.com/gopad/gopad-api/pkg/upload"
 	"github.com/gopad/gopad-api/pkg/validate"
 )
 
 // TokenProfileHandler implements the handler for the ProfileTokenProfile operation.
-func TokenProfileHandler(cfg *config.Config, uploads upload.Upload) profile.TokenProfileHandlerFunc {
+func TokenProfileHandler(cfg *config.Config) profile.TokenProfileHandlerFunc {
 	return func(params profile.TokenProfileParams, principal *models.User) middleware.Responder {
 		result, err := token.New(*principal.Username).Unlimited(cfg.Session.Secret)
 
