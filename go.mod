@@ -32,7 +32,7 @@ require (
 	github.com/urfave/cli/v2 v2.10.2
 	github.com/utahta/swagger-doc v0.0.1
 	go.etcd.io/bbolt v1.3.6
-	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	golang.org/x/net v0.0.0-20220621193019-9d032be2e588
 	gorm.io/driver/mysql v1.3.4
 	gorm.io/driver/postgres v1.3.7
