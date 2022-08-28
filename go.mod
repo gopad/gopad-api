@@ -26,7 +26,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0
-	github.com/rs/zerolog v1.27.0
+	github.com/rs/zerolog v1.28.0
 	github.com/spf13/viper v1.12.0
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/urfave/cli/v2 v2.11.2
