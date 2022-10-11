@@ -2,20 +2,20 @@
 
 // Package restapi Gopad OpenAPI
 //
-//	API definition for Gopad
-//	Schemes:
-//	  http
-//	  https
-//	Host: try.gopad.eu
-//	BasePath: /api/v1
-//	Version: 1.0.0-alpha1
-//	License: Apache-2.0 http://www.apache.org/licenses/LICENSE-2.0.html
+//  API definition for Gopad
+//  Schemes:
+//    http
+//    https
+//  Host: try.gopad.eu
+//  BasePath: /api/v1
+//  Version: 1.0.0-alpha1
+//  License: Apache-2.0 http://www.apache.org/licenses/LICENSE-2.0.html
 //
-//	Consumes:
-//	  - application/json
+//  Consumes:
+//    - application/json
 //
-//	Produces:
-//	  - application/json
+//  Produces:
+//    - application/json
 //
 // swagger:meta
 package restapi
