@@ -6,7 +6,8 @@ import (
 	"fmt"
 
 	"github.com/Machiel/slugify"
-	"github.com/asaskevich/govalidator"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/google/uuid"
 	"github.com/gopad/gopad-api/pkg/model"
 	"github.com/gopad/gopad-api/pkg/service/teams"
@@ -254,7 +255,7 @@ func (t *Teams) AppendUser(ctx context.Context, teamID, userID, perm string) err
 		Perm:   perm,
 	}
 
-	if err := t.validatePerm(record); err != nil {
+	if err := t.validatePerm(record.Perm); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -283,7 +284,7 @@ func (t *Teams) PermitUser(ctx context.Context, teamID, userID, perm string) err
 	record := &model.TeamUser{}
 	record.Perm = perm
 
-	if err := t.validatePerm(record); err != nil {
+	if err := t.validatePerm(record.Perm); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -358,31 +359,25 @@ func (t *Teams) isUnassignedFromUser(teamID, userID string) bool {
 func (t *Teams) validateCreate(record *model.Team) error {
 	errs := validate.Errors{}
 
-	if ok := govalidator.IsByteLength(record.Slug, 3, 255); !ok {
+	if err := validation.Validate(
+		record.Slug,
+		validation.Length(3, 255),
+		validation.By(t.uniqueValueIsPresent("slug", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "slug",
-			Error: fmt.Errorf("is not between 3 and 255 characters long"),
+			Error: err,
 		})
 	}
 
-	if t.uniqueValueIsPresent("slug", record.Slug, record.ID) {
-		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "slug",
-			Error: fmt.Errorf("is already taken"),
-		})
-	}
-
-	if ok := govalidator.IsByteLength(record.Name, 3, 255); !ok {
+	if err := validation.Validate(
+		record.Name,
+		validation.Length(3, 255),
+		validation.By(t.uniqueValueIsPresent("name", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "name",
-			Error: fmt.Errorf("is not between 3 and 255 characters long"),
-		})
-	}
-
-	if t.uniqueValueIsPresent("name", record.Name, record.ID) {
-		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "name",
-			Error: fmt.Errorf("is already taken"),
+			Error: err,
 		})
 	}
 
@@ -396,38 +391,37 @@ func (t *Teams) validateCreate(record *model.Team) error {
 func (t *Teams) validateUpdate(record *model.Team) error {
 	errs := validate.Errors{}
 
-	if ok := govalidator.IsUUIDv4(record.ID); !ok {
+	if err := validation.Validate(
+		record.ID,
+		validation.Required,
+		is.UUIDv4,
+		validation.By(t.uniqueValueIsPresent("id", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "id",
-			Error: fmt.Errorf("is not a valid uuid v4"),
+			Error: err,
 		})
 	}
 
-	if ok := govalidator.IsByteLength(record.Slug, 3, 255); !ok {
+	if err := validation.Validate(
+		record.Slug,
+		validation.Length(3, 255),
+		validation.By(t.uniqueValueIsPresent("slug", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "slug",
-			Error: fmt.Errorf("is not between 3 and 255 characters long"),
+			Error: err,
 		})
 	}
 
-	if t.uniqueValueIsPresent("slug", record.Slug, record.ID) {
-		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "slug",
-			Error: fmt.Errorf("is already taken"),
-		})
-	}
-
-	if ok := govalidator.IsByteLength(record.Name, 3, 255); !ok {
+	if err := validation.Validate(
+		record.Name,
+		validation.Length(3, 255),
+		validation.By(t.uniqueValueIsPresent("name", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "name",
-			Error: fmt.Errorf("is not between 3 and 255 characters long"),
-		})
-	}
-
-	if t.uniqueValueIsPresent("name", record.Name, record.ID) {
-		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "name",
-			Error: fmt.Errorf("is already taken"),
+			Error: err,
 		})
 	}
 
@@ -438,8 +432,11 @@ func (t *Teams) validateUpdate(record *model.Team) error {
 	return nil
 }
 
-func (t *Teams) validatePerm(record *model.TeamUser) error {
-	if ok := govalidator.IsIn(record.Perm, "user", "admin", "owner"); !ok {
+func (t *Teams) validatePerm(perm string) error {
+	if err := validation.Validate(
+		perm,
+		validation.In("user", "admin", "owner"),
+	); err != nil {
 		return validate.Errors{
 			Errors: []validate.Error{
 				{
@@ -453,16 +450,24 @@ func (t *Teams) validatePerm(record *model.TeamUser) error {
 	return nil
 }
 
-func (t *Teams) uniqueValueIsPresent(key, val, id string) bool {
-	res := t.client.handle.Where(
-		fmt.Sprintf("%s = ?", key),
-		val,
-	).Not(
-		"id = ?",
-		id,
-	).Find(
-		&model.Team{},
-	)
+func (t *Teams) uniqueValueIsPresent(key, id string) func(value interface{}) error {
+	return func(value interface{}) error {
+		val, _ := value.(string)
 
-	return res.RowsAffected != 0
+		res := t.client.handle.Where(
+			fmt.Sprintf("%s = ?", key),
+			val,
+		).Not(
+			"id = ?",
+			id,
+		).Find(
+			&model.Team{},
+		)
+
+		if res.RowsAffected != 0 {
+			return errors.New("is already taken")
+		}
+
+		return nil
+	}
 }

@@ -7,7 +7,8 @@ import (
 	"strings"
 
 	"github.com/Machiel/slugify"
-	"github.com/asaskevich/govalidator"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/google/uuid"
 	"github.com/gopad/gopad-api/pkg/model"
 	"github.com/gopad/gopad-api/pkg/service/users"
@@ -323,7 +324,7 @@ func (u *Users) AppendTeam(ctx context.Context, userID, teamID, perm string) err
 		Perm:   perm,
 	}
 
-	if err := u.validatePerm(record); err != nil {
+	if err := u.validatePerm(record.Perm); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -352,7 +353,7 @@ func (u *Users) PermitTeam(ctx context.Context, userID, teamID, perm string) err
 	record := &model.TeamUser{}
 	record.Perm = perm
 
-	if err := u.validatePerm(record); err != nil {
+	if err := u.validatePerm(record.Perm); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -427,52 +428,48 @@ func (u *Users) isUnassignedFromTeam(userID, teamID string) bool {
 func (u *Users) validateCreate(record *model.User) error {
 	errs := validate.Errors{}
 
-	if ok := govalidator.IsByteLength(record.Slug, 3, 255); !ok {
+	if err := validation.Validate(
+		record.Slug,
+		validation.Length(3, 255),
+		validation.By(u.uniqueValueIsPresent("slug", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "slug",
-			Error: fmt.Errorf("is not between 3 and 255 characters long"),
+			Error: err,
 		})
 	}
 
-	if u.uniqueValueIsPresent("slug", record.Slug, record.ID) {
-		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "slug",
-			Error: fmt.Errorf("is already taken"),
-		})
-	}
-
-	if ok := govalidator.IsEmail(record.Email); !ok {
-		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "email",
-			Error: fmt.Errorf("is not valid"),
-		})
-	}
-
-	if u.uniqueValueIsPresent("email", record.Email, record.ID) {
-		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "email",
-			Error: fmt.Errorf("is already taken"),
-		})
-	}
-
-	if ok := govalidator.IsByteLength(record.Username, 3, 255); !ok {
+	if err := validation.Validate(
+		record.Username,
+		validation.Length(3, 255),
+		validation.By(u.uniqueValueIsPresent("username", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "username",
-			Error: fmt.Errorf("is not between 3 and 255 characters long"),
+			Error: err,
 		})
 	}
 
-	if u.uniqueValueIsPresent("username", record.Username, record.ID) {
+	if err := validation.Validate(
+		record.Email,
+		validation.Length(3, 255),
+		is.EmailFormat,
+		validation.By(u.uniqueValueIsPresent("email", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "username",
-			Error: fmt.Errorf("is already taken"),
+			Field: "email",
+			Error: err,
 		})
 	}
 
-	if ok := govalidator.IsByteLength(record.Password, 3, 255); !ok {
+	if err := validation.Validate(
+		record.Password,
+		validation.Required,
+		validation.Length(3, 255),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "password",
-			Error: fmt.Errorf("is not between 3 and 255 characters long"),
+			Error: err,
 		})
 	}
 
@@ -486,52 +483,49 @@ func (u *Users) validateCreate(record *model.User) error {
 func (u *Users) validateUpdate(record *model.User) error {
 	errs := validate.Errors{}
 
-	if ok := govalidator.IsUUIDv4(record.ID); !ok {
+	if err := validation.Validate(
+		record.ID,
+		validation.Required,
+		is.UUIDv4,
+		validation.By(u.uniqueValueIsPresent("id", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "id",
-			Error: fmt.Errorf("is not a valid uuid v4"),
+			Error: err,
 		})
 	}
 
-	if ok := govalidator.IsByteLength(record.Slug, 3, 255); !ok {
+	if err := validation.Validate(
+		record.Slug,
+		validation.Length(3, 255),
+		validation.By(u.uniqueValueIsPresent("slug", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "slug",
-			Error: fmt.Errorf("is not between 3 and 255 characters long"),
+			Error: err,
 		})
 	}
 
-	if u.uniqueValueIsPresent("slug", record.Slug, record.ID) {
-		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "slug",
-			Error: fmt.Errorf("is already taken"),
-		})
-	}
-
-	if ok := govalidator.IsEmail(record.Email); !ok {
-		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "email",
-			Error: fmt.Errorf("is not valid"),
-		})
-	}
-
-	if u.uniqueValueIsPresent("email", record.Email, record.ID) {
-		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "email",
-			Error: fmt.Errorf("is already taken"),
-		})
-	}
-
-	if ok := govalidator.IsByteLength(record.Username, 3, 255); !ok {
+	if err := validation.Validate(
+		record.Username,
+		validation.Length(3, 255),
+		validation.By(u.uniqueValueIsPresent("username", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "username",
-			Error: fmt.Errorf("is not between 3 and 255 characters long"),
+			Error: err,
 		})
 	}
 
-	if u.uniqueValueIsPresent("username", record.Username, record.ID) {
+	if err := validation.Validate(
+		record.Email,
+		validation.Length(3, 255),
+		is.EmailFormat,
+		validation.By(u.uniqueValueIsPresent("email", record.ID)),
+	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
-			Field: "username",
-			Error: fmt.Errorf("is already taken"),
+			Field: "email",
+			Error: err,
 		})
 	}
 
@@ -542,8 +536,11 @@ func (u *Users) validateUpdate(record *model.User) error {
 	return nil
 }
 
-func (u *Users) validatePerm(record *model.TeamUser) error {
-	if ok := govalidator.IsIn(record.Perm, "user", "admin", "owner"); !ok {
+func (u *Users) validatePerm(perm string) error {
+	if err := validation.Validate(
+		perm,
+		validation.In("user", "admin", "owner"),
+	); err != nil {
 		return validate.Errors{
 			Errors: []validate.Error{
 				{
@@ -557,16 +554,24 @@ func (u *Users) validatePerm(record *model.TeamUser) error {
 	return nil
 }
 
-func (u *Users) uniqueValueIsPresent(key, val, id string) bool {
-	res := u.client.handle.Where(
-		fmt.Sprintf("%s = ?", key),
-		val,
-	).Not(
-		"id = ?",
-		id,
-	).Find(
-		&model.User{},
-	)
+func (u *Users) uniqueValueIsPresent(key, id string) func(value interface{}) error {
+	return func(value interface{}) error {
+		val, _ := value.(string)
 
-	return res.RowsAffected != 0
+		res := u.client.handle.Where(
+			fmt.Sprintf("%s = ?", key),
+			val,
+		).Not(
+			"id = ?",
+			id,
+		).Find(
+			&model.User{},
+		)
+
+		if res.RowsAffected != 0 {
+			return errors.New("is already taken")
+		}
+
+		return nil
+	}
 }
