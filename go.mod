@@ -33,7 +33,7 @@ require (
 	github.com/utahta/swagger-doc v0.0.1
 	go.etcd.io/bbolt v1.3.6
 	golang.org/x/crypto v0.0.0-20221012134737-56aed061732a
-	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b
+	golang.org/x/net v0.0.0-20221017152216-f25eb7ecb193
 	gorm.io/driver/mysql v1.4.3
 	gorm.io/driver/postgres v1.4.4
 	gorm.io/gorm v1.24.0
