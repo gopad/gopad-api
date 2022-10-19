@@ -80,7 +80,7 @@ generate:
 	go generate $(PACKAGES)
 
 .PHONY: mocks
-mocks:
+mocks: \
 	pkg/upload/mock.go pkg/store/mock.go \
 	pkg/service/users/repository/mock.go \
 	pkg/service/teams/repository/mock.go \
