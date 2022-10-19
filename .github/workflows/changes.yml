@@ -21,7 +21,7 @@ jobs:
         id: golang
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18.1
+          go-version: 1.19.2
 
       - name: Run changelog
         id: changelog
@@ -52,7 +52,7 @@ jobs:
         id: golang
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18.1
+          go-version: 1.19.2
 
       - name: Run generate
         id: generate
@@ -65,7 +65,7 @@ jobs:
           author_name: GitHub Actions
           author_email: github@gopad.eu
           add: |
-            pkg/api/v1
+            **/mock.go
           message: Automated generate update
           push: true
           commit: --signoff
