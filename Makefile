@@ -76,7 +76,11 @@ lint: $(GOLINT)
 	for PKG in $(PACKAGES); do $(GOLINT) -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate: \
+generate:
+	go generate $(PACKAGES)
+
+.PHONY: mocks
+mocks:
 	pkg/upload/mock.go pkg/store/mock.go \
 	pkg/service/users/repository/mock.go \
 	pkg/service/teams/repository/mock.go \
