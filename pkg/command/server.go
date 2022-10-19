@@ -13,18 +13,24 @@ import (
 	"github.com/gopad/gopad-api/pkg/metrics"
 	"github.com/gopad/gopad-api/pkg/middleware/requestid"
 	"github.com/gopad/gopad-api/pkg/router"
+	"github.com/gopad/gopad-api/pkg/service/members"
+	membersRepository "github.com/gopad/gopad-api/pkg/service/members/repository"
 	"github.com/gopad/gopad-api/pkg/service/teams"
+	teamsRepository "github.com/gopad/gopad-api/pkg/service/teams/repository"
 	"github.com/gopad/gopad-api/pkg/service/users"
+	usersRepository "github.com/gopad/gopad-api/pkg/service/users/repository"
 	"github.com/oklog/run"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
 // Server provides the sub-command to start the server.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:   "server",
-		Usage:  "start integrated server",
+		Usage:  "Start integrated server",
 		Flags:  serverFlags(cfg),
 		Action: serverAction(cfg),
 	}
@@ -32,6 +38,13 @@ func Server(cfg *config.Config) *cli.Command {
 
 func serverFlags(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
+		&cli.BoolFlag{
+			Name:        "debug-pprof",
+			Value:       false,
+			Usage:       "Enable pprof debugging",
+			EnvVars:     []string{"GOPAD_API_DEBUG_PPROF"},
+			Destination: &cfg.Metrics.Pprof,
+		},
 		&cli.StringFlag{
 			Name:        "metrics-addr",
 			Value:       defaultMetricsAddr,
@@ -45,6 +58,7 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 			Usage:       "Token to make metrics secure",
 			EnvVars:     []string{"GOPAD_API_METRICS_TOKEN"},
 			Destination: &cfg.Metrics.Token,
+			FilePath:    "/etc/gopad/secrets/metrics-token",
 		},
 		&cli.StringFlag{
 			Name:        "server-addr",
@@ -52,20 +66,6 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 			Usage:       "Address to bind the server",
 			EnvVars:     []string{"GOPAD_API_SERVER_ADDR"},
 			Destination: &cfg.Server.Addr,
-		},
-		&cli.BoolFlag{
-			Name:        "server-pprof",
-			Value:       false,
-			Usage:       "Enable pprof debugging",
-			EnvVars:     []string{"GOPAD_API_SERVER_PPROF"},
-			Destination: &cfg.Server.Pprof,
-		},
-		&cli.BoolFlag{
-			Name:        "server-docs",
-			Value:       true,
-			Usage:       "Enable swagger documentation",
-			EnvVars:     []string{"GOPAD_API_SERVER_DOCS"},
-			Destination: &cfg.Server.Docs,
 		},
 		&cli.StringFlag{
 			Name:        "server-host",
@@ -82,11 +82,26 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Server.Root,
 		},
 		&cli.StringFlag{
+			Name:        "server-cert",
+			Value:       "",
+			Usage:       "Path to SSL cert",
+			EnvVars:     []string{"GOPAD_API_SERVER_CERT"},
+			Destination: &cfg.Server.Cert,
+		},
+		&cli.StringFlag{
+			Name:        "server-key",
+			Value:       "",
+			Usage:       "Path to SSL key",
+			EnvVars:     []string{"GOPAD_API_SERVER_KEY"},
+			Destination: &cfg.Server.Key,
+		},
+		&cli.StringFlag{
 			Name:        "database-dsn",
-			Value:       "boltdb://storage/gopad.db",
+			Value:       "sqlite3://storage/gopad.db",
 			Usage:       "Database dsn",
 			EnvVars:     []string{"GOPAD_API_DATABASE_DSN"},
 			Destination: &cfg.Database.DSN,
+			FilePath:    "/etc/gopad/secrets/database-dsn",
 		},
 		&cli.StringFlag{
 			Name:        "upload-dsn",
@@ -94,6 +109,7 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 			Usage:       "Uploads dsn",
 			EnvVars:     []string{"GOPAD_API_UPLOAD_DSN"},
 			Destination: &cfg.Upload.DSN,
+			FilePath:    "/etc/gopad/secrets/upload-dsn",
 		},
 		&cli.DurationFlag{
 			Name:        "session-expire",
@@ -108,6 +124,7 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 			Usage:       "Session encryption secret",
 			EnvVars:     []string{"GOPAD_API_SESSION_SECRET"},
 			Destination: &cfg.Session.Secret,
+			FilePath:    "/etc/gopad/secrets/session-secret",
 		},
 		&cli.BoolFlag{
 			Name:        "admin-create",
@@ -122,6 +139,7 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 			Usage:       "Initial admin username",
 			EnvVars:     []string{"GOPAD_API_ADMIN_USERNAME"},
 			Destination: &cfg.Admin.Username,
+			FilePath:    "/etc/gopad/secrets/admin-username",
 		},
 		&cli.StringFlag{
 			Name:        "admin-password",
@@ -129,6 +147,7 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 			Usage:       "Initial admin password",
 			EnvVars:     []string{"GOPAD_API_ADMIN_PASSWORD"},
 			Destination: &cfg.Admin.Password,
+			FilePath:    "/etc/gopad/secrets/admin-password",
 		},
 		&cli.StringFlag{
 			Name:        "admin-email",
@@ -136,6 +155,7 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 			Usage:       "Initial admin email",
 			EnvVars:     []string{"GOPAD_API_ADMIN_EMAIL"},
 			Destination: &cfg.Admin.Email,
+			FilePath:    "/etc/gopad/secrets/admin-email",
 		},
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
@@ -265,44 +285,85 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 			}
 		}
 
-		metrics := metrics.New()
-
-		teamsService := teams.NewTracingService(
-			teams.NewMetricsService(
-				teams.NewLoggingService(
-					teams.NewService(
-						storage.Teams(),
-					),
-					requestid.Get,
-				),
-				metrics,
-			),
-			requestid.Get,
-		)
-
-		usersService := users.NewTracingService(
-			users.NewMetricsService(
-				users.NewLoggingService(
-					users.NewService(
-						storage.Users(),
-					),
-					requestid.Get,
-				),
-				metrics,
-			),
-			requestid.Get,
-		)
-
-		var gr run.Group
+		metricz := metrics.New()
+		gr := run.Group{}
 
 		{
+			routing := router.Server(
+				cfg,
+				uploads,
+			)
+
+			usersRepo := usersRepository.NewTracingRepository(
+				usersRepository.NewMetricsRepository(
+					usersRepository.NewLoggingRepository(
+						usersRepository.NewGormRepository(
+							storage.Handle(),
+						),
+						requestid.Get,
+					),
+					metricz,
+				),
+				requestid.Get,
+			)
+
+			users.RegisterServer(
+				cfg,
+				uploads,
+				metricz,
+				usersRepo,
+				routing,
+			)
+
+			teamsRepo := teamsRepository.NewTracingRepository(
+				teamsRepository.NewMetricsRepository(
+					teamsRepository.NewLoggingRepository(
+						teamsRepository.NewGormRepository(
+							storage.Handle(),
+						),
+						requestid.Get,
+					),
+					metricz,
+				),
+				requestid.Get,
+			)
+
+			teams.RegisterServer(
+				cfg,
+				uploads,
+				metricz,
+				teamsRepo,
+				routing,
+			)
+
+			membersRepo := membersRepository.NewTracingRepository(
+				membersRepository.NewMetricsRepository(
+					membersRepository.NewLoggingRepository(
+						membersRepository.NewGormRepository(
+							storage.Handle(),
+							teamsRepo,
+							usersRepo,
+						),
+						requestid.Get,
+					),
+					metricz,
+				),
+				requestid.Get,
+			)
+
+			members.RegisterServer(
+				cfg,
+				uploads,
+				metricz,
+				membersRepo,
+				routing,
+			)
+
 			server := &http.Server{
 				Addr: cfg.Server.Addr,
-				Handler: router.Server(
-					cfg,
-					uploads,
-					usersService,
-					teamsService,
+				Handler: h2c.NewHandler(
+					routing,
+					&http2.Server{},
 				),
 				ReadTimeout:  5 * time.Second,
 				WriteTimeout: 10 * time.Second,
@@ -312,6 +373,13 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 				log.Info().
 					Str("addr", cfg.Server.Addr).
 					Msg("starting http server")
+
+				if cfg.Server.Cert != "" && cfg.Server.Key != "" {
+					return server.ListenAndServeTLS(
+						cfg.Server.Cert,
+						cfg.Server.Key,
+					)
+				}
 
 				return server.ListenAndServe()
 			}, func(reason error) {
@@ -333,11 +401,16 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 		}
 
 		{
+			routing := router.Metrics(
+				cfg,
+				metricz,
+			)
+
 			server := &http.Server{
 				Addr: cfg.Metrics.Addr,
-				Handler: router.Metrics(
-					cfg,
-					metrics,
+				Handler: h2c.NewHandler(
+					routing,
+					&http2.Server{},
 				),
 				ReadTimeout:  5 * time.Second,
 				WriteTimeout: 10 * time.Second,

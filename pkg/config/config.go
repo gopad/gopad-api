@@ -29,17 +29,18 @@ type Session struct {
 
 // Server defines the webserver configuration.
 type Server struct {
-	Host  string `mapstructure:"host"`
-	Root  string `mapstructure:"root"`
-	Addr  string `mapstructure:"addr"`
-	Pprof bool   `mapstructure:"pprof"`
-	Docs  bool   `mapstructure:"docs"`
+	Host string `mapstructure:"host"`
+	Root string `mapstructure:"root"`
+	Addr string `mapstructure:"addr"`
+	Cert string `mapstructure:"cert"`
+	Key  string `mapstructure:"key"`
 }
 
 // Metrics defines the metrics server configuration.
 type Metrics struct {
 	Addr  string `mapstructure:"addr"`
 	Token string `mapstructure:"token"`
+	Pprof bool   `mapstructure:"pprof"`
 }
 
 // Tracing defines the tracing client configuration.

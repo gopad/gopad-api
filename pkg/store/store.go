@@ -1,9 +1,8 @@
 package store
 
 import (
-	"github.com/gopad/gopad-api/pkg/service/teams"
-	"github.com/gopad/gopad-api/pkg/service/users"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 var (
@@ -16,10 +15,10 @@ type Store interface {
 	Info() map[string]interface{}
 	Prepare() error
 	Open() error
+
 	Close() error
 	Ping() error
 	Migrate() error
 	Admin(string, string, string) error
-	Teams() teams.Store
-	Users() users.Store
+	Handle() *gorm.DB
 }

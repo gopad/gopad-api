@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	defaultMetricsAddr   = "0.0.0.0:8090"
+	defaultMetricsAddr   = "0.0.0.0:8000"
 	defaultServerAddress = "0.0.0.0:8080"
 )
 
@@ -92,6 +92,7 @@ func globalBefore(cfg *config.Config) cli.BeforeFunc {
 
 func globalCommands(cfg *config.Config) []*cli.Command {
 	return []*cli.Command{
+		Gen(cfg),
 		Server(cfg),
 		Health(cfg),
 	}

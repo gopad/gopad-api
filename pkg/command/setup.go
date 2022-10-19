@@ -8,17 +8,12 @@ import (
 
 	"github.com/gopad/gopad-api/pkg/config"
 	"github.com/gopad/gopad-api/pkg/store"
-	"github.com/gopad/gopad-api/pkg/store/boltdb"
-	"github.com/gopad/gopad-api/pkg/store/gormdb"
 	"github.com/gopad/gopad-api/pkg/upload"
-	"github.com/gopad/gopad-api/pkg/upload/file"
-	"github.com/gopad/gopad-api/pkg/upload/s3"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"github.com/uber/jaeger-client-go"
-	tracecfg "github.com/uber/jaeger-client-go/config"
 )
 
 func setupConfig(cfg *config.Config) error {
@@ -132,11 +127,11 @@ func setupUploads(cfg *config.Config) (upload.Upload, error) {
 
 	switch parsed.Scheme {
 	case "file":
-		return file.New(cfg.Upload)
+		return upload.NewFileUpload(cfg.Upload)
 	case "s3":
-		return s3.New(cfg.Upload)
+		return upload.NewS3Upload(cfg.Upload)
 	case "minio":
-		return s3.New(cfg.Upload)
+		return upload.NewS3Upload(cfg.Upload)
 	}
 
 	return nil, upload.ErrUnknownDriver
@@ -150,12 +145,12 @@ func setupStorage(cfg *config.Config) (store.Store, error) {
 	}
 
 	switch parsed.Scheme {
-	case "boltdb":
-		return boltdb.New(cfg.Database)
+	case "sqlite", "sqlite3":
+		return store.NewGormStore(cfg.Database)
 	case "mysql", "mariadb":
-		return gormdb.New(cfg.Database)
+		return store.NewGormStore(cfg.Database)
 	case "postgres", "postgresql":
-		return gormdb.New(cfg.Database)
+		return store.NewGormStore(cfg.Database)
 	}
 
 	return nil, store.ErrUnknownDriver

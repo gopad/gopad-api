@@ -1,0 +1,17 @@
+---
+version: v1
+
+managed:
+  enabled: true
+  go_package_prefix:
+    default: github.com/gopad/gopad-api/pkg/service
+
+plugins:
+  - name: go
+    out: pkg/service
+    opt: paths=source_relative
+  - name: connect-go
+    out: pkg/service
+    opt: paths=source_relative
+
+...

@@ -15,7 +15,6 @@ func Health(cfg *config.Config) *cli.Command {
 		Name:   "health",
 		Usage:  "Perform health checks",
 		Flags:  healthFlags(cfg),
-		Before: healthBefore(cfg),
 		Action: healthAction(cfg),
 	}
 }
@@ -29,13 +28,6 @@ func healthFlags(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GOPAD_API_METRICS_ADDR"},
 			Destination: &cfg.Metrics.Addr,
 		},
-	}
-}
-
-func healthBefore(cfg *config.Config) cli.BeforeFunc {
-	return func(c *cli.Context) error {
-		setupLogger(cfg)
-		return setupConfig(cfg)
 	}
 }
 

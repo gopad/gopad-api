@@ -26,12 +26,12 @@ docker-compose -f hack/compose/base.yml -f hack/compose/image.yml up
 
 After deciding the base of it you should choose one of the supported databases. Here we got currently the following options so far.
 
-### BoltDB
+### SQLite
 
-This simply configures a named volume for the embedded BoltDB storage used as a database backend.
+This simply configures a named volume for the SQLite storage used as a database backend.
 
 ```console
-docker-compose <base from above> -f hack/compose/db/boltdb.yml up
+docker-compose <base from above> -f hack/compose/db/sqlite.yml up
 ```
 
 ### MariaDB

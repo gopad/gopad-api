@@ -11,5 +11,5 @@ type Team struct {
 	Name      string `storm:"unique" gorm:"unique;length:255"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Users     []*TeamUser
+	Users     []*Member
 }
