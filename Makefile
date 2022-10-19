@@ -16,7 +16,7 @@ endif
 
 GOBUILD ?= CGO_ENABLED=0 go build
 PACKAGES ?= $(shell go list ./...)
-SOURCES ?= $(shell find . -name "*.go" -type f)
+SOURCES ?= $(shell find . -name "*.go" -type f -not -iname mock.go)
 
 TAGS ?= netgo
 
