@@ -1,7 +1,6 @@
 package command
 
 import (
-	"io"
 	"net/url"
 	"os"
 	"strings"
@@ -13,7 +12,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"github.com/uber/jaeger-client-go"
 )
 
 func setupConfig(cfg *config.Config) error {
@@ -85,36 +83,6 @@ func setupLogger(cfg *config.Config) {
 				NoColor: !cfg.Logs.Color,
 			},
 		)
-	}
-}
-
-func setupTracing(cfg *config.Config) (io.Closer, error) {
-	switch {
-	case cfg.Tracing.Enabled:
-		closer, err := tracecfg.Configuration{
-			Sampler: &tracecfg.SamplerConfig{
-				Type:  jaeger.SamplerTypeConst,
-				Param: 1,
-			},
-			Reporter: &tracecfg.ReporterConfig{
-				LocalAgentHostPort: cfg.Tracing.Endpoint,
-			},
-		}.InitGlobalTracer("gopad-api")
-
-		if err != nil {
-			return nil, err
-		}
-
-		log.Info().
-			Str("addr", cfg.Tracing.Endpoint).
-			Msg("application tracing is enabled")
-
-		return closer, nil
-	default:
-		log.Info().
-			Msg("application tracing is disabled")
-
-		return nil, nil
 	}
 }
 

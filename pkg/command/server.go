@@ -157,37 +157,11 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Admin.Email,
 			FilePath:    "/etc/gopad/secrets/admin-email",
 		},
-		&cli.BoolFlag{
-			Name:        "tracing-enabled",
-			Value:       false,
-			Usage:       "Enable open tracing",
-			EnvVars:     []string{"GOPAD_API_TRACING_ENABLED"},
-			Destination: &cfg.Tracing.Enabled,
-		},
-		&cli.StringFlag{
-			Name:        "tracing-endpoint",
-			Value:       "",
-			Usage:       "Open tracing endpoint",
-			EnvVars:     []string{"GOPAD_API_TRACING_ENDPOINT"},
-			Destination: &cfg.Tracing.Endpoint,
-		},
 	}
 }
 
 func serverAction(cfg *config.Config) cli.ActionFunc {
 	return func(c *cli.Context) error {
-		tracing, err := setupTracing(cfg)
-
-		if err != nil {
-			log.Fatal().
-				Err(err).
-				Msg("failed to setup tracing")
-		}
-
-		if tracing != nil {
-			defer tracing.Close()
-		}
-
 		uploads, err := setupUploads(cfg)
 
 		if err != nil {
@@ -294,17 +268,14 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 				uploads,
 			)
 
-			usersRepo := usersRepository.NewTracingRepository(
-				usersRepository.NewMetricsRepository(
-					usersRepository.NewLoggingRepository(
-						usersRepository.NewGormRepository(
-							storage.Handle(),
-						),
-						requestid.Get,
+			usersRepo := usersRepository.NewMetricsRepository(
+				usersRepository.NewLoggingRepository(
+					usersRepository.NewGormRepository(
+						storage.Handle(),
 					),
-					metricz,
+					requestid.Get,
 				),
-				requestid.Get,
+				metricz,
 			)
 
 			users.RegisterServer(
@@ -315,17 +286,14 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 				routing,
 			)
 
-			teamsRepo := teamsRepository.NewTracingRepository(
-				teamsRepository.NewMetricsRepository(
-					teamsRepository.NewLoggingRepository(
-						teamsRepository.NewGormRepository(
-							storage.Handle(),
-						),
-						requestid.Get,
+			teamsRepo := teamsRepository.NewMetricsRepository(
+				teamsRepository.NewLoggingRepository(
+					teamsRepository.NewGormRepository(
+						storage.Handle(),
 					),
-					metricz,
+					requestid.Get,
 				),
-				requestid.Get,
+				metricz,
 			)
 
 			teams.RegisterServer(
@@ -336,19 +304,16 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 				routing,
 			)
 
-			membersRepo := membersRepository.NewTracingRepository(
-				membersRepository.NewMetricsRepository(
-					membersRepository.NewLoggingRepository(
-						membersRepository.NewGormRepository(
-							storage.Handle(),
-							teamsRepo,
-							usersRepo,
-						),
-						requestid.Get,
+			membersRepo := membersRepository.NewMetricsRepository(
+				membersRepository.NewLoggingRepository(
+					membersRepository.NewGormRepository(
+						storage.Handle(),
+						teamsRepo,
+						usersRepo,
 					),
-					metricz,
+					requestid.Get,
 				),
-				requestid.Get,
+				metricz,
 			)
 
 			members.RegisterServer(

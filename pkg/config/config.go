@@ -43,12 +43,6 @@ type Metrics struct {
 	Pprof bool   `mapstructure:"pprof"`
 }
 
-// Tracing defines the tracing client configuration.
-type Tracing struct {
-	Enabled  bool   `mapstructure:"enabled"`
-	Endpoint string `mapstructure:"endpoint"`
-}
-
 // Admin defines the initial admin user configuration.
 type Admin struct {
 	Create   bool   `mapstructure:"create"`
@@ -66,7 +60,6 @@ type Config struct {
 	Session  Session  `mapstructure:"session"`
 	Server   Server   `mapstructure:"server"`
 	Metrics  Metrics  `mapstructure:"metrics"`
-	Tracing  Tracing  `mapstructure:"tracing"`
 	Admin    Admin    `mapstructure:"admins"`
 }
 
