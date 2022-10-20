@@ -15,7 +15,7 @@ import (
 // List implements the UsersServiceHandler interface.
 func (s *UsersServer) List(
 	ctx context.Context,
-	req *connect.Request[users.ListRequest],
+	_ *connect.Request[users.ListRequest],
 ) (*connect.Response[users.ListResponse], error) {
 	// if !current.Admin {
 	// 	return nil, connect.NewError(

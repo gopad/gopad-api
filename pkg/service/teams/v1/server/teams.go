@@ -15,7 +15,7 @@ import (
 // List implements the TeamsServiceHandler interface.
 func (s *TeamsServer) List(
 	ctx context.Context,
-	req *connect.Request[teams.ListRequest],
+	_ *connect.Request[teams.ListRequest],
 ) (*connect.Response[teams.ListResponse], error) {
 	// if !current.Admin {
 	// 	return nil, connect.NewError(

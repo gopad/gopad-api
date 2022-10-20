@@ -30,7 +30,7 @@ type GormRepository struct {
 func (r *GormRepository) List(ctx context.Context) ([]*model.User, error) {
 	records := make([]*model.User, 0)
 
-	if err := r.query().Find(
+	if err := r.query(ctx).Find(
 		&records,
 	).Error; err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (r *GormRepository) List(ctx context.Context) ([]*model.User, error) {
 
 // Create implements the UsersRepository interface.
 func (r *GormRepository) Create(ctx context.Context, user *model.User) (*model.User, error) {
-	tx := r.handle.Begin()
+	tx := r.handle.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	if user.Slug == "" {
@@ -54,7 +54,7 @@ func (r *GormRepository) Create(ctx context.Context, user *model.User) (*model.U
 
 	user.ID = uuid.New().String()
 
-	if err := r.validate(user, false); err != nil {
+	if err := r.validate(ctx, user, false); err != nil {
 		return nil, err
 	}
 
@@ -71,7 +71,7 @@ func (r *GormRepository) Create(ctx context.Context, user *model.User) (*model.U
 
 // Update implements the UsersRepository interface.
 func (r *GormRepository) Update(ctx context.Context, user *model.User) (*model.User, error) {
-	tx := r.handle.Begin()
+	tx := r.handle.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	if user.Slug == "" {
@@ -82,7 +82,7 @@ func (r *GormRepository) Update(ctx context.Context, user *model.User) (*model.U
 		)
 	}
 
-	if err := r.validate(user, true); err != nil {
+	if err := r.validate(ctx, user, true); err != nil {
 		return nil, err
 	}
 
@@ -101,7 +101,7 @@ func (r *GormRepository) Update(ctx context.Context, user *model.User) (*model.U
 func (r *GormRepository) Show(ctx context.Context, name string) (*model.User, error) {
 	record := &model.User{}
 
-	err := r.query().Where(
+	err := r.query(ctx).Where(
 		"id = ?",
 		name,
 	).Or(
@@ -120,7 +120,7 @@ func (r *GormRepository) Show(ctx context.Context, name string) (*model.User, er
 
 // Delete implements the UsersRepository interface.
 func (r *GormRepository) Delete(ctx context.Context, name string) error {
-	tx := r.handle.Begin()
+	tx := r.handle.WithContext(ctx).Begin()
 	defer tx.Rollback()
 
 	if err := tx.Where(
@@ -140,7 +140,7 @@ func (r *GormRepository) Delete(ctx context.Context, name string) error {
 
 // Exists implements the UsersRepository interface.
 func (r *GormRepository) Exists(ctx context.Context, name string) (bool, error) {
-	res := r.query().Where(
+	res := r.query(ctx).Where(
 		"id = ?",
 		name,
 	).Or(
@@ -161,7 +161,7 @@ func (r *GormRepository) Exists(ctx context.Context, name string) (bool, error) 
 	return res.RowsAffected > 0, nil
 }
 
-func (r *GormRepository) validate(record *model.User, existing bool) error {
+func (r *GormRepository) validate(ctx context.Context, record *model.User, existing bool) error {
 	errs := validate.Errors{}
 
 	if existing {
@@ -169,7 +169,7 @@ func (r *GormRepository) validate(record *model.User, existing bool) error {
 			record.ID,
 			validation.Required,
 			is.UUIDv4,
-			validation.By(r.uniqueValueIsPresent("id", record.ID)),
+			validation.By(r.uniqueValueIsPresent(ctx, "id", record.ID)),
 		); err != nil {
 			errs.Errors = append(errs.Errors, validate.Error{
 				Field: "id",
@@ -182,7 +182,7 @@ func (r *GormRepository) validate(record *model.User, existing bool) error {
 		record.Slug,
 		validation.Required,
 		validation.Length(3, 255),
-		validation.By(r.uniqueValueIsPresent("slug", record.ID)),
+		validation.By(r.uniqueValueIsPresent(ctx, "slug", record.ID)),
 	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "slug",
@@ -194,7 +194,7 @@ func (r *GormRepository) validate(record *model.User, existing bool) error {
 		record.Username,
 		validation.Required,
 		validation.Length(3, 255),
-		validation.By(r.uniqueValueIsPresent("username", record.ID)),
+		validation.By(r.uniqueValueIsPresent(ctx, "username", record.ID)),
 	); err != nil {
 		errs.Errors = append(errs.Errors, validate.Error{
 			Field: "username",
@@ -209,11 +209,11 @@ func (r *GormRepository) validate(record *model.User, existing bool) error {
 	return nil
 }
 
-func (r *GormRepository) uniqueValueIsPresent(key, id string) func(value interface{}) error {
+func (r *GormRepository) uniqueValueIsPresent(ctx context.Context, key, id string) func(value interface{}) error {
 	return func(value interface{}) error {
 		val, _ := value.(string)
 
-		res := r.handle.Where(
+		res := r.handle.WithContext(ctx).Where(
 			fmt.Sprintf("%s = ?", key),
 			val,
 		).Not(
@@ -231,8 +231,10 @@ func (r *GormRepository) uniqueValueIsPresent(key, id string) func(value interfa
 	}
 }
 
-func (r *GormRepository) query() *gorm.DB {
-	return r.handle.Order(
+func (r *GormRepository) query(ctx context.Context) *gorm.DB {
+	return r.handle.WithContext(
+		ctx,
+	).Order(
 		"username ASC",
 	).Model(
 		&model.User{},

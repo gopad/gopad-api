@@ -42,7 +42,7 @@ func Run() error {
 	return app.Run(os.Args)
 }
 
-func authorList(cfg *config.Config) []*cli.Author {
+func authorList(_ *config.Config) []*cli.Author {
 	return []*cli.Author{
 		{
 			Name:  "Thomas Boerger",

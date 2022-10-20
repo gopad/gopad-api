@@ -29,7 +29,7 @@ func Gen(cfg *config.Config) *cli.Command {
 	}
 }
 
-func genFlags(cfg *config.Config) []cli.Flag {
+func genFlags(_ *config.Config) []cli.Flag {
 	return []cli.Flag{}
 }
 
@@ -49,7 +49,7 @@ func GenCert(cfg *config.Config) *cli.Command {
 	}
 }
 
-func genCertFlags(cfg *config.Config) []cli.Flag {
+func genCertFlags(_ *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringSliceFlag{
 			Name:    "cert-host",
@@ -102,7 +102,7 @@ func genCertFlags(cfg *config.Config) []cli.Flag {
 	}
 }
 
-func genCertAction(cfg *config.Config) cli.ActionFunc {
+func genCertAction(_ *config.Config) cli.ActionFunc {
 	return func(c *cli.Context) error {
 		priv, err := parseEcdsaCurve(c)
 

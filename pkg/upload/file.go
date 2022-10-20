@@ -9,6 +9,7 @@ import (
 
 	"github.com/gopad/gopad-api/pkg/config"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // FileUpload implements the Upload interface.
@@ -43,11 +44,21 @@ func (u *FileUpload) Close() error {
 
 // Upload stores an attachment within the defined S3 bucket.
 func (u *FileUpload) Upload(path, ctype string, content []byte) error {
+	log.Debug().
+		Str("path", path).
+		Str("ctype", ctype).
+		Bytes("content", content).
+		Msg("Upload")
+
 	return nil
 }
 
 // Delete removes an attachment from the defined S3 bucket.
 func (u *FileUpload) Delete(path string) error {
+	log.Debug().
+		Str("path", path).
+		Msg("Delete")
+
 	return nil
 }
 

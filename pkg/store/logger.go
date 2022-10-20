@@ -42,7 +42,7 @@ func (l *GormLogger) Error(_ context.Context, msg string, data ...interface{}) {
 }
 
 // Trace implements the logger.Interface.
-func (l *GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
+func (l *GormLogger) Trace(_ context.Context, begin time.Time, fc func() (string, int64), err error) {
 	elapsed := time.Since(begin)
 
 	if err != nil && !errors.Is(err, logger.ErrRecordNotFound) {
