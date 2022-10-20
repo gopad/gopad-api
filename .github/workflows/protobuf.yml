@@ -29,11 +29,14 @@ jobs:
       - name: Run linting
         id: linting
         uses: bufbuild/buf-lint-action@v1.0.2
+        with:
+          input: proto/
 
       - name: Run breaking
         id: breaking
         uses: bufbuild/buf-breaking-action@v1.1.1
         with:
+          input: proto/
           against: https://github.com/${{ github.repository }}.git#branch=master
 
       - name: Buf publish
@@ -41,6 +44,7 @@ jobs:
         uses: bufbuild/buf-push-action@v1.0.1
         if: github.event_name != 'pull_request'
         with:
+          input: proto/
           buf_token: ${{ secrets.BUF_TOKEN }}
 
 ...
