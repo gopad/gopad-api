@@ -1,0 +1,46 @@
+---
+name: protobuf
+
+"on":
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  protobuf:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout source
+        id: source
+        uses: actions/checkout@v3
+
+      - name: Setup buf
+        id: buf
+        uses: bufbuild/buf-setup-action@v1.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run linting
+        id: linting
+        uses: bufbuild/buf-lint-action@v1.0.2
+
+      - name: Run breaking
+        id: breaking
+        uses: bufbuild/buf-breaking-action@v1.1.1
+        with:
+          against: https://github.com/${{ github.repository }}.git#branch=master
+
+      - name: Buf publish
+        id: publish
+        uses: bufbuild/buf-push-action@v1.0.1
+        if: github.event_name != 'pull_request'
+        with:
+          buf_token: ${{ secrets.BUF_TOKEN }}
+
+...
