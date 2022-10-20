@@ -1,6 +1,5 @@
 syntax = "proto3";
 package members.v1;
-option go_package = "github.com/gopad/gopad-api/pkg/service/members/v1;members";
 
 import "google/protobuf/timestamp.proto";
 

@@ -1,6 +1,5 @@
 syntax = "proto3";
 package teams.v1;
-option go_package = "github.com/gopad/gopad-api/pkg/service/teams/v1;teams";
 
 import "google/protobuf/timestamp.proto";
 
