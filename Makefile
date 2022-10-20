@@ -72,7 +72,7 @@ staticcheck: $(STATICCHECK)
 	$(STATICCHECK) -tags '$(TAGS)' $(PACKAGES)
 
 .PHONY: lint
-lint: $(GOLINT)
+lint: $(REVIVE)
 	for PKG in $(PACKAGES); do $(REVIVE) -config revive.toml -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
