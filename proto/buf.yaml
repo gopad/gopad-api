@@ -2,7 +2,8 @@
 version: v1
 name: buf.build/gopad/api
 
-deps: []
+deps:
+  - buf.build/googleapis/googleapis
 
 build:
   excludes:

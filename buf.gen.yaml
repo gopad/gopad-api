@@ -7,16 +7,18 @@ managed:
     default: github.com/gopad/gopad-api/pkg/service
 
 plugins:
-  - name: go
-    out: pkg/service
-    opt:
-      - paths=source_relative
-  - name: connect-go
+  - remote: buf.build/bufbuild/plugins/connect-go:v1.1.0-1
     out: pkg/service
     opt:
       - paths=source_relative
 
-  - name: doc
+  - remote: buf.build/library/plugins/go:v1.27.1-1
+    out: pkg/service
+    opt:
+      - paths=source_relative
+
+  - # remote: buf.build/webhippie/plugins/protoc-gen-doc
+    name: doc
     out: proto
     strategy: all
     opt:
