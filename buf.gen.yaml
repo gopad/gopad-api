@@ -9,9 +9,17 @@ managed:
 plugins:
   - name: go
     out: pkg/service
-    opt: paths=source_relative
+    opt:
+      - paths=source_relative
   - name: connect-go
     out: pkg/service
-    opt: paths=source_relative
+    opt:
+      - paths=source_relative
+
+  - name: doc
+    out: proto
+    strategy: all
+    opt:
+      - markdown,README.md
 
 ...
