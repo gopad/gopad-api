@@ -24,9 +24,6 @@
             buf
             gnumake
             grpcurl
-            protobuf
-            protoc-gen-connect-go
-            protoc-gen-go
           ];
 
           shellHook = ''
