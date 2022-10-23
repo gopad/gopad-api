@@ -29,12 +29,6 @@ $(CALENS): $(BINGO_DIR)/calens.mod
 	@echo "(re)installing $(GOBIN)/calens-v0.2.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=calens.mod -o=$(GOBIN)/calens-v0.2.0 "github.com/restic/calens"
 
-GOLINT := $(GOBIN)/golint-v0.0.0-20210508222113-6edffad5e616
-$(GOLINT): $(BINGO_DIR)/golint.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/golint-v0.0.0-20210508222113-6edffad5e616"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=golint.mod -o=$(GOBIN)/golint-v0.0.0-20210508222113-6edffad5e616 "golang.org/x/lint/golint"
-
 MOCKGEN := $(GOBIN)/mockgen-v1.6.0
 $(MOCKGEN): $(BINGO_DIR)/mockgen.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
