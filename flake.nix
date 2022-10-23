@@ -23,6 +23,7 @@
           buildInputs = with pkgs; [
             buf
             gnumake
+            go_1_19
             grpcurl
           ];
 

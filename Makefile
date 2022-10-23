@@ -165,7 +165,6 @@ release-windows: $(DIST) \
 $(DIST)/$(EXECUTABLE)-$(OUTPUT)-windows-4.0-%.exe:
 	GOOS=windows GOARCH=$* $(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
 
-
 .PHONY: release-reduce
 release-reduce:
 	cd $(DIST); $(foreach file,$(wildcard $(DIST)/$(EXECUTABLE)-*),upx $(notdir $(file));)
