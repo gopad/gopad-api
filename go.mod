@@ -23,7 +23,7 @@ require (
 	github.com/prometheus/client_golang v1.13.1
 	github.com/rs/zerolog v1.28.0
 	github.com/spf13/viper v1.13.0
-	github.com/urfave/cli/v2 v2.23.2
+	github.com/urfave/cli/v2 v2.23.4
 	golang.org/x/net v0.1.0
 	google.golang.org/protobuf v1.28.1
 	gorm.io/driver/mysql v1.4.3
