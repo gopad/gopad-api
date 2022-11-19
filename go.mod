@@ -8,7 +8,7 @@ require (
 	github.com/bufbuild/connect-go v1.1.0
 	github.com/bufbuild/connect-grpchealth-go v1.0.0
 	github.com/bufbuild/connect-grpcreflect-go v1.0.0
-	github.com/cenkalti/backoff/v4 v4.1.3
+	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/dchest/uniuri v1.2.0
 	github.com/glebarez/sqlite v1.5.0
 	github.com/go-chi/chi/v5 v5.0.7
