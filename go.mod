@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Machiel/slugify v1.0.1
-	github.com/aws/aws-sdk-go v1.44.154
+	github.com/aws/aws-sdk-go v1.44.155
 	github.com/bufbuild/connect-go v1.3.2
 	github.com/bufbuild/connect-grpchealth-go v1.0.0
 	github.com/bufbuild/connect-grpcreflect-go v1.0.0
