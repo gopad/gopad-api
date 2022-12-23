@@ -8,7 +8,7 @@ name: changes
 
 jobs:
   changelog:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source
@@ -39,7 +39,7 @@ jobs:
           commit: --signoff
 
   mocks:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source

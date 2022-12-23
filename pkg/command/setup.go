@@ -14,49 +14,15 @@ import (
 	"github.com/spf13/viper"
 )
 
-func setupConfig(cfg *config.Config) error {
-	if cfg.File != "" {
-		viper.SetConfigFile(cfg.File)
-	} else {
-		viper.SetConfigName("api")
-
-		viper.AddConfigPath("/etc/gopad")
-		viper.AddConfigPath("$HOME/.gopad")
-		viper.AddConfigPath("./config")
-	}
-
-	if err := viper.ReadInConfig(); err != nil {
-		switch err.(type) {
-		case viper.ConfigFileNotFoundError:
-			log.Info().
-				Msg("continue without config")
-		case viper.UnsupportedConfigError:
-			log.Fatal().
-				Err(err).
-				Msg("unsupported config type")
-
-			return err
-		default:
-			log.Fatal().
-				Err(err).
-				Msg("failed to read config")
-
-			return err
-		}
-	}
-
-	if err := viper.Unmarshal(&cfg); err != nil {
-		log.Fatal().
-			Err(err).
-			Msg("failed to parse config")
-
+func setup(cfg *config.Config) error {
+	if err := setupLogger(cfg); err != nil {
 		return err
 	}
 
-	return nil
+	return setupConfig(cfg)
 }
 
-func setupLogger(cfg *config.Config) {
+func setupLogger(cfg *config.Config) error {
 	switch strings.ToLower(cfg.Logs.Level) {
 	case "panic":
 		zerolog.SetGlobalLevel(zerolog.PanicLevel)
@@ -84,6 +50,50 @@ func setupLogger(cfg *config.Config) {
 			},
 		)
 	}
+
+	return nil
+}
+
+func setupConfig(cfg *config.Config) error {
+	if cfg.File != "" {
+		viper.SetConfigFile(cfg.File)
+	} else {
+		viper.SetConfigName("api")
+
+		viper.AddConfigPath("/etc/gopad")
+		viper.AddConfigPath("$HOME/.gopad")
+		viper.AddConfigPath("./config")
+	}
+
+	if err := viper.ReadInConfig(); err != nil {
+		switch err.(type) {
+		case viper.ConfigFileNotFoundError:
+			log.Info().
+				Msg("Continue without config")
+		case viper.UnsupportedConfigError:
+			log.Fatal().
+				Err(err).
+				Msg("Unsupported config type")
+
+			return err
+		default:
+			log.Fatal().
+				Err(err).
+				Msg("Failed to read config")
+
+			return err
+		}
+	}
+
+	if err := viper.Unmarshal(&cfg); err != nil {
+		log.Fatal().
+			Err(err).
+			Msg("Failed to parse config")
+
+		return err
+	}
+
+	return nil
 }
 
 func setupUploads(cfg *config.Config) (upload.Upload, error) {

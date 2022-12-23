@@ -31,12 +31,13 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:   "server",
 		Usage:  "Start integrated server",
-		Flags:  serverFlags(cfg),
-		Action: serverAction(cfg),
+		Flags:  ServerFlags(cfg),
+		Action: ServerAction(cfg),
 	}
 }
 
-func serverFlags(cfg *config.Config) []cli.Flag {
+// ServerFlags defines server flags.
+func ServerFlags(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.BoolFlag{
 			Name:        "debug-pprof",
@@ -160,21 +161,22 @@ func serverFlags(cfg *config.Config) []cli.Flag {
 	}
 }
 
-func serverAction(cfg *config.Config) cli.ActionFunc {
+// ServerAction defines server action.
+func ServerAction(cfg *config.Config) cli.ActionFunc {
 	return func(c *cli.Context) error {
 		uploads, err := setupUploads(cfg)
 
 		if err != nil {
 			log.Fatal().
 				Err(err).
-				Msg("failed to setup uploads")
+				Msg("Failed to setup uploads")
 
 			return err
 		}
 
 		log.Info().
 			Fields(uploads.Info()).
-			Msg("preparing uploads")
+			Msg("Preparing uploads")
 
 		if uploads != nil {
 			defer uploads.Close()
@@ -185,14 +187,14 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 		if err != nil {
 			log.Fatal().
 				Err(err).
-				Msg("failed to setup database")
+				Msg("Failed to setup database")
 
 			return err
 		}
 
 		log.Info().
 			Fields(storage.Info()).
-			Msg("preparing database")
+			Msg("Preparing database")
 
 		if storage != nil {
 			defer storage.Close()
@@ -204,12 +206,12 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 			func(err error, dur time.Duration) {
 				log.Warn().
 					Dur("retry", dur).
-					Msg("database open failed")
+					Msg("Database open failed")
 			},
 		); err != nil {
 			log.Fatal().
 				Err(err).
-				Msg("giving up to connect to db")
+				Msg("Giving up to connect to db")
 
 			return err
 		}
@@ -220,12 +222,12 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 			func(err error, dur time.Duration) {
 				log.Warn().
 					Dur("retry", dur).
-					Msg("database ping failed")
+					Msg("Database ping failed")
 			},
 		); err != nil {
 			log.Fatal().
 				Err(err).
-				Msg("giving up to ping the db")
+				Msg("Giving up to ping the db")
 
 			return err
 		}
@@ -233,7 +235,7 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 		if err := storage.Migrate(); err != nil {
 			log.Fatal().
 				Err(err).
-				Msg("failed to migrate database")
+				Msg("Failed to migrate database")
 		}
 
 		if cfg.Admin.Create {
@@ -249,13 +251,13 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 					Str("username", cfg.Admin.Username).
 					Str("password", cfg.Admin.Password).
 					Str("email", cfg.Admin.Email).
-					Msg("failed to create admin")
+					Msg("Failed to create admin")
 			} else {
 				log.Info().
 					Str("username", cfg.Admin.Username).
 					Str("password", cfg.Admin.Password).
 					Str("email", cfg.Admin.Email).
-					Msg("admin successfully stored")
+					Msg("Admin successfully stored")
 			}
 		}
 
@@ -337,7 +339,7 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 			gr.Add(func() error {
 				log.Info().
 					Str("addr", cfg.Server.Addr).
-					Msg("starting http server")
+					Msg("Starting HTTP server")
 
 				if cfg.Server.Cert != "" && cfg.Server.Key != "" {
 					return server.ListenAndServeTLS(
@@ -354,14 +356,14 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 				if err := server.Shutdown(ctx); err != nil {
 					log.Error().
 						Err(err).
-						Msg("failed to shutdown http gracefully")
+						Msg("Failed to shutdown HTTP gracefully")
 
 					return
 				}
 
 				log.Info().
 					Err(reason).
-					Msg("http shutdown gracefully")
+					Msg("HTTP shutdown gracefully")
 			})
 		}
 
@@ -384,7 +386,7 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 			gr.Add(func() error {
 				log.Info().
 					Str("addr", cfg.Metrics.Addr).
-					Msg("starting metrics server")
+					Msg("Starting metrics server")
 
 				return server.ListenAndServe()
 			}, func(reason error) {
@@ -394,14 +396,14 @@ func serverAction(cfg *config.Config) cli.ActionFunc {
 				if err := server.Shutdown(ctx); err != nil {
 					log.Error().
 						Err(err).
-						Msg("failed to shutdown metrics gracefully")
+						Msg("Failed to shutdown metrics gracefully")
 
 					return
 				}
 
 				log.Info().
 					Err(reason).
-					Msg("metrics shutdown gracefully")
+					Msg("Metrics shutdown gracefully")
 			})
 		}
 

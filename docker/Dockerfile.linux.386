@@ -3,7 +3,7 @@ RUN apk add --no-cache ca-certificates mailcap
 
 FROM scratch
 
-EXPOSE 8080 8090
+EXPOSE 8000 8080
 VOLUME ["/var/lib/gopad"]
 ENTRYPOINT ["/usr/bin/gopad-api"]
 CMD ["server"]

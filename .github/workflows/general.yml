@@ -10,8 +10,8 @@ name: general
       - master
 
 jobs:
-  general:
-    runs-on: ubuntu-20.04
+  testing:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source

@@ -24,16 +24,12 @@ func Gen(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:        "gen",
 		Usage:       "Generate required stuff",
-		Flags:       genFlags(cfg),
-		Subcommands: genCommands(cfg),
+		Subcommands: GenCommands(cfg),
 	}
 }
 
-func genFlags(_ *config.Config) []cli.Flag {
-	return []cli.Flag{}
-}
-
-func genCommands(cfg *config.Config) []*cli.Command {
+// GenCommands defines gen-related sub-commands.
+func GenCommands(cfg *config.Config) []*cli.Command {
 	return []*cli.Command{
 		GenCert(cfg),
 	}
@@ -44,12 +40,13 @@ func GenCert(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:   "cert",
 		Usage:  "Generate SSL certificates",
-		Flags:  genCertFlags(cfg),
-		Action: genCertAction(cfg),
+		Flags:  GenCertFlags(cfg),
+		Action: GenCertAction(cfg),
 	}
 }
 
-func genCertFlags(_ *config.Config) []cli.Flag {
+// GenCertFlags defines gen cert flags.
+func GenCertFlags(_ *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringSliceFlag{
 			Name:    "cert-host",
@@ -102,7 +99,8 @@ func genCertFlags(_ *config.Config) []cli.Flag {
 	}
 }
 
-func genCertAction(_ *config.Config) cli.ActionFunc {
+// GenCertAction defines gen cert action.
+func GenCertAction(_ *config.Config) cli.ActionFunc {
 	return func(c *cli.Context) error {
 		priv, err := parseEcdsaCurve(c)
 

@@ -5,19 +5,21 @@ managed:
   enabled: true
   go_package_prefix:
     default: github.com/gopad/gopad-api/pkg/service
+    except:
+      - buf.build/googleapis/googleapis
 
 plugins:
-  - remote: buf.build/bufbuild/plugins/connect-go:v1.1.0-1
+  - plugin: buf.build/bufbuild/connect-go
     out: pkg/service
     opt:
       - paths=source_relative
 
-  - remote: buf.build/library/plugins/go:v1.27.1-1
+  - plugin: buf.build/protocolbuffers/go
     out: pkg/service
     opt:
       - paths=source_relative
 
-  - remote: buf.build/webhippie/plugins/protoc-gen-doc:v1.5.1-1
+  - plugin: buf.build/community/pseudomuto-doc
     out: proto
     opt:
       - markdown,README.md
