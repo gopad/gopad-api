@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Machiel/slugify v1.0.1
-	github.com/aws/aws-sdk-go v1.44.195
+	github.com/aws/aws-sdk-go v1.44.196
 	github.com/bufbuild/connect-go v1.5.1
 	github.com/bufbuild/connect-grpchealth-go v1.0.0
 	github.com/bufbuild/connect-grpcreflect-go v1.0.0
@@ -26,8 +26,8 @@ require (
 	github.com/urfave/cli/v2 v2.24.3
 	golang.org/x/net v0.5.0
 	google.golang.org/protobuf v1.28.1
-	gorm.io/driver/mysql v1.4.5
-	gorm.io/driver/postgres v1.4.6
+	gorm.io/driver/mysql v1.4.6
+	gorm.io/driver/postgres v1.4.7
 	gorm.io/gorm v1.24.5
 )
 
