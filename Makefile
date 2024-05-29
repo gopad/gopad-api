@@ -16,7 +16,7 @@ endif
 
 GOBUILD ?= CGO_ENABLED=0 go build
 PACKAGES ?= $(shell go list ./...)
-SOURCES ?= $(shell find . -name "*.go" -type f -not -iname mock.go)
+SOURCES ?= $(shell find . -name "*.go" -type f -not -iname mock.go -not -path ./.devenv/\* -not -path ./.direnv/\*)
 
 TAGS ?= netgo
 
@@ -67,6 +67,10 @@ fmt:
 vet:
 	go vet $(PACKAGES)
 
+.PHONY: golangci
+golangci: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) run ./...
+
 .PHONY: staticcheck
 staticcheck: $(STATICCHECK)
 	$(STATICCHECK) -tags '$(TAGS)' $(PACKAGES)
@@ -76,12 +80,8 @@ lint: $(REVIVE)
 	for PKG in $(PACKAGES); do $(REVIVE) -config revive.toml -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate: buf
+generate:
 	go generate $(PACKAGES)
-
-.PHONY: buf
-buf: $(BUF)
-	$(BUF) generate
 
 .PHONY: mocks
 mocks: \
@@ -104,10 +104,6 @@ pkg/service/teams/repository/mock.go: pkg/service/teams/repository/repository.go
 
 pkg/service/members/repository/mock.go: pkg/service/members/repository/repository.go $(MOCKGEN)
 	$(MOCKGEN) -source $< -destination $@ -package repository
-
-.PHONY: changelog
-changelog: $(CALENS)
-	$(CALENS) >| CHANGELOG.md
 
 .PHONY: test
 test: test

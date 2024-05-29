@@ -1,0 +1,1478 @@
+---
+openapi: "3.0.0"
+
+info:
+  version: "1.0.0-alpha1"
+  description: "API definition for Gopad, Etherpad for markdown with go"
+  title: "Gopad OpenAPI"
+  contact:
+    name: "Gopad"
+    email: "gopad@webhippie.de"
+    url: "https://gopad.eu"
+  license:
+    name: "Apache-2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+
+servers:
+  - url: "https://try.gopad.eu/api/v1"
+
+security:
+  - Cookie: []
+  - Header: []
+  - Basic: []
+
+
+paths:
+  /auth/{provider}/initialize:
+    get:
+      summary: "Initialize the external authentication"
+      operationId: "ExternalInitialize"
+      tags:
+        - "auth"
+      parameters:
+        - in: "path"
+          name: "provider"
+          description: "An identifier for the auth provider"
+          schema:
+            type: string
+          required: true
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Auth state
+      security: []
+      responses:
+        "307":
+          description: "Redirect to external auth provider"
+        "404":
+          description: "Provider identifier is unknown"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "412":
+          description: "Failed to initialze the provider"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+  /auth/{provider}/callback:
+    get:
+      summary: "Callback for external authentication"
+      operationId: "ExternalCallback"
+      tags:
+        - "auth"
+      parameters:
+        - in: "path"
+          name: "provider"
+          description: "An identifier for the auth provider"
+          schema:
+            type: string
+          required: true
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Auth state
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Auth code
+      security: []
+      responses:
+        "307":
+          description: "Redirect to root of the application"
+        "404":
+          description: "Provider identifier is unknown"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "412":
+          description: "Failed to initialize provider"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+  /teams:
+    get:
+      summary: "Fetch all available teams"
+      operationId: "ListTeams"
+      tags:
+        - "team"
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search query
+          x-example: John Doe
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - slug
+              - name
+          description: Sorting column
+          x-example: name
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: Sorting order
+          x-example: desc
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Paging limit
+          x-example: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Paging offset
+          x-example: 0
+      responses:
+        "200":
+          description: "A collection of teams"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/teams"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    post:
+      summary: "Create a new team"
+      operationId: "CreateTeam"
+      tags:
+        - "team"
+      requestBody:
+        description: "The team data to create"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/team"
+      responses:
+        "200":
+          description: "The created team data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/team"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "422":
+          description: "Failed to validate request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+  /teams/{team_id}:
+    get:
+      summary: "Fetch a specific team"
+      operationId: "ShowTeam"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team_id"
+          description: "A team identifier or slug"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "The fetched team details"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/team"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "Team not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    put:
+      summary: "Update a specific team"
+      operationId: "UpdateTeam"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team_id"
+          description: "A team identifier or slug"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: "The team data to update"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/team"
+      responses:
+        "200":
+          description: "The updated team details"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/team"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "Team not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "422":
+          description: "Failed to validate request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    delete:
+      summary: "Delete a specific team"
+      operationId: "DeleteTeam"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team_id"
+          description: "A team identifier or slug"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Plain success message"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "Team not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "400":
+          description: "Failed to delete the team"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+  /teams/{team_id}/users:
+    get:
+      summary: "Fetch all users assigned to team"
+      operationId: "ListTeamUsers"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team_id"
+          description: "A team identifier or slug"
+          schema:
+            type: string
+          required: true
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search query
+          x-example: John Doe
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - username
+              - email
+              - fullname
+              - admin
+              - active
+          description: Sorting column
+          x-example: name
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: Sorting order
+          x-example: desc
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Paging limit
+          x-example: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Paging offset
+          x-example: 0
+      responses:
+        "200":
+          description: "A collection of team users"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/team_users"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "Team not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    post:
+      summary: "Assign a user to team"
+      operationId: "AttachTeamToUser"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team_id"
+          description: "A team identifier or slug"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: "The team user data to attach"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/team_user_params"
+      responses:
+        "200":
+          description: "Plain success message"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "Team or user not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "412":
+          description: "User is already assigned"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "422":
+          description: "Failed to validate request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    put:
+      summary: "Update user perms for team"
+      operationId: "PermitTeamUser"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team_id"
+          description: "A team identifier or slug"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: "The team user data to update"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/team_user_params"
+      responses:
+        "200":
+          description: "Plain success message"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "Team or user not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "412":
+          description: "User is not assigned"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "422":
+          description: "Failed to validate request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    delete:
+      summary: "Remove a user from team"
+      operationId: "DeleteTeamFromUser"
+      tags:
+        - "team"
+      parameters:
+        - in: "path"
+          name: "team_id"
+          description: "A team identifier or slug"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: "The team user data to delete"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/team_user_params"
+      responses:
+        "200":
+          description: "Plain success message"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "Team or user not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "412":
+          description: "User is not assigned"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+  /users:
+    get:
+      summary: "Fetch all available users"
+      operationId: "ListUsers"
+      tags:
+        - "user"
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search query
+          x-example: John Doe
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - username
+              - email
+              - fullname
+              - admin
+              - active
+          description: Sorting column
+          x-example: username
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: Sorting order
+          x-example: desc
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Paging limit
+          x-example: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Paging offset
+          x-example: 0
+      responses:
+        "200":
+          description: "A collection of users"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/users"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    post:
+      summary: "Create a new user"
+      operationId: "CreateUser"
+      tags:
+        - "user"
+      requestBody:
+        description: "The user data to create"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user"
+      responses:
+        "200":
+          description: "The created user data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "422":
+          description: "Failed to validate request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+  /users/{user_id}:
+    get:
+      summary: "Fetch a specific user"
+      operationId: "ShowUser"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user_id"
+          description: "A user identifier or slug"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "The fetched user details"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    put:
+      summary: "Update a specific user"
+      operationId: "UpdateUser"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user_id"
+          description: "A user identifier or slug"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: "The user data to update"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user"
+      responses:
+        "200":
+          description: "The updated user details"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "422":
+          description: "Failed to validate request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    delete:
+      summary: "Delete a specific user"
+      operationId: "DeleteUser"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user_id"
+          description: "A user identifier or slug"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Plain success message"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "400":
+          description: "Failed to delete the user"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+  /users/{user_id}/teams:
+    get:
+      summary: "Fetch all teams assigned to user"
+      operationId: "ListUserTeams"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user_id"
+          description: "A user identifier or slug"
+          schema:
+            type: string
+          required: true
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search query
+          x-example: John Doe
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - slug
+              - name
+          description: Sorting column
+          x-example: name
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: Sorting order
+          x-example: desc
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Paging limit
+          x-example: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Paging offset
+          x-example: 0
+      responses:
+        "200":
+          description: "A collection of user teams"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user_teams"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    post:
+      summary: "Assign a team to user"
+      operationId: "AttachUserToTeam"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user_id"
+          description: "A user identifier or slug"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: "The user team data to attach"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user_team_params"
+      responses:
+        "200":
+          description: "Plain success message"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "User or team not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "412":
+          description: "Team is already assigned"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "422":
+          description: "Failed to validate request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    put:
+      summary: "Update team perms for user"
+      operationId: "PermitUserTeam"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user_id"
+          description: "A user identifier or slug"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: "The user team data to update"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user_team_params"
+      responses:
+        "200":
+          description: "Plain success message"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "User or team not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "412":
+          description: "Team is not assigned"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "422":
+          description: "Failed to validate request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+    delete:
+      summary: "Remove a team from user"
+      operationId: "DeleteUserFromTeam"
+      tags:
+        - "user"
+      parameters:
+        - in: "path"
+          name: "user_id"
+          description: "A user identifier or slug"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: "The user team data to delete"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user_team_params"
+      responses:
+        "200":
+          description: "Plain success message"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "403":
+          description: "User is not authorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "404":
+          description: "User or team not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "412":
+          description: "Team is not assigned"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        "500":
+          description: "Some internal server error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+        default:
+          description: "Some error unrelated to the handler"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notification"
+
+components:
+  securitySchemes:
+    Cookie:
+      type: apiKey
+      in: header
+      name: Cookie
+    Header:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    Basic:
+      type: http
+      scheme: basic
+
+  schemas:
+    teams:
+      title: "Teams"
+      description: "Model to represent list of teams"
+      type: "object"
+      properties:
+        total:
+          type: integer
+          format: int64
+        teams:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/team"
+
+    team:
+      title: "Team"
+      description: "Model to represent team"
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          readOnly: true
+        slug:
+          type: "string"
+          x-omitempty: true
+          x-nullable: true
+        name:
+          type: "string"
+          x-omitempty: true
+          x-nullable: true
+        created_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        updated_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        users:
+          type: "array"
+          x-omitempty: true
+          x-nullable: true
+          readOnly: true
+          items:
+            $ref: "#/components/schemas/user_team"
+
+    users:
+      title: "Users"
+      description: "Model to represent list of users"
+      type: "object"
+      properties:
+        total:
+          type: integer
+          format: int64
+        users:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/user"
+
+    user:
+      title: "User"
+      description: "Model to represent user"
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          readOnly: true
+        username:
+          type: "string"
+          x-omitempty: true
+          x-nullable: true
+        password:
+          type: "string"
+          format: "password"
+          x-omitempty: true
+          x-nullable: true
+        email:
+          type: "string"
+          x-omitempty: true
+          x-nullable: true
+        fullname:
+          type: "string"
+          x-omitempty: true
+          x-nullable: true
+        profile:
+          type: "string"
+          x-omitempty: true
+          x-nullable: true
+        admin:
+          type: "boolean"
+          x-omitempty: true
+          x-nullable: true
+        active:
+          type: "boolean"
+          x-omitempty: true
+          x-nullable: true
+        created_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        updated_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        auths:
+          type: "array"
+          x-omitempty: true
+          x-nullable: true
+          readOnly: true
+          items:
+            $ref: "#/components/schemas/user_auth"
+        teams:
+          type: "array"
+          x-omitempty: true
+          x-nullable: true
+          readOnly: true
+          items:
+            $ref: "#/components/schemas/user_team"
+
+    user_auth:
+      title: "User Auth"
+      description: "Model to represent user auth"
+      type: "object"
+      properties:
+        provider:
+          type: "string"
+        ref:
+          type: "string"
+        created_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        updated_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+
+    user_teams:
+      title: "User Teams"
+      description: "Model to represent user teams"
+      type: "object"
+      properties:
+        user:
+          $ref: "#/components/schemas/user"
+          readOnly: true
+        total:
+          type: integer
+          format: int64
+        teams:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/user_team"
+
+    team_users:
+      title: "Team Users"
+      description: "Model to represent team users"
+      type: "object"
+      properties:
+        team:
+          $ref: "#/components/schemas/team"
+          readOnly: true
+        total:
+          type: integer
+          format: int64
+        users:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/user_team"
+
+    user_team:
+      title: "User Team"
+      description: "Model to represent user team"
+      type: "object"
+      required:
+        - "user_id"
+        - "team_id"
+      properties:
+        user_id:
+          type: "string"
+        user:
+          x-omitempty: true
+          x-nullable: true
+          readOnly: true
+          $ref: "#/components/schemas/user"
+        team_id:
+          type: "string"
+        team:
+          x-omitempty: true
+          x-nullable: true
+          readOnly: true
+          $ref: "#/components/schemas/team"
+        perm:
+          type: "string"
+          enum:
+            - "user"
+            - "admin"
+            - "owner"
+        created_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        updated_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+
+    team_user_params:
+      title: "Team User Params"
+      description: "Parameters to attach or remove team user"
+      type: "object"
+      required:
+        - "user"
+      properties:
+        user:
+          type: "string"
+        perm:
+          type: "string"
+          enum:
+            - "user"
+            - "admin"
+            - "owner"
+
+    user_team_params:
+      title: "User Team Params"
+      description: "Parameters to attach or remove user team"
+      type: "object"
+      required:
+        - "team"
+      properties:
+        team:
+          type: "string"
+        perm:
+          type: "string"
+          enum:
+            - "user"
+            - "admin"
+            - "owner"
+
+    notification:
+      title: "Notification"
+      description: "Generic response for errors and validations"
+      type: "object"
+      properties:
+        status:
+          type: "integer"
+          x-omitempty: true
+        message:
+          type: "string"
+          x-omitempty: true
+        errors:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/validation"
+
+    validation:
+      title: "Validation"
+      description: "General structure to show validation errors"
+      type: "object"
+      properties:
+        field:
+          type: "string"
+        message:
+          type: "string"
+
+...
