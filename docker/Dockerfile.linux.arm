@@ -1,17 +1,17 @@
-FROM arm32v6/alpine:3.20 AS build
-RUN apk add --no-cache ca-certificates mailcap
+FROM arm32v6/alpine:3.20
 
-FROM scratch
+RUN apk add --no-cache ca-certificates mailcap && \
+    addgroup -g 1337 gopad && \
+    adduser -D -u 1337 -h /var/lib/gopad -G gopad gopad
 
 EXPOSE 8000 8080
 VOLUME ["/var/lib/gopad"]
 ENTRYPOINT ["/usr/bin/gopad-api"]
 CMD ["server"]
 
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /etc/mime.types /etc/
-
 ENV GOPAD_API_DATABASE_DSN sqlite:///var/lib/gopad/database.sqlite3
 ENV GOPAD_API_UPLOAD_DSN file:///var/lib/gopad/uploads
 
 COPY bin/gopad-api /usr/bin/gopad-api
+WORKDIR /var/lib/gopad
+USER gopad
