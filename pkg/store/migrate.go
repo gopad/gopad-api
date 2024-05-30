@@ -11,16 +11,14 @@ var (
 	// Migrations define all database migrations.
 	Migrations = []*gormigrate.Migration{
 		{
-			ID: "202206181600001",
+			ID: "0001_create_users_table",
 			Migrate: func(tx *gorm.DB) error {
 				type User struct {
-					ID        string `gorm:"primaryKey;length:36"`
-					Slug      string `gorm:"unique;length:255"`
+					ID        string `gorm:"primaryKey;length:20"`
 					Username  string `gorm:"unique;length:255"`
-					Password  string `gorm:"length:255"`
-					Email     string `gorm:"unique;length:255"`
-					Firstname string `gorm:"length:255"`
-					Lastname  string `gorm:"length:255"`
+					Hashword  string `gorm:"length:255"`
+					Email     string `gorm:"length:255"`
+					Fullname  string `gorm:"length:255"`
 					Active    bool   `gorm:"default:false"`
 					Admin     bool   `gorm:"default:false"`
 					CreatedAt time.Time
@@ -34,10 +32,55 @@ var (
 			},
 		},
 		{
-			ID: "202206181600002",
+			ID: "0002_create_user_auths_table",
+			Migrate: func(tx *gorm.DB) error {
+				type UserAuth struct {
+					ID        string `gorm:"primaryKey;length:20"`
+					UserID    string `gorm:"length:20"`
+					Provider  string `gorm:"length:255"`
+					Ref       string `gorm:"length:255"`
+					CreatedAt time.Time
+					UpdatedAt time.Time
+				}
+
+				return tx.Migrator().CreateTable(&UserAuth{})
+			},
+			Rollback: func(tx *gorm.DB) error {
+				return tx.Migrator().DropTable("user_auths")
+			},
+		},
+		{
+			ID: "0003_create_user_auths_users_constraint",
+			Migrate: func(tx *gorm.DB) error {
+				type UserAuth struct {
+					UserID string `gorm:"length:20"`
+				}
+
+				type User struct {
+					ID    string      `gorm:"primaryKey"`
+					Auths []*UserAuth `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+				}
+
+				return tx.Migrator().CreateConstraint(&User{}, "Auths")
+			},
+			Rollback: func(tx *gorm.DB) error {
+				type UserAuth struct {
+					UserID string `gorm:"length:20"`
+				}
+
+				type User struct {
+					ID    string      `gorm:"primaryKey"`
+					Auths []*UserAuth `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+				}
+
+				return tx.Migrator().DropConstraint(&User{}, "Auths")
+			},
+		},
+		{
+			ID: "0004_create_teams_table",
 			Migrate: func(tx *gorm.DB) error {
 				type Team struct {
-					ID        string `gorm:"primaryKey;length:36"`
+					ID        string `gorm:"primaryKey;length:20"`
 					Slug      string `gorm:"unique;length:255"`
 					Name      string `gorm:"unique;length:255"`
 					CreatedAt time.Time
@@ -51,11 +94,12 @@ var (
 			},
 		},
 		{
-			ID: "202206181600003",
+			ID: "0005_create_members_table",
 			Migrate: func(tx *gorm.DB) error {
 				type Member struct {
-					TeamID    string `gorm:"index:idx_id,unique;length:36"`
-					UserID    string `gorm:"index:idx_id,unique;length:36"`
+					TeamID    string `gorm:"index:idx_id,unique;length:20"`
+					UserID    string `gorm:"index:idx_id,unique;length:20"`
+					Perm      string `gorm:"length:64"`
 					CreatedAt time.Time
 					UpdatedAt time.Time
 				}
@@ -67,11 +111,11 @@ var (
 			},
 		},
 		{
-			ID: "202206181600004",
+			ID: "0006_create_members_teams_constraint",
 			Migrate: func(tx *gorm.DB) error {
 				type Member struct {
-					TeamID string `gorm:"index:idx_id,unique;length:36"`
-					UserID string `gorm:"index:idx_id,unique;length:36"`
+					TeamID string `gorm:"index:idx_id,unique;length:20"`
+					UserID string `gorm:"index:idx_id,unique;length:20"`
 				}
 
 				type Team struct {
@@ -83,8 +127,8 @@ var (
 			},
 			Rollback: func(tx *gorm.DB) error {
 				type Member struct {
-					TeamID string `gorm:"index:idx_id,unique;length:36"`
-					UserID string `gorm:"index:idx_id,unique;length:36"`
+					TeamID string `gorm:"index:idx_id,unique;length:20"`
+					UserID string `gorm:"index:idx_id,unique;length:20"`
 				}
 
 				type Team struct {
@@ -96,11 +140,11 @@ var (
 			},
 		},
 		{
-			ID: "202206181600005",
+			ID: "0007_create_members_users_constraint",
 			Migrate: func(tx *gorm.DB) error {
 				type Member struct {
-					TeamID string `gorm:"index:idx_id,unique;length:36"`
-					UserID string `gorm:"index:idx_id,unique;length:36"`
+					TeamID string `gorm:"index:idx_id,unique;length:20"`
+					UserID string `gorm:"index:idx_id,unique;length:20"`
 				}
 
 				type User struct {
@@ -112,8 +156,8 @@ var (
 			},
 			Rollback: func(tx *gorm.DB) error {
 				type Member struct {
-					TeamID string `gorm:"index:idx_id,unique;length:36"`
-					UserID string `gorm:"index:idx_id,unique;length:36"`
+					TeamID string `gorm:"index:idx_id,unique;length:20"`
+					UserID string `gorm:"index:idx_id,unique;length:20"`
 				}
 
 				type User struct {

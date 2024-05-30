@@ -132,6 +132,7 @@ paths:
           required: false
           schema:
             type: string
+            default: name
             enum:
               - slug
               - name
@@ -142,6 +143,7 @@ paths:
           required: false
           schema:
             type: string
+            default: asc
             enum:
               - asc
               - desc
@@ -152,6 +154,7 @@ paths:
           required: false
           schema:
             type: integer
+            default: 100
           description: Paging limit
           x-example: 100
         - name: offset
@@ -159,6 +162,7 @@ paths:
           required: false
           schema:
             type: integer
+            default: 0
           description: Paging offset
           x-example: 0
       responses:
@@ -408,6 +412,7 @@ paths:
           required: false
           schema:
             type: string
+            default: username
             enum:
               - username
               - email
@@ -421,6 +426,7 @@ paths:
           required: false
           schema:
             type: string
+            default: asc
             enum:
               - asc
               - desc
@@ -431,6 +437,7 @@ paths:
           required: false
           schema:
             type: integer
+            default: 100
           description: Paging limit
           x-example: 100
         - name: offset
@@ -438,6 +445,7 @@ paths:
           required: false
           schema:
             type: integer
+            default: 0
           description: Paging offset
           x-example: 0
       responses:
@@ -674,6 +682,7 @@ paths:
           required: false
           schema:
             type: string
+            default: username
             enum:
               - username
               - email
@@ -687,6 +696,7 @@ paths:
           required: false
           schema:
             type: string
+            default: asc
             enum:
               - asc
               - desc
@@ -697,6 +707,7 @@ paths:
           required: false
           schema:
             type: integer
+            default: 100
           description: Paging limit
           x-example: 100
         - name: offset
@@ -704,6 +715,7 @@ paths:
           required: false
           schema:
             type: integer
+            default: 0
           description: Paging offset
           x-example: 0
       responses:
@@ -953,6 +965,7 @@ paths:
           required: false
           schema:
             type: string
+            default: name
             enum:
               - slug
               - name
@@ -963,6 +976,7 @@ paths:
           required: false
           schema:
             type: string
+            default: asc
             enum:
               - asc
               - desc
@@ -1404,6 +1418,7 @@ components:
           $ref: "#/components/schemas/team"
         perm:
           type: "string"
+          default: "user"
           enum:
             - "user"
             - "admin"
@@ -1428,6 +1443,7 @@ components:
           type: "string"
         perm:
           type: "string"
+          default: "user"
           enum:
             - "user"
             - "admin"
@@ -1444,6 +1460,7 @@ components:
           type: "string"
         perm:
           type: "string"
+          default: "user"
           enum:
             - "user"
             - "admin"
