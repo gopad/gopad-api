@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/gopad/gopad-api/pkg/middleware/current"
 	"github.com/gopad/gopad-api/pkg/model"
 	"github.com/gopad/gopad-api/pkg/service/members"
 	"github.com/gopad/gopad-api/pkg/service/teams"
@@ -13,6 +14,13 @@ import (
 
 // ListTeams implements the v1.ServerInterface.
 func (a *API) ListTeams(ctx context.Context, request ListTeamsRequestObject) (ListTeamsResponseObject, error) {
+	if principal := current.GetUser(ctx); principal == nil || !principal.Admin {
+		return ListTeams403JSONResponse{
+			Message: ToPtr("Only admins can access this resource"),
+			Status:  ToPtr(http.StatusForbidden),
+		}, nil
+	}
+
 	records, count, err := a.teams.List(
 		ctx,
 		toListParams(
@@ -44,6 +52,13 @@ func (a *API) ListTeams(ctx context.Context, request ListTeamsRequestObject) (Li
 
 // ShowTeam implements the v1.ServerInterface.
 func (a *API) ShowTeam(ctx context.Context, request ShowTeamRequestObject) (ShowTeamResponseObject, error) {
+	if principal := current.GetUser(ctx); principal == nil || !principal.Admin {
+		return ShowTeam403JSONResponse{
+			Message: ToPtr("Only admins can access this resource"),
+			Status:  ToPtr(http.StatusForbidden),
+		}, nil
+	}
+
 	record, err := a.teams.Show(
 		ctx,
 		request.TeamId,
@@ -70,6 +85,13 @@ func (a *API) ShowTeam(ctx context.Context, request ShowTeamRequestObject) (Show
 
 // CreateTeam implements the v1.ServerInterface.
 func (a *API) CreateTeam(ctx context.Context, request CreateTeamRequestObject) (CreateTeamResponseObject, error) {
+	if principal := current.GetUser(ctx); principal == nil || !principal.Admin {
+		return CreateTeam403JSONResponse{
+			Message: ToPtr("Only admins can access this resource"),
+			Status:  ToPtr(http.StatusForbidden),
+		}, nil
+	}
+
 	record := &model.Team{}
 
 	if request.Body.Slug != nil {
@@ -117,6 +139,13 @@ func (a *API) CreateTeam(ctx context.Context, request CreateTeamRequestObject) (
 
 // UpdateTeam implements the v1.ServerInterface.
 func (a *API) UpdateTeam(ctx context.Context, request UpdateTeamRequestObject) (UpdateTeamResponseObject, error) {
+	if principal := current.GetUser(ctx); principal == nil || !principal.Admin {
+		return UpdateTeam403JSONResponse{
+			Message: ToPtr("Only admins can access this resource"),
+			Status:  ToPtr(http.StatusForbidden),
+		}, nil
+	}
+
 	record, err := a.teams.Show(
 		ctx,
 		request.TeamId,
@@ -181,6 +210,13 @@ func (a *API) UpdateTeam(ctx context.Context, request UpdateTeamRequestObject) (
 
 // DeleteTeam implements the v1.ServerInterface.
 func (a *API) DeleteTeam(ctx context.Context, request DeleteTeamRequestObject) (DeleteTeamResponseObject, error) {
+	if principal := current.GetUser(ctx); principal == nil || !principal.Admin {
+		return DeleteTeam403JSONResponse{
+			Message: ToPtr("Only admins can access this resource"),
+			Status:  ToPtr(http.StatusForbidden),
+		}, nil
+	}
+
 	record, err := a.teams.Show(
 		ctx,
 		request.TeamId,
@@ -218,6 +254,13 @@ func (a *API) DeleteTeam(ctx context.Context, request DeleteTeamRequestObject) (
 
 // ListTeamUsers implements the v1.ServerInterface.
 func (a *API) ListTeamUsers(ctx context.Context, request ListTeamUsersRequestObject) (ListTeamUsersResponseObject, error) {
+	if principal := current.GetUser(ctx); principal == nil || !principal.Admin {
+		return ListTeamUsers403JSONResponse{
+			Message: ToPtr("Only admins can access this resource"),
+			Status:  ToPtr(http.StatusForbidden),
+		}, nil
+	}
+
 	record, err := a.teams.Show(
 		ctx,
 		request.TeamId,
@@ -272,6 +315,13 @@ func (a *API) ListTeamUsers(ctx context.Context, request ListTeamUsersRequestObj
 
 // AttachTeamToUser implements the v1.ServerInterface.
 func (a *API) AttachTeamToUser(ctx context.Context, request AttachTeamToUserRequestObject) (AttachTeamToUserResponseObject, error) {
+	if principal := current.GetUser(ctx); principal == nil || !principal.Admin {
+		return AttachTeamToUser403JSONResponse{
+			Message: ToPtr("Only admins can access this resource"),
+			Status:  ToPtr(http.StatusForbidden),
+		}, nil
+	}
+
 	if err := a.members.Attach(
 		ctx,
 		model.MemberParams{
@@ -328,6 +378,13 @@ func (a *API) AttachTeamToUser(ctx context.Context, request AttachTeamToUserRequ
 
 // PermitTeamUser implements the v1.ServerInterface.
 func (a *API) PermitTeamUser(ctx context.Context, request PermitTeamUserRequestObject) (PermitTeamUserResponseObject, error) {
+	if principal := current.GetUser(ctx); principal == nil || !principal.Admin {
+		return PermitTeamUser403JSONResponse{
+			Message: ToPtr("Only admins can access this resource"),
+			Status:  ToPtr(http.StatusForbidden),
+		}, nil
+	}
+
 	if err := a.members.Permit(
 		ctx,
 		model.MemberParams{
@@ -384,6 +441,13 @@ func (a *API) PermitTeamUser(ctx context.Context, request PermitTeamUserRequestO
 
 // DeleteTeamFromUser implements the v1.ServerInterface.
 func (a *API) DeleteTeamFromUser(ctx context.Context, request DeleteTeamFromUserRequestObject) (DeleteTeamFromUserResponseObject, error) {
+	if principal := current.GetUser(ctx); principal == nil || !principal.Admin {
+		return DeleteTeamFromUser403JSONResponse{
+			Message: ToPtr("Only admins can access this resource"),
+			Status:  ToPtr(http.StatusForbidden),
+		}, nil
+	}
+
 	if err := a.members.Drop(
 		ctx,
 		model.MemberParams{

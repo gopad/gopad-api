@@ -135,7 +135,10 @@ func (a *API) ExternalCallback(ctx context.Context, request ExternalCallbackRequ
 		}, nil
 	}
 
-	// defer gothic.Logout(w, r)
+	a.session.Pop(
+		ctx,
+		request.Provider,
+	)
 
 	if err := verifyAuthState(
 		request.Params.State,

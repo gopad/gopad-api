@@ -63,6 +63,16 @@ func (s *metricsService) External(ctx context.Context, provider, ref, username, 
 	return s.service.External(ctx, provider, ref, username, email, fullname)
 }
 
+// AuthByID implements the Service interface for metrics.
+func (s *metricsService) AuthByID(ctx context.Context, userID string) (*model.User, error) {
+	return s.service.AuthByID(ctx, userID)
+}
+
+// AuthByCreds implements the Service interface.
+func (s *metricsService) AuthByCreds(ctx context.Context, username, password string) (*model.User, error) {
+	return s.service.AuthByCreds(ctx, username, password)
+}
+
 // List implements the Service interface for metrics.
 func (s *metricsService) List(ctx context.Context, params model.ListParams) ([]*model.User, int64, error) {
 	defer func(start time.Time) {

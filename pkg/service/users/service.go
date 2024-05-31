@@ -16,11 +16,16 @@ var (
 
 	// ErrNotAssigned is returned when a user is not assigned.
 	ErrNotAssigned = errors.New("user is not assigned")
+
+	// ErrWrongCredentials is returned when credentials are wrong.
+	ErrWrongCredentials = errors.New("wrong credentials provided")
 )
 
 // Service handles all interactions with users.
 type Service interface {
 	External(context.Context, string, string, string, string, string) (*model.User, error)
+	AuthByID(context.Context, string) (*model.User, error)
+	AuthByCreds(context.Context, string, string) (*model.User, error)
 	List(context.Context, model.ListParams) ([]*model.User, int64, error)
 	Show(context.Context, string) (*model.User, error)
 	Create(context.Context, *model.User) error
@@ -43,6 +48,16 @@ func NewService(users Service) Service {
 // External implements the Service interface.
 func (s *service) External(ctx context.Context, provider, ref, username, email, fullname string) (*model.User, error) {
 	return s.users.External(ctx, provider, ref, username, email, fullname)
+}
+
+// AuthByID implements the Service interface.
+func (s *service) AuthByID(ctx context.Context, userID string) (*model.User, error) {
+	return s.users.AuthByID(ctx, userID)
+}
+
+// AuthByCreds implements the Service interface.
+func (s *service) AuthByCreds(ctx context.Context, username, password string) (*model.User, error) {
+	return s.users.AuthByCreds(ctx, username, password)
 }
 
 // List implements the Service interface.

@@ -11,6 +11,7 @@ import (
 	"github.com/gopad/gopad-api/pkg/model"
 	"github.com/gopad/gopad-api/pkg/secret"
 	"github.com/gopad/gopad-api/pkg/validate"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -94,6 +95,43 @@ func (s *GormService) External(ctx context.Context, provider, ref, username, ema
 	}
 
 	return record.User, nil
+}
+
+// AuthByID implements the Service interface for database persistence.
+func (s *GormService) AuthByID(ctx context.Context, userID string) (*model.User, error) {
+	return s.Show(ctx, userID)
+}
+
+// AuthByCreds implements the Service interface.
+func (s *GormService) AuthByCreds(ctx context.Context, username, password string) (*model.User, error) {
+	record := &model.User{}
+
+	err := s.query(ctx).Where(
+		"username = ?",
+		username,
+	).Or(
+		"email = ?",
+		username,
+	).First(
+		record,
+	).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return record, ErrNotFound
+		}
+
+		return record, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword(
+		[]byte(record.Hashword),
+		[]byte(password),
+	); err != nil {
+		return nil, ErrWrongCredentials
+	}
+
+	return record, nil
 }
 
 // List implements the Service interface for database persistence.

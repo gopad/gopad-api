@@ -27,6 +27,7 @@ type contextKey string
 
 const (
 	BasicScopes  contextKey = "Basic.Scopes"
+	BearerScopes contextKey = "Bearer.Scopes"
 	CookieScopes contextKey = "Cookie.Scopes"
 	HeaderScopes contextKey = "Header.Scopes"
 )
@@ -644,11 +645,13 @@ func (siw *ServerInterfaceWrapper) ListTeams(w http.ResponseWriter, r *http.Requ
 
 	var err error
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListTeamsParams
@@ -708,11 +711,13 @@ func (siw *ServerInterfaceWrapper) ListTeams(w http.ResponseWriter, r *http.Requ
 func (siw *ServerInterfaceWrapper) CreateTeam(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateTeam(w, r)
@@ -740,11 +745,13 @@ func (siw *ServerInterfaceWrapper) DeleteTeam(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteTeam(w, r, teamId)
@@ -772,11 +779,13 @@ func (siw *ServerInterfaceWrapper) ShowTeam(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ShowTeam(w, r, teamId)
@@ -804,11 +813,13 @@ func (siw *ServerInterfaceWrapper) UpdateTeam(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateTeam(w, r, teamId)
@@ -836,11 +847,13 @@ func (siw *ServerInterfaceWrapper) DeleteTeamFromUser(w http.ResponseWriter, r *
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteTeamFromUser(w, r, teamId)
@@ -868,11 +881,13 @@ func (siw *ServerInterfaceWrapper) ListTeamUsers(w http.ResponseWriter, r *http.
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListTeamUsersParams
@@ -943,11 +958,13 @@ func (siw *ServerInterfaceWrapper) AttachTeamToUser(w http.ResponseWriter, r *ht
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.AttachTeamToUser(w, r, teamId)
@@ -975,11 +992,13 @@ func (siw *ServerInterfaceWrapper) PermitTeamUser(w http.ResponseWriter, r *http
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PermitTeamUser(w, r, teamId)
@@ -998,11 +1017,13 @@ func (siw *ServerInterfaceWrapper) ListUsers(w http.ResponseWriter, r *http.Requ
 
 	var err error
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListUsersParams
@@ -1062,11 +1083,13 @@ func (siw *ServerInterfaceWrapper) ListUsers(w http.ResponseWriter, r *http.Requ
 func (siw *ServerInterfaceWrapper) CreateUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateUser(w, r)
@@ -1094,11 +1117,13 @@ func (siw *ServerInterfaceWrapper) DeleteUser(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteUser(w, r, userId)
@@ -1126,11 +1151,13 @@ func (siw *ServerInterfaceWrapper) ShowUser(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ShowUser(w, r, userId)
@@ -1158,11 +1185,13 @@ func (siw *ServerInterfaceWrapper) UpdateUser(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateUser(w, r, userId)
@@ -1190,11 +1219,13 @@ func (siw *ServerInterfaceWrapper) DeleteUserFromTeam(w http.ResponseWriter, r *
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteUserFromTeam(w, r, userId)
@@ -1222,11 +1253,13 @@ func (siw *ServerInterfaceWrapper) ListUserTeams(w http.ResponseWriter, r *http.
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListUserTeamsParams
@@ -1297,11 +1330,13 @@ func (siw *ServerInterfaceWrapper) AttachUserToTeam(w http.ResponseWriter, r *ht
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.AttachUserToTeam(w, r, userId)
@@ -1329,11 +1364,13 @@ func (siw *ServerInterfaceWrapper) PermitUserTeam(w http.ResponseWriter, r *http
 		return
 	}
 
-	ctx = context.WithValue(ctx, CookieScopes, []string{})
-
 	ctx = context.WithValue(ctx, HeaderScopes, []string{})
 
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
 	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PermitUserTeam(w, r, userId)
@@ -3429,47 +3466,47 @@ func (sh *strictHandler) PermitUserTeam(w http.ResponseWriter, r *http.Request, 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

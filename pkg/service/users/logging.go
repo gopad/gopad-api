@@ -28,6 +28,16 @@ func (s *loggingService) External(ctx context.Context, provider, ref, username, 
 	return s.service.External(ctx, provider, ref, username, email, fullname)
 }
 
+// AuthByID implements the Service interface for logging.
+func (s *loggingService) AuthByID(ctx context.Context, userID string) (*model.User, error) {
+	return s.service.AuthByID(ctx, userID)
+}
+
+// AuthByCreds implements the Service interface.
+func (s *loggingService) AuthByCreds(ctx context.Context, username, password string) (*model.User, error) {
+	return s.service.AuthByCreds(ctx, username, password)
+}
+
 // List implements the Service interface for logging.
 func (s *loggingService) List(ctx context.Context, params model.ListParams) ([]*model.User, int64, error) {
 	start := time.Now()

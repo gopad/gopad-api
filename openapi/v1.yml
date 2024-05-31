@@ -17,10 +17,10 @@ servers:
   - url: "https://try.gopad.eu/api/v1"
 
 security:
-  - Cookie: []
   - Header: []
+  - Bearer: []
   - Basic: []
-
+  - Cookie: []
 
 paths:
   /auth/{provider}/initialize:
@@ -1213,17 +1213,20 @@ paths:
 
 components:
   securitySchemes:
-    Cookie:
-      type: apiKey
-      in: header
-      name: Cookie
     Header:
       type: apiKey
       in: header
       name: X-API-Key
+    Bearer:
+      type: http
+      in: bearer
     Basic:
       type: http
       scheme: basic
+    Cookie:
+      type: apiKey
+      in: header
+      name: Cookie
 
   schemas:
     teams:

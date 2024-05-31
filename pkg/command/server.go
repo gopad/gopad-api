@@ -54,6 +54,7 @@ var (
 	defaultUploadBucket     = ""
 	defaultUploadRegion     = "us-east-1"
 	defaultUploadPerms      = "0755"
+	defaultSessionName      = "gopad"
 	defaultSessionSecret    = secret.Generate(32)
 	defaultSessionExpire    = time.Hour * 24
 	defaultSessionSecure    = false
@@ -159,6 +160,10 @@ func init() {
 	serverCmd.PersistentFlags().String("upload-perms", defaultUploadPerms, "Chmod value for upload path")
 	viper.SetDefault("upload.perms", defaultUploadPerms)
 	_ = viper.BindPFlag("upload.perms", serverCmd.PersistentFlags().Lookup("upload-perms"))
+
+	serverCmd.PersistentFlags().String("session-name", defaultSessionName, "Session cookie name")
+	viper.SetDefault("session.name", defaultSessionName)
+	_ = viper.BindPFlag("session.name", serverCmd.PersistentFlags().Lookup("session-name"))
 
 	serverCmd.PersistentFlags().String("session-secret", defaultSessionSecret, "Session encryption secret")
 	viper.SetDefault("session.secret", defaultSessionSecret)
@@ -349,6 +354,7 @@ func serverAction(_ *cobra.Command, _ []string) {
 	sess := session.New(
 		session.WithStore(storage.Session()),
 		session.WithLifetime(cfg.Session.Expire),
+		session.WithName(cfg.Session.Name),
 		session.WithPath(cfg.Server.Root),
 		session.WithSecure(cfg.Session.Secure),
 	)

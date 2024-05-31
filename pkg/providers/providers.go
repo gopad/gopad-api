@@ -397,11 +397,6 @@ func oidcProvider(cfg config.AuthProvider) (*openidConnect.Provider, error) {
 		}
 	}
 
-	if cfg.Mappings.Avatar != "" {
-		provider.AvatarURLClaims = []string{
-			cfg.Mappings.Avatar,
-		}
-	}
-
+	provider.SetName(cfg.Name)
 	return provider, nil
 }
