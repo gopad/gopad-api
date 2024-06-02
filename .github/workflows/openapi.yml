@@ -32,7 +32,6 @@ jobs:
           cp openapi/v1.yml dist/$(ruby -ryaml -e "puts YAML::load(open('openapi/v1.yml').read)['info']['version']").yml
 
       - name: Upload spec
-        if: startsWith(github.ref, 'refs/tags/')
         run: |
           aws s3 sync dist/ s3://dl.gopad.eu/openapi/
 
