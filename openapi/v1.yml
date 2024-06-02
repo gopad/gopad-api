@@ -1434,7 +1434,7 @@ components:
       name: X-API-Key
     Bearer:
       type: http
-      in: bearer
+      scheme: bearer
     Basic:
       type: http
       scheme: basic
