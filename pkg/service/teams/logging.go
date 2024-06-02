@@ -23,6 +23,12 @@ func NewLoggingService(s Service) Service {
 	}
 }
 
+// External implements the Service interface for logging.
+func (s *loggingService) WithPrincipal(principal *model.User) Service {
+	s.service.WithPrincipal(principal)
+	return s
+}
+
 // List implements the Service interface for logging.
 func (s *loggingService) List(ctx context.Context, params model.ListParams) ([]*model.Team, int64, error) {
 	start := time.Now()

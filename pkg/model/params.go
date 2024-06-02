@@ -9,8 +9,8 @@ type ListParams struct {
 	Offset int
 }
 
-// MemberParams defines parameters for members.
-type MemberParams struct {
+// UserTeamParams defines parameters for user teams.
+type UserTeamParams struct {
 	ListParams
 
 	UserID string

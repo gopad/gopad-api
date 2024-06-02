@@ -7,8 +7,8 @@ import (
 
 	"github.com/gopad/gopad-api/pkg/middleware/current"
 	"github.com/gopad/gopad-api/pkg/model"
-	"github.com/gopad/gopad-api/pkg/service/members"
 	"github.com/gopad/gopad-api/pkg/service/teams"
+	userteams "github.com/gopad/gopad-api/pkg/service/user_teams"
 	"github.com/gopad/gopad-api/pkg/validate"
 )
 
@@ -21,7 +21,9 @@ func (a *API) ListTeams(ctx context.Context, request ListTeamsRequestObject) (Li
 		}, nil
 	}
 
-	records, count, err := a.teams.List(
+	records, count, err := a.teams.WithPrincipal(
+		current.GetUser(ctx),
+	).List(
 		ctx,
 		toListParams(
 			string(FromPtr(request.Params.Sort)),
@@ -59,7 +61,9 @@ func (a *API) ShowTeam(ctx context.Context, request ShowTeamRequestObject) (Show
 		}, nil
 	}
 
-	record, err := a.teams.Show(
+	record, err := a.teams.WithPrincipal(
+		current.GetUser(ctx),
+	).Show(
 		ctx,
 		request.TeamId,
 	)
@@ -102,7 +106,9 @@ func (a *API) CreateTeam(ctx context.Context, request CreateTeamRequestObject) (
 		record.Name = FromPtr(request.Body.Name)
 	}
 
-	if err := a.teams.Create(
+	if err := a.teams.WithPrincipal(
+		current.GetUser(ctx),
+	).Create(
 		ctx,
 		record,
 	); err != nil {
@@ -146,7 +152,9 @@ func (a *API) UpdateTeam(ctx context.Context, request UpdateTeamRequestObject) (
 		}, nil
 	}
 
-	record, err := a.teams.Show(
+	record, err := a.teams.WithPrincipal(
+		current.GetUser(ctx),
+	).Show(
 		ctx,
 		request.TeamId,
 	)
@@ -173,7 +181,9 @@ func (a *API) UpdateTeam(ctx context.Context, request UpdateTeamRequestObject) (
 		record.Name = FromPtr(request.Body.Name)
 	}
 
-	if err := a.teams.Update(
+	if err := a.teams.WithPrincipal(
+		current.GetUser(ctx),
+	).Update(
 		ctx,
 		record,
 	); err != nil {
@@ -217,7 +227,9 @@ func (a *API) DeleteTeam(ctx context.Context, request DeleteTeamRequestObject) (
 		}, nil
 	}
 
-	record, err := a.teams.Show(
+	record, err := a.teams.WithPrincipal(
+		current.GetUser(ctx),
+	).Show(
 		ctx,
 		request.TeamId,
 	)
@@ -236,7 +248,9 @@ func (a *API) DeleteTeam(ctx context.Context, request DeleteTeamRequestObject) (
 		}, nil
 	}
 
-	if err := a.teams.Delete(
+	if err := a.teams.WithPrincipal(
+		current.GetUser(ctx),
+	).Delete(
 		ctx,
 		record.ID,
 	); err != nil {
@@ -261,7 +275,9 @@ func (a *API) ListTeamUsers(ctx context.Context, request ListTeamUsersRequestObj
 		}, nil
 	}
 
-	record, err := a.teams.Show(
+	record, err := a.teams.WithPrincipal(
+		current.GetUser(ctx),
+	).Show(
 		ctx,
 		request.TeamId,
 	)
@@ -280,9 +296,11 @@ func (a *API) ListTeamUsers(ctx context.Context, request ListTeamUsersRequestObj
 		}, nil
 	}
 
-	records, count, err := a.members.List(
+	records, count, err := a.userteams.WithPrincipal(
+		current.GetUser(ctx),
+	).List(
 		ctx,
-		model.MemberParams{
+		model.UserTeamParams{
 			ListParams: toListParams(
 				string(FromPtr(request.Params.Sort)),
 				string(FromPtr(request.Params.Order)),
@@ -296,7 +314,7 @@ func (a *API) ListTeamUsers(ctx context.Context, request ListTeamUsersRequestObj
 
 	if err != nil {
 		return ListTeamUsers500JSONResponse{
-			Message: ToPtr("Failed to load members"),
+			Message: ToPtr("Failed to load users"),
 			Status:  ToPtr(http.StatusInternalServerError),
 		}, nil
 	}
@@ -322,22 +340,24 @@ func (a *API) AttachTeamToUser(ctx context.Context, request AttachTeamToUserRequ
 		}, nil
 	}
 
-	if err := a.members.Attach(
+	if err := a.userteams.WithPrincipal(
+		current.GetUser(ctx),
+	).Attach(
 		ctx,
-		model.MemberParams{
+		model.UserTeamParams{
 			TeamID: request.TeamId,
 			UserID: request.Body.User,
 			Perm:   string(FromPtr(request.Body.Perm)),
 		},
 	); err != nil {
-		if errors.Is(err, members.ErrNotFound) {
+		if errors.Is(err, userteams.ErrNotFound) {
 			return AttachTeamToUser404JSONResponse{
 				Message: ToPtr("Failed to find team or user"),
 				Status:  ToPtr(http.StatusNotFound),
 			}, nil
 		}
 
-		if errors.Is(err, members.ErrAlreadyAssigned) {
+		if errors.Is(err, userteams.ErrAlreadyAssigned) {
 			return AttachTeamToUser412JSONResponse{
 				Message: ToPtr("User is already attached"),
 				Status:  ToPtr(http.StatusPreconditionFailed),
@@ -385,22 +405,24 @@ func (a *API) PermitTeamUser(ctx context.Context, request PermitTeamUserRequestO
 		}, nil
 	}
 
-	if err := a.members.Permit(
+	if err := a.userteams.WithPrincipal(
+		current.GetUser(ctx),
+	).Permit(
 		ctx,
-		model.MemberParams{
+		model.UserTeamParams{
 			TeamID: request.TeamId,
 			UserID: request.Body.User,
 			Perm:   string(FromPtr(request.Body.Perm)),
 		},
 	); err != nil {
-		if errors.Is(err, members.ErrNotFound) {
+		if errors.Is(err, userteams.ErrNotFound) {
 			return PermitTeamUser404JSONResponse{
 				Message: ToPtr("Failed to find team or user"),
 				Status:  ToPtr(http.StatusNotFound),
 			}, nil
 		}
 
-		if errors.Is(err, members.ErrNotAssigned) {
+		if errors.Is(err, userteams.ErrNotAssigned) {
 			return PermitTeamUser412JSONResponse{
 				Message: ToPtr("User is not attached"),
 				Status:  ToPtr(http.StatusPreconditionFailed),
@@ -448,21 +470,23 @@ func (a *API) DeleteTeamFromUser(ctx context.Context, request DeleteTeamFromUser
 		}, nil
 	}
 
-	if err := a.members.Drop(
+	if err := a.userteams.WithPrincipal(
+		current.GetUser(ctx),
+	).Drop(
 		ctx,
-		model.MemberParams{
+		model.UserTeamParams{
 			TeamID: request.TeamId,
 			UserID: request.Body.User,
 		},
 	); err != nil {
-		if errors.Is(err, members.ErrNotFound) {
+		if errors.Is(err, userteams.ErrNotFound) {
 			return DeleteTeamFromUser404JSONResponse{
 				Message: ToPtr("Failed to find team or user"),
 				Status:  ToPtr(http.StatusPreconditionFailed),
 			}, nil
 		}
 
-		if errors.Is(err, members.ErrNotAssigned) {
+		if errors.Is(err, userteams.ErrNotAssigned) {
 			return DeleteTeamFromUser412JSONResponse{
 				Message: ToPtr("User is not attached"),
 				Status:  ToPtr(http.StatusPreconditionFailed),
@@ -506,7 +530,7 @@ func (a *API) convertTeam(record *model.Team, includeRefs bool) Team {
 	return result
 }
 
-func (a *API) convertTeamUser(record *model.Member) UserTeam {
+func (a *API) convertTeamUser(record *model.UserTeam) UserTeam {
 	result := UserTeam{
 		UserId:    record.UserID,
 		User:      ToPtr(a.convertUser(record.User, false)),

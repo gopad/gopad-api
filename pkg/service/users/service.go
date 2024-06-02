@@ -32,6 +32,7 @@ type Service interface {
 	Update(context.Context, *model.User) error
 	Delete(context.Context, string) error
 	Exists(context.Context, string) (bool, error)
+	WithPrincipal(*model.User) Service
 }
 
 type service struct {
@@ -43,6 +44,11 @@ func NewService(users Service) Service {
 	return &service{
 		users: users,
 	}
+}
+
+// WithPrincipal implements the Service interface.
+func (s *service) WithPrincipal(principal *model.User) Service {
+	return s.users.WithPrincipal(principal)
 }
 
 // External implements the Service interface.

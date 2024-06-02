@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,6 +12,10 @@ import (
 	"strings"
 
 	"github.com/Machiel/slugify"
+	"github.com/gopad/gopad-api/pkg/middleware/current"
+	"github.com/gopad/gopad-api/pkg/model"
+	"github.com/gopad/gopad-api/pkg/service/users"
+	"github.com/gopad/gopad-api/pkg/token"
 	"github.com/markbates/goth"
 	"github.com/rs/zerolog/log"
 )
@@ -343,6 +348,125 @@ func (r ExternalCallbackRedirectResponse) VisitExternalCallbackResponse(w http.R
 	)
 
 	return nil
+}
+
+// LoginAuth implements the v1.ServerInterface.
+func (a *API) LoginAuth(ctx context.Context, request LoginAuthRequestObject) (LoginAuthResponseObject, error) {
+	user, err := a.users.AuthByCreds(
+		ctx,
+		request.Body.Username,
+		request.Body.Password,
+	)
+
+	if err != nil {
+		if errors.Is(err, users.ErrNotFound) {
+			return LoginAuth401JSONResponse{
+				Message: ToPtr("Wrong username or password"),
+				Status:  ToPtr(http.StatusUnauthorized),
+			}, nil
+		}
+
+		if errors.Is(err, users.ErrWrongCredentials) {
+			return LoginAuth401JSONResponse{
+				Message: ToPtr("Wrong username or password"),
+				Status:  ToPtr(http.StatusUnauthorized),
+			}, nil
+		}
+
+		log.Error().
+			Err(err).
+			Str("username", request.Body.Username).
+			Msg("Failed to authenticate")
+
+		return LoginAuth500JSONResponse{
+			Message: ToPtr("Failed to authenticate user"),
+			Status:  ToPtr(http.StatusInternalServerError),
+		}, nil
+	}
+
+	result, err := token.New(
+		user.Username,
+	).Expiring(
+		a.config.Session.Secret,
+		a.config.Session.Expire,
+	)
+
+	if err != nil {
+		log.Error().
+			Err(err).
+			Str("username", request.Body.Username).
+			Msg("Failed to generate a token")
+
+		return LoginAuth500JSONResponse{
+			Message: ToPtr("Failed to generate a token"),
+			Status:  ToPtr(http.StatusInternalServerError),
+		}, nil
+	}
+
+	return LoginAuth200JSONResponse(
+		a.convertAuthToken(result),
+	), nil
+}
+
+// RefreshAuth implements the v1.ServerInterface.
+func (a *API) RefreshAuth(ctx context.Context, _ RefreshAuthRequestObject) (RefreshAuthResponseObject, error) {
+	principal := current.GetUser(
+		ctx,
+	)
+
+	result, err := token.New(
+		principal.Username,
+	).Expiring(
+		a.config.Session.Secret,
+		a.config.Session.Expire,
+	)
+
+	if err != nil {
+		log.Error().
+			Err(err).
+			Str("username", principal.Username).
+			Msg("Failed to generate a token")
+
+		return RefreshAuth401JSONResponse{
+			Message: ToPtr("Failed to generate a token"),
+			Status:  ToPtr(http.StatusInternalServerError),
+		}, nil
+	}
+
+	return RefreshAuth200JSONResponse(
+		a.convertAuthToken(result),
+	), nil
+}
+
+// VerifyAuth implements the v1.ServerInterface.
+func (a *API) VerifyAuth(ctx context.Context, _ VerifyAuthRequestObject) (VerifyAuthResponseObject, error) {
+	principal := current.GetUser(
+		ctx,
+	)
+
+	return VerifyAuth200JSONResponse(
+		a.convertAuthVerify(principal),
+	), nil
+}
+
+func (a *API) convertAuthToken(record *token.Result) AuthToken {
+	if record.ExpiresAt.IsZero() {
+		return AuthToken{
+			Token: ToPtr(record.Token),
+		}
+	}
+
+	return AuthToken{
+		Token:     ToPtr(record.Token),
+		ExpiresAt: ToPtr(record.ExpiresAt),
+	}
+}
+
+func (a *API) convertAuthVerify(record *model.User) AuthVerify {
+	return AuthVerify{
+		Username:  ToPtr(record.Username),
+		CreatedAt: ToPtr(record.CreatedAt),
+	}
 }
 
 func setAuthState(state *string) string {

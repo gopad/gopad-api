@@ -107,11 +107,45 @@ const (
 	ListUserTeamsParamsOrderDesc ListUserTeamsParamsOrder = "desc"
 )
 
+// AuthLogin defines model for auth_login.
+type AuthLogin struct {
+	Password string `json:"password"`
+	Username string `json:"username"`
+}
+
+// AuthToken defines model for auth_token.
+type AuthToken struct {
+	ExpiresAt *time.Time `json:"expires_at,omitempty"`
+	Token     *string    `json:"token,omitempty"`
+}
+
+// AuthVerify defines model for auth_verify.
+type AuthVerify struct {
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	Username  *string    `json:"username,omitempty"`
+}
+
 // Notification Generic response for errors and validations
 type Notification struct {
 	Errors  *[]Validation `json:"errors,omitempty"`
 	Message *string       `json:"message,omitempty"`
 	Status  *int          `json:"status,omitempty"`
+}
+
+// Profile Model to represent profile
+type Profile struct {
+	Active    *bool       `json:"active,omitempty"`
+	Admin     *bool       `json:"admin,omitempty"`
+	Auths     *[]UserAuth `json:"auths,omitempty"`
+	CreatedAt *time.Time  `json:"created_at,omitempty"`
+	Email     *string     `json:"email,omitempty"`
+	Fullname  *string     `json:"fullname,omitempty"`
+	Id        *string     `json:"id,omitempty"`
+	Password  *string     `json:"password,omitempty"`
+	Profile   *string     `json:"profile,omitempty"`
+	Teams     *[]UserTeam `json:"teams,omitempty"`
+	UpdatedAt *time.Time  `json:"updated_at,omitempty"`
+	Username  *string     `json:"username,omitempty"`
 }
 
 // Team Model to represent team
@@ -330,6 +364,12 @@ type ListUserTeamsParamsSort string
 // ListUserTeamsParamsOrder defines parameters for ListUserTeams.
 type ListUserTeamsParamsOrder string
 
+// LoginAuthJSONRequestBody defines body for LoginAuth for application/json ContentType.
+type LoginAuthJSONRequestBody = AuthLogin
+
+// UpdateProfileJSONRequestBody defines body for UpdateProfile for application/json ContentType.
+type UpdateProfileJSONRequestBody = Profile
+
 // CreateTeamJSONRequestBody defines body for CreateTeam for application/json ContentType.
 type CreateTeamJSONRequestBody = Team
 
@@ -362,12 +402,30 @@ type PermitUserTeamJSONRequestBody = UserTeamParams
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Authenticate an user by credentials
+	// (POST /auth/login)
+	LoginAuth(w http.ResponseWriter, r *http.Request)
+	// Refresh an auth token before it expires
+	// (GET /auth/refresh)
+	RefreshAuth(w http.ResponseWriter, r *http.Request)
+	// Verify validity for an authentication token
+	// (GET /auth/verify)
+	VerifyAuth(w http.ResponseWriter, r *http.Request)
 	// Callback for external authentication
 	// (GET /auth/{provider}/callback)
 	ExternalCallback(w http.ResponseWriter, r *http.Request, provider string, params ExternalCallbackParams)
 	// Initialize the external authentication
 	// (GET /auth/{provider}/initialize)
 	ExternalInitialize(w http.ResponseWriter, r *http.Request, provider string, params ExternalInitializeParams)
+	// Fetch profile details of the personal account
+	// (GET /profile/self)
+	ShowProfile(w http.ResponseWriter, r *http.Request)
+	// Update your own profile information
+	// (PUT /profile/self)
+	UpdateProfile(w http.ResponseWriter, r *http.Request)
+	// Retrieve an unlimited auth token
+	// (GET /profile/token)
+	TokenProfile(w http.ResponseWriter, r *http.Request)
 	// Fetch all available teams
 	// (GET /teams)
 	ListTeams(w http.ResponseWriter, r *http.Request, params ListTeamsParams)
@@ -428,6 +486,24 @@ type ServerInterface interface {
 
 type Unimplemented struct{}
 
+// Authenticate an user by credentials
+// (POST /auth/login)
+func (_ Unimplemented) LoginAuth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Refresh an auth token before it expires
+// (GET /auth/refresh)
+func (_ Unimplemented) RefreshAuth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Verify validity for an authentication token
+// (GET /auth/verify)
+func (_ Unimplemented) VerifyAuth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // Callback for external authentication
 // (GET /auth/{provider}/callback)
 func (_ Unimplemented) ExternalCallback(w http.ResponseWriter, r *http.Request, provider string, params ExternalCallbackParams) {
@@ -437,6 +513,24 @@ func (_ Unimplemented) ExternalCallback(w http.ResponseWriter, r *http.Request, 
 // Initialize the external authentication
 // (GET /auth/{provider}/initialize)
 func (_ Unimplemented) ExternalInitialize(w http.ResponseWriter, r *http.Request, provider string, params ExternalInitializeParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Fetch profile details of the personal account
+// (GET /profile/self)
+func (_ Unimplemented) ShowProfile(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Update your own profile information
+// (PUT /profile/self)
+func (_ Unimplemented) UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Retrieve an unlimited auth token
+// (GET /profile/token)
+func (_ Unimplemented) TokenProfile(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -557,6 +651,67 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
+// LoginAuth operation middleware
+func (siw *ServerInterfaceWrapper) LoginAuth(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.LoginAuth(w, r)
+	}))
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		handler = siw.HandlerMiddlewares[i](handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// RefreshAuth operation middleware
+func (siw *ServerInterfaceWrapper) RefreshAuth(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, HeaderScopes, []string{})
+
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
+	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RefreshAuth(w, r)
+	}))
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		handler = siw.HandlerMiddlewares[i](handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// VerifyAuth operation middleware
+func (siw *ServerInterfaceWrapper) VerifyAuth(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, HeaderScopes, []string{})
+
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
+	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.VerifyAuth(w, r)
+	}))
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		handler = siw.HandlerMiddlewares[i](handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
 // ExternalCallback operation middleware
 func (siw *ServerInterfaceWrapper) ExternalCallback(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -630,6 +785,67 @@ func (siw *ServerInterfaceWrapper) ExternalInitialize(w http.ResponseWriter, r *
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ExternalInitialize(w, r, provider, params)
+	}))
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		handler = siw.HandlerMiddlewares[i](handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ShowProfile operation middleware
+func (siw *ServerInterfaceWrapper) ShowProfile(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, HeaderScopes, []string{})
+
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
+	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ShowProfile(w, r)
+	}))
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		handler = siw.HandlerMiddlewares[i](handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// UpdateProfile operation middleware
+func (siw *ServerInterfaceWrapper) UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateProfile(w, r)
+	}))
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		handler = siw.HandlerMiddlewares[i](handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// TokenProfile operation middleware
+func (siw *ServerInterfaceWrapper) TokenProfile(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, HeaderScopes, []string{})
+
+	ctx = context.WithValue(ctx, BearerScopes, []string{})
+
+	ctx = context.WithValue(ctx, BasicScopes, []string{})
+
+	ctx = context.WithValue(ctx, CookieScopes, []string{})
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.TokenProfile(w, r)
 	}))
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
@@ -1497,10 +1713,28 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/auth/login", wrapper.LoginAuth)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/auth/refresh", wrapper.RefreshAuth)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/auth/verify", wrapper.VerifyAuth)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/auth/{provider}/callback", wrapper.ExternalCallback)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/auth/{provider}/initialize", wrapper.ExternalInitialize)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/profile/self", wrapper.ShowProfile)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/profile/self", wrapper.UpdateProfile)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/profile/token", wrapper.TokenProfile)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/teams", wrapper.ListTeams)
@@ -1558,6 +1792,145 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 
 	return r
+}
+
+type LoginAuthRequestObject struct {
+	Body *LoginAuthJSONRequestBody
+}
+
+type LoginAuthResponseObject interface {
+	VisitLoginAuthResponse(w http.ResponseWriter) error
+}
+
+type LoginAuth200JSONResponse AuthToken
+
+func (response LoginAuth200JSONResponse) VisitLoginAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type LoginAuth401JSONResponse Notification
+
+func (response LoginAuth401JSONResponse) VisitLoginAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type LoginAuth500JSONResponse Notification
+
+func (response LoginAuth500JSONResponse) VisitLoginAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type LoginAuthdefaultJSONResponse struct {
+	Body       Notification
+	StatusCode int
+}
+
+func (response LoginAuthdefaultJSONResponse) VisitLoginAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RefreshAuthRequestObject struct {
+}
+
+type RefreshAuthResponseObject interface {
+	VisitRefreshAuthResponse(w http.ResponseWriter) error
+}
+
+type RefreshAuth200JSONResponse AuthToken
+
+func (response RefreshAuth200JSONResponse) VisitRefreshAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RefreshAuth401JSONResponse Notification
+
+func (response RefreshAuth401JSONResponse) VisitRefreshAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RefreshAuth500JSONResponse Notification
+
+func (response RefreshAuth500JSONResponse) VisitRefreshAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RefreshAuthdefaultJSONResponse struct {
+	Body       Notification
+	StatusCode int
+}
+
+func (response RefreshAuthdefaultJSONResponse) VisitRefreshAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type VerifyAuthRequestObject struct {
+}
+
+type VerifyAuthResponseObject interface {
+	VisitVerifyAuthResponse(w http.ResponseWriter) error
+}
+
+type VerifyAuth200JSONResponse AuthVerify
+
+func (response VerifyAuth200JSONResponse) VisitVerifyAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type VerifyAuth401JSONResponse Notification
+
+func (response VerifyAuth401JSONResponse) VisitVerifyAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type VerifyAuth500JSONResponse Notification
+
+func (response VerifyAuth500JSONResponse) VisitVerifyAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type VerifyAuthdefaultJSONResponse struct {
+	Body       Notification
+	StatusCode int
+}
+
+func (response VerifyAuthdefaultJSONResponse) VisitVerifyAuthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
 }
 
 type ExternalCallbackRequestObject struct {
@@ -1648,6 +2021,154 @@ type ExternalInitializedefaultJSONResponse struct {
 }
 
 func (response ExternalInitializedefaultJSONResponse) VisitExternalInitializeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type ShowProfileRequestObject struct {
+}
+
+type ShowProfileResponseObject interface {
+	VisitShowProfileResponse(w http.ResponseWriter) error
+}
+
+type ShowProfile200JSONResponse Profile
+
+func (response ShowProfile200JSONResponse) VisitShowProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ShowProfile403JSONResponse Notification
+
+func (response ShowProfile403JSONResponse) VisitShowProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ShowProfile500JSONResponse Notification
+
+func (response ShowProfile500JSONResponse) VisitShowProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ShowProfiledefaultJSONResponse struct {
+	Body       Notification
+	StatusCode int
+}
+
+func (response ShowProfiledefaultJSONResponse) VisitShowProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type UpdateProfileRequestObject struct {
+	Body *UpdateProfileJSONRequestBody
+}
+
+type UpdateProfileResponseObject interface {
+	VisitUpdateProfileResponse(w http.ResponseWriter) error
+}
+
+type UpdateProfile200JSONResponse Profile
+
+func (response UpdateProfile200JSONResponse) VisitUpdateProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateProfile403JSONResponse Notification
+
+func (response UpdateProfile403JSONResponse) VisitUpdateProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateProfile422JSONResponse Notification
+
+func (response UpdateProfile422JSONResponse) VisitUpdateProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateProfile500JSONResponse Notification
+
+func (response UpdateProfile500JSONResponse) VisitUpdateProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateProfiledefaultJSONResponse struct {
+	Body       Notification
+	StatusCode int
+}
+
+func (response UpdateProfiledefaultJSONResponse) VisitUpdateProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type TokenProfileRequestObject struct {
+}
+
+type TokenProfileResponseObject interface {
+	VisitTokenProfileResponse(w http.ResponseWriter) error
+}
+
+type TokenProfile200JSONResponse AuthToken
+
+func (response TokenProfile200JSONResponse) VisitTokenProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type TokenProfile403JSONResponse Notification
+
+func (response TokenProfile403JSONResponse) VisitTokenProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type TokenProfile500JSONResponse Notification
+
+func (response TokenProfile500JSONResponse) VisitTokenProfileResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type TokenProfiledefaultJSONResponse struct {
+	Body       Notification
+	StatusCode int
+}
+
+func (response TokenProfiledefaultJSONResponse) VisitTokenProfileResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -2782,12 +3303,30 @@ func (response PermitUserTeamdefaultJSONResponse) VisitPermitUserTeamResponse(w 
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// Authenticate an user by credentials
+	// (POST /auth/login)
+	LoginAuth(ctx context.Context, request LoginAuthRequestObject) (LoginAuthResponseObject, error)
+	// Refresh an auth token before it expires
+	// (GET /auth/refresh)
+	RefreshAuth(ctx context.Context, request RefreshAuthRequestObject) (RefreshAuthResponseObject, error)
+	// Verify validity for an authentication token
+	// (GET /auth/verify)
+	VerifyAuth(ctx context.Context, request VerifyAuthRequestObject) (VerifyAuthResponseObject, error)
 	// Callback for external authentication
 	// (GET /auth/{provider}/callback)
 	ExternalCallback(ctx context.Context, request ExternalCallbackRequestObject) (ExternalCallbackResponseObject, error)
 	// Initialize the external authentication
 	// (GET /auth/{provider}/initialize)
 	ExternalInitialize(ctx context.Context, request ExternalInitializeRequestObject) (ExternalInitializeResponseObject, error)
+	// Fetch profile details of the personal account
+	// (GET /profile/self)
+	ShowProfile(ctx context.Context, request ShowProfileRequestObject) (ShowProfileResponseObject, error)
+	// Update your own profile information
+	// (PUT /profile/self)
+	UpdateProfile(ctx context.Context, request UpdateProfileRequestObject) (UpdateProfileResponseObject, error)
+	// Retrieve an unlimited auth token
+	// (GET /profile/token)
+	TokenProfile(ctx context.Context, request TokenProfileRequestObject) (TokenProfileResponseObject, error)
 	// Fetch all available teams
 	// (GET /teams)
 	ListTeams(ctx context.Context, request ListTeamsRequestObject) (ListTeamsResponseObject, error)
@@ -2873,6 +3412,85 @@ type strictHandler struct {
 	options     StrictHTTPServerOptions
 }
 
+// LoginAuth operation middleware
+func (sh *strictHandler) LoginAuth(w http.ResponseWriter, r *http.Request) {
+	var request LoginAuthRequestObject
+
+	var body LoginAuthJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.LoginAuth(ctx, request.(LoginAuthRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "LoginAuth")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(LoginAuthResponseObject); ok {
+		if err := validResponse.VisitLoginAuthResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RefreshAuth operation middleware
+func (sh *strictHandler) RefreshAuth(w http.ResponseWriter, r *http.Request) {
+	var request RefreshAuthRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RefreshAuth(ctx, request.(RefreshAuthRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RefreshAuth")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RefreshAuthResponseObject); ok {
+		if err := validResponse.VisitRefreshAuthResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// VerifyAuth operation middleware
+func (sh *strictHandler) VerifyAuth(w http.ResponseWriter, r *http.Request) {
+	var request VerifyAuthRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.VerifyAuth(ctx, request.(VerifyAuthRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "VerifyAuth")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(VerifyAuthResponseObject); ok {
+		if err := validResponse.VisitVerifyAuthResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // ExternalCallback operation middleware
 func (sh *strictHandler) ExternalCallback(w http.ResponseWriter, r *http.Request, provider string, params ExternalCallbackParams) {
 	var request ExternalCallbackRequestObject
@@ -2920,6 +3538,85 @@ func (sh *strictHandler) ExternalInitialize(w http.ResponseWriter, r *http.Reque
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ExternalInitializeResponseObject); ok {
 		if err := validResponse.VisitExternalInitializeResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ShowProfile operation middleware
+func (sh *strictHandler) ShowProfile(w http.ResponseWriter, r *http.Request) {
+	var request ShowProfileRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ShowProfile(ctx, request.(ShowProfileRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ShowProfile")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ShowProfileResponseObject); ok {
+		if err := validResponse.VisitShowProfileResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateProfile operation middleware
+func (sh *strictHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	var request UpdateProfileRequestObject
+
+	var body UpdateProfileJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateProfile(ctx, request.(UpdateProfileRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateProfile")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateProfileResponseObject); ok {
+		if err := validResponse.VisitUpdateProfileResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// TokenProfile operation middleware
+func (sh *strictHandler) TokenProfile(w http.ResponseWriter, r *http.Request) {
+	var request TokenProfileRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.TokenProfile(ctx, request.(TokenProfileRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "TokenProfile")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(TokenProfileResponseObject); ok {
+		if err := validResponse.VisitTokenProfileResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -3466,47 +4163,55 @@ func (sh *strictHandler) PermitUserTeam(w http.ResponseWriter, r *http.Request, 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

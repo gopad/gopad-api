@@ -1,4 +1,4 @@
-package members
+package userteams
 
 import (
 	"context"
@@ -24,9 +24,9 @@ func NewMetricsService(s Service, m *metrics.Metrics) Service {
 			prometheus.NewHistogramVec(
 				prometheus.HistogramOpts{
 					Namespace: m.Namespace,
-					Subsystem: "members_service",
+					Subsystem: "user_teams_service",
 					Name:      "request_latency_microseconds",
-					Help:      "Histogram of latencies for requests to the members service.",
+					Help:      "Histogram of latencies for requests to the user teams service.",
 					Buckets:   []float64{0.001, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0},
 				},
 				[]string{"method"},
@@ -36,9 +36,9 @@ func NewMetricsService(s Service, m *metrics.Metrics) Service {
 			prometheus.NewCounterVec(
 				prometheus.CounterOpts{
 					Namespace: m.Namespace,
-					Subsystem: "members_service",
+					Subsystem: "user_teams_service",
 					Name:      "errors_count",
-					Help:      "Total number of errors within the members service.",
+					Help:      "Total number of errors within the user teams service.",
 				},
 				[]string{"method"},
 			),
@@ -47,9 +47,9 @@ func NewMetricsService(s Service, m *metrics.Metrics) Service {
 			prometheus.NewCounterVec(
 				prometheus.CounterOpts{
 					Namespace: m.Namespace,
-					Subsystem: "members_service",
+					Subsystem: "user_teams_service",
 					Name:      "request_count",
-					Help:      "Total number of requests to the members service.",
+					Help:      "Total number of requests to the user teams service.",
 				},
 				[]string{"method"},
 			),
@@ -57,8 +57,14 @@ func NewMetricsService(s Service, m *metrics.Metrics) Service {
 	}
 }
 
+// External implements the Service interface for metrics.
+func (s *metricsService) WithPrincipal(principal *model.User) Service {
+	s.service.WithPrincipal(principal)
+	return s
+}
+
 // List implements the Service interface for metrics.
-func (s *metricsService) List(ctx context.Context, params model.MemberParams) ([]*model.Member, int64, error) {
+func (s *metricsService) List(ctx context.Context, params model.UserTeamParams) ([]*model.UserTeam, int64, error) {
 	defer func(start time.Time) {
 		s.requestCount.WithLabelValues("list").Add(1)
 		s.requestLatency.WithLabelValues("list").Observe(time.Since(start).Seconds())
@@ -74,7 +80,7 @@ func (s *metricsService) List(ctx context.Context, params model.MemberParams) ([
 }
 
 // Attach implements the Service interface for metrics.
-func (s *metricsService) Attach(ctx context.Context, params model.MemberParams) error {
+func (s *metricsService) Attach(ctx context.Context, params model.UserTeamParams) error {
 	defer func(start time.Time) {
 		s.requestCount.WithLabelValues("attach").Add(1)
 		s.requestLatency.WithLabelValues("attach").Observe(time.Since(start).Seconds())
@@ -90,7 +96,7 @@ func (s *metricsService) Attach(ctx context.Context, params model.MemberParams) 
 }
 
 // Permit implements the Service interface for metrics.
-func (s *metricsService) Permit(ctx context.Context, params model.MemberParams) error {
+func (s *metricsService) Permit(ctx context.Context, params model.UserTeamParams) error {
 	defer func(start time.Time) {
 		s.requestCount.WithLabelValues("permit").Add(1)
 		s.requestLatency.WithLabelValues("permit").Observe(time.Since(start).Seconds())
@@ -106,7 +112,7 @@ func (s *metricsService) Permit(ctx context.Context, params model.MemberParams) 
 }
 
 // Drop implements the Service interface for metrics.
-func (s *metricsService) Drop(ctx context.Context, params model.MemberParams) error {
+func (s *metricsService) Drop(ctx context.Context, params model.UserTeamParams) error {
 	defer func(start time.Time) {
 		s.requestCount.WithLabelValues("drop").Add(1)
 		s.requestLatency.WithLabelValues("drop").Observe(time.Since(start).Seconds())

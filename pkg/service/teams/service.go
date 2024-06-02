@@ -26,6 +26,7 @@ type Service interface {
 	Update(context.Context, *model.Team) error
 	Delete(context.Context, string) error
 	Exists(context.Context, string) (bool, error)
+	WithPrincipal(*model.User) Service
 }
 
 type service struct {
@@ -37,6 +38,11 @@ func NewService(teams Service) Service {
 	return &service{
 		teams: teams,
 	}
+}
+
+// WithPrincipal implements the Service interface.
+func (s *service) WithPrincipal(principal *model.User) Service {
+	return s.teams.WithPrincipal(principal)
 }
 
 // List implements the Service interface.

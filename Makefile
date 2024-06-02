@@ -80,15 +80,15 @@ lint: $(REVIVE)
 	for PKG in $(PACKAGES); do $(REVIVE) -config revive.toml -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate:
+generate: mocks
 	go generate $(PACKAGES)
 
 .PHONY: mocks
 mocks: \
 	pkg/upload/mock.go pkg/store/mock.go \
-	pkg/service/users/repository/mock.go \
-	pkg/service/teams/repository/mock.go \
-	pkg/service/members/repository/mock.go
+	pkg/service/users/mock.go \
+	pkg/service/teams/mock.go \
+	pkg/service/user_teams/mock.go
 
 pkg/upload/mock.go: pkg/upload/upload.go $(MOCKGEN)
 	$(MOCKGEN) -source $< -destination $@ -package upload
@@ -96,14 +96,14 @@ pkg/upload/mock.go: pkg/upload/upload.go $(MOCKGEN)
 pkg/store/mock.go: pkg/store/store.go $(MOCKGEN)
 	$(MOCKGEN) -source $< -destination $@ -package store
 
-pkg/service/users/repository/mock.go: pkg/service/users/repository/repository.go $(MOCKGEN)
-	$(MOCKGEN) -source $< -destination $@ -package repository
+pkg/service/users/mock.go: pkg/service/users/service.go $(MOCKGEN)
+	$(MOCKGEN) -source $< -destination $@ -package users
 
-pkg/service/teams/repository/mock.go: pkg/service/teams/repository/repository.go $(MOCKGEN)
-	$(MOCKGEN) -source $< -destination $@ -package repository
+pkg/service/teams/mock.go: pkg/service/teams/service.go $(MOCKGEN)
+	$(MOCKGEN) -source $< -destination $@ -package teams
 
-pkg/service/members/repository/mock.go: pkg/service/members/repository/repository.go $(MOCKGEN)
-	$(MOCKGEN) -source $< -destination $@ -package repository
+pkg/service/user_teams/mock.go: pkg/service/user_teams/service.go $(MOCKGEN)
+	$(MOCKGEN) -source $< -destination $@ -package userteams
 
 .PHONY: test
 test: test

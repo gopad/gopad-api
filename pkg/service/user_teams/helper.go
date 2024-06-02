@@ -1,4 +1,4 @@
-package members
+package userteams
 
 import (
 	"strings"

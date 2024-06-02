@@ -1,4 +1,4 @@
-package members
+package userteams
 
 import (
 	"context"
@@ -17,10 +17,11 @@ import (
 
 // GormService defines the service to store content within a database based on Gorm.
 type GormService struct {
-	handle *gorm.DB
-	config *config.Config
-	teams  teamsService.Service
-	users  usersService.Service
+	handle    *gorm.DB
+	config    *config.Config
+	principal *model.User
+	teams     teamsService.Service
+	users     usersService.Service
 }
 
 // NewGormService initializes the service to store content within a database based on Gorm.
@@ -38,10 +39,16 @@ func NewGormService(
 	}
 }
 
+// WithPrincipal implements the Service interface for database persistence.
+func (s *GormService) WithPrincipal(principal *model.User) Service {
+	s.principal = principal
+	return s
+}
+
 // List implements the Service interface for database persistence.
-func (s *GormService) List(ctx context.Context, params model.MemberParams) ([]*model.Member, int64, error) {
+func (s *GormService) List(ctx context.Context, params model.UserTeamParams) ([]*model.UserTeam, int64, error) {
 	counter := int64(0)
-	records := make([]*model.Member, 0)
+	records := make([]*model.UserTeam, 0)
 	q := s.query(ctx).Debug()
 
 	switch {
@@ -142,7 +149,7 @@ func (s *GormService) List(ctx context.Context, params model.MemberParams) ([]*m
 }
 
 // Attach implements the Service interface for database persistence.
-func (s *GormService) Attach(ctx context.Context, params model.MemberParams) error {
+func (s *GormService) Attach(ctx context.Context, params model.UserTeamParams) error {
 	team, err := s.teamID(ctx, params.TeamID)
 	if err != nil {
 		return err
@@ -162,7 +169,7 @@ func (s *GormService) Attach(ctx context.Context, params model.MemberParams) err
 	).Begin()
 	defer tx.Rollback()
 
-	record := &model.Member{
+	record := &model.UserTeam{
 		TeamID: team,
 		UserID: user,
 		Perm:   params.Perm,
@@ -180,7 +187,7 @@ func (s *GormService) Attach(ctx context.Context, params model.MemberParams) err
 }
 
 // Permit implements the Service interface for database persistence.
-func (s *GormService) Permit(ctx context.Context, params model.MemberParams) error {
+func (s *GormService) Permit(ctx context.Context, params model.UserTeamParams) error {
 	team, err := s.teamID(ctx, params.TeamID)
 	if err != nil {
 		return err
@@ -200,7 +207,7 @@ func (s *GormService) Permit(ctx context.Context, params model.MemberParams) err
 	).Begin()
 	defer tx.Rollback()
 
-	record := &model.Member{}
+	record := &model.UserTeam{}
 	record.Perm = params.Perm
 
 	if err := s.validatePerm(record.Perm); err != nil {
@@ -212,7 +219,7 @@ func (s *GormService) Permit(ctx context.Context, params model.MemberParams) err
 		team,
 		user,
 	).Model(
-		&model.Member{},
+		&model.UserTeam{},
 	).Updates(
 		record,
 	).Error; err != nil {
@@ -223,7 +230,7 @@ func (s *GormService) Permit(ctx context.Context, params model.MemberParams) err
 }
 
 // Drop implements the Service interface for database persistence.
-func (s *GormService) Drop(ctx context.Context, params model.MemberParams) error {
+func (s *GormService) Drop(ctx context.Context, params model.UserTeamParams) error {
 	team, err := s.teamID(ctx, params.TeamID)
 	if err != nil {
 		return err
@@ -248,7 +255,7 @@ func (s *GormService) Drop(ctx context.Context, params model.MemberParams) error
 		team,
 		user,
 	).Delete(
-		&model.Member{},
+		&model.UserTeam{},
 	).Error; err != nil {
 		return err
 	}
@@ -292,7 +299,7 @@ func (s *GormService) isAssigned(ctx context.Context, teamID, userID string) boo
 		teamID,
 		userID,
 	).Find(
-		&model.Member{},
+		&model.UserTeam{},
 	)
 
 	return res.RowsAffected != 0
@@ -306,7 +313,7 @@ func (s *GormService) isUnassigned(ctx context.Context, teamID, userID string) b
 		teamID,
 		userID,
 	).Find(
-		&model.Member{},
+		&model.UserTeam{},
 	)
 
 	return res.RowsAffected == 0
@@ -316,7 +323,7 @@ func (s *GormService) query(ctx context.Context) *gorm.DB {
 	return s.handle.WithContext(
 		ctx,
 	).Model(
-		&model.Member{},
+		&model.UserTeam{},
 	).Preload(
 		"Team",
 	).Joins(

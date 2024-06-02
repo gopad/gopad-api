@@ -21,8 +21,8 @@ import (
 	"github.com/gopad/gopad-api/pkg/middleware/header"
 	"github.com/gopad/gopad-api/pkg/model"
 	"github.com/gopad/gopad-api/pkg/respond"
-	"github.com/gopad/gopad-api/pkg/service/members"
 	"github.com/gopad/gopad-api/pkg/service/teams"
+	userteams "github.com/gopad/gopad-api/pkg/service/user_teams"
 	"github.com/gopad/gopad-api/pkg/service/users"
 	"github.com/gopad/gopad-api/pkg/session"
 	"github.com/gopad/gopad-api/pkg/store"
@@ -42,7 +42,7 @@ func Server(
 	storage store.Store,
 	teamsService teams.Service,
 	usersService users.Service,
-	membersService members.Service,
+	userteamsService userteams.Service,
 ) *chi.Mux {
 	mux := chi.NewRouter()
 
@@ -75,8 +75,8 @@ func Server(
 			respond.JSON(
 				w,
 				r,
-				[]string{
-					sess.Get(
+				map[string]string{
+					"user": sess.Get(
 						r.Context(),
 						"user",
 					),
@@ -315,7 +315,7 @@ func Server(
 						storage,
 						teamsService,
 						usersService,
-						membersService,
+						userteamsService,
 					),
 					make([]v1.StrictMiddlewareFunc, 0),
 				),

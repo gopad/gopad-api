@@ -15,7 +15,7 @@ type Team struct {
 	Name      string `gorm:"unique;length:255"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Users     []*Member
+	Users     []*UserTeam
 }
 
 // BeforeSave defines the hook executed before every save.

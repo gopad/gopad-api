@@ -17,8 +17,9 @@ import (
 
 // GormService defines the service to store content within a database based on Gorm.
 type GormService struct {
-	handle *gorm.DB
-	config *config.Config
+	handle    *gorm.DB
+	config    *config.Config
+	principal *model.User
 }
 
 // NewGormService initializes the service to store content within a database based on Gorm.
@@ -30,6 +31,12 @@ func NewGormService(
 		handle: handle,
 		config: cfg,
 	}
+}
+
+// WithPrincipal implements the Service interface for database persistence.
+func (s *GormService) WithPrincipal(principal *model.User) Service {
+	s.principal = principal
+	return s
 }
 
 // External implements the Service interface for database persistence.
@@ -210,7 +217,7 @@ func (s *GormService) List(ctx context.Context, params model.ListParams) ([]*mod
 func (s *GormService) Show(ctx context.Context, name string) (*model.User, error) {
 	record := &model.User{}
 
-	err := s.query(ctx).Where(
+	err := s.query(ctx).Debug().Where(
 		"id = ?",
 		name,
 	).Or(

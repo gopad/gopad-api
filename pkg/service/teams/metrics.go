@@ -58,6 +58,12 @@ func NewMetricsService(s Service, m *metrics.Metrics) Service {
 	}
 }
 
+// External implements the Service interface for metrics.
+func (s *metricsService) WithPrincipal(principal *model.User) Service {
+	s.service.WithPrincipal(principal)
+	return s
+}
+
 // List implements the Service interface for metrics.
 func (s *metricsService) List(ctx context.Context, params model.ListParams) ([]*model.Team, int64, error) {
 	defer func(start time.Time) {

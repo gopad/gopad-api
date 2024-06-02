@@ -1,4 +1,4 @@
-package members
+package userteams
 
 import (
 	"context"
@@ -19,12 +19,18 @@ type loggingService struct {
 func NewLoggingService(s Service) Service {
 	return &loggingService{
 		service: s,
-		logger:  log.With().Str("service", "members").Logger(),
+		logger:  log.With().Str("service", "userteams").Logger(),
 	}
 }
 
+// External implements the Service interface for logging.
+func (s *loggingService) WithPrincipal(principal *model.User) Service {
+	s.service.WithPrincipal(principal)
+	return s
+}
+
 // List implements the Service interface for logging.
-func (s *loggingService) List(ctx context.Context, params model.MemberParams) ([]*model.Member, int64, error) {
+func (s *loggingService) List(ctx context.Context, params model.UserTeamParams) ([]*model.UserTeam, int64, error) {
 	start := time.Now()
 	records, counter, err := s.service.List(ctx, params)
 
@@ -39,7 +45,7 @@ func (s *loggingService) List(ctx context.Context, params model.MemberParams) ([
 	if err != nil {
 		logger.Error().
 			Err(err).
-			Msg("Failed to fetch members")
+			Msg("Failed to fetch user teams")
 	} else {
 		logger.Debug().
 			Msg("")
@@ -49,7 +55,7 @@ func (s *loggingService) List(ctx context.Context, params model.MemberParams) ([
 }
 
 // Attach implements the Service interface for logging.
-func (s *loggingService) Attach(ctx context.Context, params model.MemberParams) error {
+func (s *loggingService) Attach(ctx context.Context, params model.UserTeamParams) error {
 	start := time.Now()
 	err := s.service.Attach(ctx, params)
 
@@ -65,7 +71,7 @@ func (s *loggingService) Attach(ctx context.Context, params model.MemberParams) 
 	if err != nil {
 		logger.Error().
 			Err(err).
-			Msg("Failed to attach member")
+			Msg("Failed to attach user team")
 	} else {
 		logger.Debug().
 			Msg("")
@@ -75,7 +81,7 @@ func (s *loggingService) Attach(ctx context.Context, params model.MemberParams) 
 }
 
 // Permit implements the Service interface for logging.
-func (s *loggingService) Permit(ctx context.Context, params model.MemberParams) error {
+func (s *loggingService) Permit(ctx context.Context, params model.UserTeamParams) error {
 	start := time.Now()
 	err := s.service.Permit(ctx, params)
 
@@ -91,7 +97,7 @@ func (s *loggingService) Permit(ctx context.Context, params model.MemberParams) 
 	if err != nil {
 		logger.Error().
 			Err(err).
-			Msg("Failed to permit member")
+			Msg("Failed to permit user team")
 	} else {
 		logger.Debug().
 			Msg("")
@@ -101,7 +107,7 @@ func (s *loggingService) Permit(ctx context.Context, params model.MemberParams) 
 }
 
 // Drop implements the Service interface for logging.
-func (s *loggingService) Drop(ctx context.Context, params model.MemberParams) error {
+func (s *loggingService) Drop(ctx context.Context, params model.UserTeamParams) error {
 	start := time.Now()
 	err := s.service.Drop(ctx, params)
 
@@ -116,7 +122,7 @@ func (s *loggingService) Drop(ctx context.Context, params model.MemberParams) er
 	if err != nil {
 		logger.Error().
 			Err(err).
-			Msg("Failed to drop member")
+			Msg("Failed to drop user team")
 	} else {
 		logger.Debug().
 			Msg("")

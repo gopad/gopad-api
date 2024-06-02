@@ -59,6 +59,12 @@ func NewMetricsService(s Service, m *metrics.Metrics) Service {
 }
 
 // External implements the Service interface for metrics.
+func (s *metricsService) WithPrincipal(principal *model.User) Service {
+	s.service.WithPrincipal(principal)
+	return s
+}
+
+// External implements the Service interface for metrics.
 func (s *metricsService) External(ctx context.Context, provider, ref, username, email, fullname string) (*model.User, error) {
 	return s.service.External(ctx, provider, ref, username, email, fullname)
 }

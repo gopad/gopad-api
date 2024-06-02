@@ -13,8 +13,8 @@ import (
 	"github.com/gopad/gopad-api/pkg/providers"
 	"github.com/gopad/gopad-api/pkg/router"
 	"github.com/gopad/gopad-api/pkg/secret"
-	"github.com/gopad/gopad-api/pkg/service/members"
 	"github.com/gopad/gopad-api/pkg/service/teams"
+	userteams "github.com/gopad/gopad-api/pkg/service/user_teams"
 	"github.com/gopad/gopad-api/pkg/service/users"
 	"github.com/gopad/gopad-api/pkg/session"
 	"github.com/oklog/run"
@@ -386,10 +386,10 @@ func serverAction(_ *cobra.Command, _ []string) {
 			registry,
 		)
 
-		membersService := members.NewMetricsService(
-			members.NewLoggingService(
-				members.NewService(
-					members.NewGormService(
+		userteamsService := userteams.NewMetricsService(
+			userteams.NewLoggingService(
+				userteams.NewService(
+					userteams.NewGormService(
 						storage.Handle(),
 						cfg,
 						teamsService,
@@ -410,7 +410,7 @@ func serverAction(_ *cobra.Command, _ []string) {
 				storage,
 				teamsService,
 				usersService,
-				membersService,
+				userteamsService,
 			),
 			ReadTimeout:  5 * time.Second,
 			WriteTimeout: 10 * time.Second,
