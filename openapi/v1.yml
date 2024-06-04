@@ -326,8 +326,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/notification"
 
-
-
   /teams:
     get:
       summary: "Fetch all available teams"
@@ -604,7 +602,7 @@ paths:
 
   /teams/{team_id}/users:
     get:
-      summary: "Fetch all users assigned to team"
+      summary: "Fetch all users attached to team"
       operationId: "ListTeamUsers"
       tags:
         - "team"
@@ -696,7 +694,7 @@ paths:
                 $ref: "#/components/schemas/notification"
 
     post:
-      summary: "Assign a user to team"
+      summary: "Attach a user to team"
       operationId: "AttachTeamToUser"
       tags:
         - "team"
@@ -734,7 +732,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/notification"
         "412":
-          description: "User is already assigned"
+          description: "User is already attached"
           content:
             application/json:
               schema:
@@ -797,7 +795,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/notification"
         "412":
-          description: "User is not assigned"
+          description: "User is not attached"
           content:
             application/json:
               schema:
@@ -822,7 +820,7 @@ paths:
                 $ref: "#/components/schemas/notification"
 
     delete:
-      summary: "Remove a user from team"
+      summary: "Unlink a user from team"
       operationId: "DeleteTeamFromUser"
       tags:
         - "team"
@@ -834,7 +832,7 @@ paths:
             type: string
           required: true
       requestBody:
-        description: "The team user data to delete"
+        description: "The team user data to unlink"
         required: true
         content:
           application/json:
@@ -860,7 +858,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/notification"
         "412":
-          description: "User is not assigned"
+          description: "User is not attached"
           content:
             application/json:
               schema:
@@ -1157,7 +1155,7 @@ paths:
 
   /users/{user_id}/teams:
     get:
-      summary: "Fetch all teams assigned to user"
+      summary: "Fetch all teams attached to user"
       operationId: "ListUserTeams"
       tags:
         - "user"
@@ -1244,7 +1242,7 @@ paths:
                 $ref: "#/components/schemas/notification"
 
     post:
-      summary: "Assign a team to user"
+      summary: "Attach a team to user"
       operationId: "AttachUserToTeam"
       tags:
         - "user"
@@ -1282,7 +1280,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/notification"
         "412":
-          description: "Team is already assigned"
+          description: "Team is already attached"
           content:
             application/json:
               schema:
@@ -1345,7 +1343,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/notification"
         "412":
-          description: "Team is not assigned"
+          description: "Team is not attached"
           content:
             application/json:
               schema:
@@ -1370,7 +1368,7 @@ paths:
                 $ref: "#/components/schemas/notification"
 
     delete:
-      summary: "Remove a team from user"
+      summary: "Unlink a team from user"
       operationId: "DeleteUserFromTeam"
       tags:
         - "user"
@@ -1382,7 +1380,7 @@ paths:
             type: string
           required: true
       requestBody:
-        description: "The user team data to delete"
+        description: "The user team data to unlink"
         required: true
         content:
           application/json:
@@ -1408,7 +1406,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/notification"
         "412":
-          description: "Team is not assigned"
+          description: "Team is not attached"
           content:
             application/json:
               schema:
@@ -1696,6 +1694,23 @@ components:
           items:
             $ref: "#/components/schemas/user_team"
 
+    user_team_params:
+      title: "User Team Params"
+      description: "Parameters to attach or unlink user team"
+      type: "object"
+      required:
+        - "team"
+      properties:
+        team:
+          type: "string"
+        perm:
+          type: "string"
+          default: "user"
+          enum:
+            - "user"
+            - "admin"
+            - "owner"
+
     team_users:
       title: "Team Users"
       description: "Model to represent team users"
@@ -1711,6 +1726,23 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/user_team"
+
+    team_user_params:
+      title: "Team User Params"
+      description: "Parameters to attach or unlink team user"
+      type: "object"
+      required:
+        - "user"
+      properties:
+        user:
+          type: "string"
+        perm:
+          type: "string"
+          default: "user"
+          enum:
+            - "user"
+            - "admin"
+            - "owner"
 
     user_team:
       title: "User Team"
@@ -1749,40 +1781,6 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-
-    team_user_params:
-      title: "Team User Params"
-      description: "Parameters to attach or remove team user"
-      type: "object"
-      required:
-        - "user"
-      properties:
-        user:
-          type: "string"
-        perm:
-          type: "string"
-          default: "user"
-          enum:
-            - "user"
-            - "admin"
-            - "owner"
-
-    user_team_params:
-      title: "User Team Params"
-      description: "Parameters to attach or remove user team"
-      type: "object"
-      required:
-        - "team"
-      properties:
-        team:
-          type: "string"
-        perm:
-          type: "string"
-          default: "user"
-          enum:
-            - "user"
-            - "admin"
-            - "owner"
 
     notification:
       title: "Notification"
