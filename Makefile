@@ -80,8 +80,12 @@ lint: $(REVIVE)
 	for PKG in $(PACKAGES); do $(REVIVE) -config revive.toml -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate: mocks
+generate: openapi mocks
 	go generate $(PACKAGES)
+
+.PHONY: openapi
+openapi: $(OAPI_CODEGEN)
+	$(OAPI_CODEGEN) --config=pkg/api/v1/config.yml openapi/v1.yml
 
 .PHONY: mocks
 mocks: \

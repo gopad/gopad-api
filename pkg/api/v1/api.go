@@ -11,8 +11,6 @@ import (
 	"github.com/gopad/gopad-api/pkg/upload"
 )
 
-//go:generate go run github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen --config=config.yml ../../../openapi/v1.yml
-
 var (
 	_ StrictServerInterface = (*API)(nil)
 )

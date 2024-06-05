@@ -7,7 +7,7 @@ package store
 import (
 	reflect "reflect"
 
-	v2 "github.com/alexedwards/scs/v2"
+	scs "github.com/alexedwards/scs/v2"
 	gomock "github.com/golang/mock/gomock"
 	gorm "gorm.io/gorm"
 )
@@ -148,10 +148,10 @@ func (mr *MockStoreMockRecorder) Prepare() *gomock.Call {
 }
 
 // Session mocks base method.
-func (m *MockStore) Session() v2.Store {
+func (m *MockStore) Session() scs.Store {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Session")
-	ret0, _ := ret[0].(v2.Store)
+	ret0, _ := ret[0].(scs.Store)
 	return ret0
 }
 
