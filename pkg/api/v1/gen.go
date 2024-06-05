@@ -158,7 +158,7 @@ type Team struct {
 	Users     *[]UserTeam `json:"users,omitempty"`
 }
 
-// TeamUserParams Parameters to attach or remove team user
+// TeamUserParams Parameters to attach or unlink team user
 type TeamUserParams struct {
 	Perm *TeamUserParamsPerm `json:"perm,omitempty"`
 	User string              `json:"user"`
@@ -223,7 +223,7 @@ type UserTeam struct {
 // UserTeamPerm defines model for UserTeam.Perm.
 type UserTeamPerm string
 
-// UserTeamParams Parameters to attach or remove user team
+// UserTeamParams Parameters to attach or unlink user team
 type UserTeamParams struct {
 	Perm *UserTeamParamsPerm `json:"perm,omitempty"`
 	Team string              `json:"team"`
@@ -441,13 +441,13 @@ type ServerInterface interface {
 	// Update a specific team
 	// (PUT /teams/{team_id})
 	UpdateTeam(w http.ResponseWriter, r *http.Request, teamId string)
-	// Remove a user from team
+	// Unlink a user from team
 	// (DELETE /teams/{team_id}/users)
 	DeleteTeamFromUser(w http.ResponseWriter, r *http.Request, teamId string)
-	// Fetch all users assigned to team
+	// Fetch all users attached to team
 	// (GET /teams/{team_id}/users)
 	ListTeamUsers(w http.ResponseWriter, r *http.Request, teamId string, params ListTeamUsersParams)
-	// Assign a user to team
+	// Attach a user to team
 	// (POST /teams/{team_id}/users)
 	AttachTeamToUser(w http.ResponseWriter, r *http.Request, teamId string)
 	// Update user perms for team
@@ -468,13 +468,13 @@ type ServerInterface interface {
 	// Update a specific user
 	// (PUT /users/{user_id})
 	UpdateUser(w http.ResponseWriter, r *http.Request, userId string)
-	// Remove a team from user
+	// Unlink a team from user
 	// (DELETE /users/{user_id}/teams)
 	DeleteUserFromTeam(w http.ResponseWriter, r *http.Request, userId string)
-	// Fetch all teams assigned to user
+	// Fetch all teams attached to user
 	// (GET /users/{user_id}/teams)
 	ListUserTeams(w http.ResponseWriter, r *http.Request, userId string, params ListUserTeamsParams)
-	// Assign a team to user
+	// Attach a team to user
 	// (POST /users/{user_id}/teams)
 	AttachUserToTeam(w http.ResponseWriter, r *http.Request, userId string)
 	// Update team perms for user
@@ -564,19 +564,19 @@ func (_ Unimplemented) UpdateTeam(w http.ResponseWriter, r *http.Request, teamId
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Remove a user from team
+// Unlink a user from team
 // (DELETE /teams/{team_id}/users)
 func (_ Unimplemented) DeleteTeamFromUser(w http.ResponseWriter, r *http.Request, teamId string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Fetch all users assigned to team
+// Fetch all users attached to team
 // (GET /teams/{team_id}/users)
 func (_ Unimplemented) ListTeamUsers(w http.ResponseWriter, r *http.Request, teamId string, params ListTeamUsersParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Assign a user to team
+// Attach a user to team
 // (POST /teams/{team_id}/users)
 func (_ Unimplemented) AttachTeamToUser(w http.ResponseWriter, r *http.Request, teamId string) {
 	w.WriteHeader(http.StatusNotImplemented)
@@ -618,19 +618,19 @@ func (_ Unimplemented) UpdateUser(w http.ResponseWriter, r *http.Request, userId
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Remove a team from user
+// Unlink a team from user
 // (DELETE /users/{user_id}/teams)
 func (_ Unimplemented) DeleteUserFromTeam(w http.ResponseWriter, r *http.Request, userId string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Fetch all teams assigned to user
+// Fetch all teams attached to user
 // (GET /users/{user_id}/teams)
 func (_ Unimplemented) ListUserTeams(w http.ResponseWriter, r *http.Request, userId string, params ListUserTeamsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Assign a team to user
+// Attach a team to user
 // (POST /users/{user_id}/teams)
 func (_ Unimplemented) AttachUserToTeam(w http.ResponseWriter, r *http.Request, userId string) {
 	w.WriteHeader(http.StatusNotImplemented)
@@ -3342,13 +3342,13 @@ type StrictServerInterface interface {
 	// Update a specific team
 	// (PUT /teams/{team_id})
 	UpdateTeam(ctx context.Context, request UpdateTeamRequestObject) (UpdateTeamResponseObject, error)
-	// Remove a user from team
+	// Unlink a user from team
 	// (DELETE /teams/{team_id}/users)
 	DeleteTeamFromUser(ctx context.Context, request DeleteTeamFromUserRequestObject) (DeleteTeamFromUserResponseObject, error)
-	// Fetch all users assigned to team
+	// Fetch all users attached to team
 	// (GET /teams/{team_id}/users)
 	ListTeamUsers(ctx context.Context, request ListTeamUsersRequestObject) (ListTeamUsersResponseObject, error)
-	// Assign a user to team
+	// Attach a user to team
 	// (POST /teams/{team_id}/users)
 	AttachTeamToUser(ctx context.Context, request AttachTeamToUserRequestObject) (AttachTeamToUserResponseObject, error)
 	// Update user perms for team
@@ -3369,13 +3369,13 @@ type StrictServerInterface interface {
 	// Update a specific user
 	// (PUT /users/{user_id})
 	UpdateUser(ctx context.Context, request UpdateUserRequestObject) (UpdateUserResponseObject, error)
-	// Remove a team from user
+	// Unlink a team from user
 	// (DELETE /users/{user_id}/teams)
 	DeleteUserFromTeam(ctx context.Context, request DeleteUserFromTeamRequestObject) (DeleteUserFromTeamResponseObject, error)
-	// Fetch all teams assigned to user
+	// Fetch all teams attached to user
 	// (GET /users/{user_id}/teams)
 	ListUserTeams(ctx context.Context, request ListUserTeamsRequestObject) (ListUserTeamsResponseObject, error)
-	// Assign a team to user
+	// Attach a team to user
 	// (POST /users/{user_id}/teams)
 	AttachUserToTeam(ctx context.Context, request AttachUserToTeamRequestObject) (AttachUserToTeamResponseObject, error)
 	// Update team perms for user
@@ -4163,55 +4163,55 @@ func (sh *strictHandler) PermitUserTeam(w http.ResponseWriter, r *http.Request, 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
