@@ -52,26 +52,6 @@ func (s *GormService) List(ctx context.Context, params model.UserTeamParams) ([]
 	q := s.query(ctx).Debug()
 
 	switch {
-	case params.TeamID != "" && params.UserID == "":
-		team, err := s.teamID(ctx, params.TeamID)
-		if err != nil {
-			return nil, counter, err
-		}
-
-		q = q.Where(
-			"team_id = ?",
-			team,
-		)
-
-		if val, ok := s.validUserSort(params.Sort); ok {
-			q = q.Order(strings.Join(
-				[]string{
-					val,
-					sortOrder(params.Order),
-				},
-				" ",
-			))
-		}
 	case params.UserID != "" && params.TeamID == "":
 		user, err := s.userID(ctx, params.UserID)
 		if err != nil {
@@ -84,6 +64,26 @@ func (s *GormService) List(ctx context.Context, params model.UserTeamParams) ([]
 		)
 
 		if val, ok := s.validTeamSort(params.Sort); ok {
+			q = q.Order(strings.Join(
+				[]string{
+					val,
+					sortOrder(params.Order),
+				},
+				" ",
+			))
+		}
+	case params.TeamID != "" && params.UserID == "":
+		team, err := s.teamID(ctx, params.TeamID)
+		if err != nil {
+			return nil, counter, err
+		}
+
+		q = q.Where(
+			"team_id = ?",
+			team,
+		)
+
+		if val, ok := s.validUserSort(params.Sort); ok {
 			q = q.Order(strings.Join(
 				[]string{
 					val,
