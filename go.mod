@@ -2,7 +2,7 @@ module github.com/gopad/gopad-api
 
 go 1.21
 
-toolchain go1.22.4
+toolchain go1.22.5
 
 require (
 	github.com/Machiel/slugify v1.0.1
