@@ -97,6 +97,7 @@
               };
 
               packages = with pkgs; [
+                air
                 bingo
                 gnumake
                 goreleaser
@@ -140,8 +141,6 @@
 
                 # GOPAD_API_SERVER_CERT = ".devenv/state/mkcert/localhost+1.pem";
                 # GOPAD_API_SERVER_KEY = ".devenv/state/mkcert/localhost+1-key.pem";
-
-                GOPAD_API_AUTH_CONFIG = "config/auth.yml";
               };
             };
           };
