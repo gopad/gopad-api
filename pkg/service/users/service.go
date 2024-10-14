@@ -17,8 +17,8 @@ var (
 	// ErrNotAssigned is returned when a user is not assigned.
 	ErrNotAssigned = errors.New("user is not assigned")
 
-	// ErrWrongCredentials is returned when credentials are wrong.
-	ErrWrongCredentials = errors.New("wrong credentials provided")
+	// ErrBadCredentials is returned when credentials are wrong.
+	ErrBadCredentials = errors.New("wrong credentials provided")
 )
 
 // Service handles all interactions with users.
