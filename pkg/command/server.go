@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/cenkalti/backoff/v4"
+	"github.com/cenkalti/backoff/v5"
 	"github.com/gopad/gopad-api/pkg/config"
 	"github.com/gopad/gopad-api/pkg/metrics"
 	"github.com/gopad/gopad-api/pkg/providers"
@@ -207,7 +207,7 @@ func init() {
 	_ = viper.BindPFlag("auth.config", serverCmd.PersistentFlags().Lookup("auth-config"))
 }
 
-func serverAction(_ *cobra.Command, _ []string) {
+func serverAction(ccmd *cobra.Command, _ []string) {
 	if err := providers.Register(
 		providers.WithConfig(cfg.Auth.Config),
 	); err != nil {
@@ -254,14 +254,16 @@ func serverAction(_ *cobra.Command, _ []string) {
 		defer storage.Close()
 	}
 
-	if err := backoff.RetryNotify(
+	if _, err := backoff.Retry(
+		ccmd.Context(),
 		storage.Open,
-		backoff.NewExponentialBackOff(),
-		func(_ error, dur time.Duration) {
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithNotify(func(err error, dur time.Duration) {
 			log.Warn().
+				Err(err).
 				Dur("retry", dur).
 				Msg("Database open failed")
-		},
+		}),
 	); err != nil {
 		log.Fatal().
 			Err(err).
@@ -270,14 +272,16 @@ func serverAction(_ *cobra.Command, _ []string) {
 		os.Exit(1)
 	}
 
-	if err := backoff.RetryNotify(
+	if _, err := backoff.Retry(
+		ccmd.Context(),
 		storage.Ping,
-		backoff.NewExponentialBackOff(),
-		func(_ error, dur time.Duration) {
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithNotify(func(err error, dur time.Duration) {
 			log.Warn().
+				Err(err).
 				Dur("retry", dur).
 				Msg("Database ping failed")
-		},
+		}),
 	); err != nil {
 		log.Fatal().
 			Err(err).
