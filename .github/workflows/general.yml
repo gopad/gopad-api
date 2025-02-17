@@ -31,9 +31,6 @@ jobs:
       - name: Server golangci
         run: make golangci
 
-      - name: Run staticcheck
-        run: make staticcheck
-
       - name: Run lint
         run: make lint
 
