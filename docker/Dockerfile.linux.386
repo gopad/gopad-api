@@ -9,8 +9,10 @@ VOLUME ["/var/lib/gopad"]
 ENTRYPOINT ["/usr/bin/gopad-api"]
 CMD ["server"]
 
-ENV GOPAD_API_DATABASE_DSN sqlite:///var/lib/gopad/database.sqlite3
-ENV GOPAD_API_UPLOAD_DSN file:///var/lib/gopad/uploads
+ENV GOPAD_API_DATABASE_DRIVER sqlite3
+ENV GOPAD_API_DATABASE_NAME /var/lib/gopad/database.sqlite3
+ENV GOPAD_API_UPLOAD_DRIVER file
+ENV GOPAD_API_UPLOAD_PATH /var/lib/gopad/uploads
 
 COPY bin/gopad-api /usr/bin/gopad-api
 WORKDIR /var/lib/gopad

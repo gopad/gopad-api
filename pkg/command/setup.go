@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/gopad/gopad-api/pkg/config"
-	"github.com/gopad/gopad-api/pkg/store"
 	"github.com/gopad/gopad-api/pkg/upload"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -100,17 +99,4 @@ func setupUploads(cfg *config.Config) (upload.Upload, error) {
 	}
 
 	return nil, upload.ErrUnknownDriver
-}
-
-func setupStorage(cfg *config.Config) (store.Store, error) {
-	switch cfg.Database.Driver {
-	case "sqlite", "sqlite3":
-		return store.NewGormStore(cfg.Database)
-	case "mysql", "mariadb":
-		return store.NewGormStore(cfg.Database)
-	case "postgres", "postgresql":
-		return store.NewGormStore(cfg.Database)
-	}
-
-	return nil, store.ErrUnknownDriver
 }

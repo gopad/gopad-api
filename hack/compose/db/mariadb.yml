@@ -6,7 +6,12 @@ volumes:
 services:
   api:
     environment:
-      - GOPAD_API_DATABASE_DSN=mysql://gopad:gopad@db:3306/gopad
+      - GOPAD_API_DATABASE_DRIVER=mysql
+      - GOPAD_API_DATABASE_ADDRESS=db
+      - GOPAD_API_DATABASE_PORT=3306
+      - GOPAD_API_DATABASE_USERNAME=gopad
+      - GOPAD_API_DATABASE_PASSWORD=gopad
+      - GOPAD_API_DATABASE_NAME=gopad
     depends_on:
       - db
 

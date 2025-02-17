@@ -6,7 +6,12 @@ volumes:
 services:
   api:
     environment:
-      - GOPAD_API_UPLOAD_DSN=minio://minioadmin:minioadmin@minio:9000/gopad
+      - GOPAD_API_UPLOAD_DRIVER=s3
+      - GOPAD_API_UPLOAD_ENDPOINT=minio:9000
+      - GOPAD_API_UPLOAD_BUCKET=gopad
+      - GOPAD_API_UPLOAD_REGION=us-east-1
+      - GOPAD_API_UPLOAD_ACCESS=minioadmin
+      - GOPAD_API_UPLOAD_SECRET=minioadmin
     depends_on:
       - minio
 

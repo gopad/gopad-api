@@ -6,6 +6,7 @@ volumes:
 services:
   api:
     environment:
-      - GOPAD_API_UPLOAD_DSN=file:///var/lib/upload
+      - GOPAD_API_UPLOAD_DRIVER=file
+      - GOPAD_API_UPLOAD_PATH=/var/lib/upload
     volumes:
       - file:/var/lib/upload

@@ -5,6 +5,7 @@
     "root": "/",
     "cert": "",
     "key": "",
+    "templates": "",
     "docs": true
   },
   "metrics": {
@@ -39,14 +40,12 @@
     "region": "us-east-1",
     "perms": "0755"
   },
-  "session": {
-    "name": "gopad",
+  "token": {
     "secret": "TxHrYxMAg01rBeEWrHn1BjOP",
-    "expire": "24h0m0s",
-    "secure": false
+    "expire": "1h0m0s"
   },
   "scim": {
-    "enabled": true,
+    "enabled": false,
     "token": ""
   },
   "admin": {

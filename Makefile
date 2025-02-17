@@ -1,5 +1,3 @@
-include .bingo/Variables.mk
-
 SHELL := bash
 NAME := gopad-api
 IMPORT := github.com/gopad/$(NAME)
@@ -68,46 +66,16 @@ vet:
 	go vet $(PACKAGES)
 
 .PHONY: golangci
-golangci: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run ./...
-
-.PHONY: staticcheck
-staticcheck: $(STATICCHECK)
-	$(STATICCHECK) -tags '$(TAGS)' $(PACKAGES)
+golangci:
+	go tool github.com/golangci/golangci-lint/cmd/golangci-lint run ./...
 
 .PHONY: lint
-lint: $(REVIVE)
-	for PKG in $(PACKAGES); do $(REVIVE) -config revive.toml -set_exit_status $$PKG || exit 1; done;
+lint:
+	for PKG in $(PACKAGES); do go tool github.com/mgechev/revive -config revive.toml -set_exit_status $$PKG || exit 1; done;
 
 .PHONY: generate
-generate: openapi mocks
+generate:
 	go generate $(PACKAGES)
-
-.PHONY: openapi
-openapi: $(OAPI_CODEGEN)
-	$(OAPI_CODEGEN) --config=pkg/api/v1/config.yml openapi/v1.yml
-
-.PHONY: mocks
-mocks: \
-	pkg/upload/mock.go pkg/store/mock.go \
-	pkg/service/users/mock.go \
-	pkg/service/teams/mock.go \
-	pkg/service/user_teams/mock.go
-
-pkg/upload/mock.go: pkg/upload/upload.go $(MOCKGEN)
-	$(MOCKGEN) -source $< -destination $@ -package upload
-
-pkg/store/mock.go: pkg/store/store.go $(MOCKGEN)
-	$(MOCKGEN) -source $< -destination $@ -package store
-
-pkg/service/users/mock.go: pkg/service/users/service.go $(MOCKGEN)
-	$(MOCKGEN) -source $< -destination $@ -package users
-
-pkg/service/teams/mock.go: pkg/service/teams/service.go $(MOCKGEN)
-	$(MOCKGEN) -source $< -destination $@ -package teams
-
-pkg/service/user_teams/mock.go: pkg/service/user_teams/service.go $(MOCKGEN)
-	$(MOCKGEN) -source $< -destination $@ -package userteams
 
 .PHONY: test
 test: test
@@ -179,3 +147,7 @@ release-checksum:
 
 .PHONY: release-finish
 release-finish: release-reduce release-checksum
+
+.PHONY: watch
+watch:
+	go tool github.com/air-verse/air -c .air.toml

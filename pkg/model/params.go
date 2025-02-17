@@ -5,15 +5,15 @@ type ListParams struct {
 	Search string
 	Sort   string
 	Order  string
-	Limit  int
-	Offset int
+	Limit  int64
+	Offset int64
 }
 
-// UserTeamParams defines parameters for user teams.
-type UserTeamParams struct {
+// UserGroupParams defines parameters for user groups.
+type UserGroupParams struct {
 	ListParams
 
-	UserID string
-	TeamID string
-	Perm   string
+	UserID  string
+	GroupID string
+	Perm    string
 }

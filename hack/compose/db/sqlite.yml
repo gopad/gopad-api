@@ -6,6 +6,7 @@ volumes:
 services:
   api:
     environment:
-      - GOPAD_API_DATABASE_DSN=sqlite:///var/lib/database/gopad.sqlite3
+      - GOPAD_API_DATABASE_DRIVER=sqlite3
+      - GOPAD_API_DATABASE_NAME=/var/lib/database/gopad.sqlite3
     volumes:
       - sqlite:/var/lib/database

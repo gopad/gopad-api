@@ -20,98 +20,84 @@ security:
   - Header: []
   - Bearer: []
   - Basic: []
-  - Cookie: []
 
 paths:
-  /auth/{provider}/initialize:
+  /auth/{provider}/request:
     get:
-      summary: "Initialize the external authentication"
-      operationId: "ExternalInitialize"
+      summary: "Request the redirect to defined provider"
+      operationId: "RequestProvider"
       tags:
         - "auth"
       parameters:
-        - in: "path"
-          name: "provider"
-          description: "An identifier for the auth provider"
-          schema:
-            type: string
-          required: true
-        - name: state
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Auth state
+        - $ref: "#/components/parameters/AuthProviderParam"
       security: []
       responses:
-        "307":
-          description: "Redirect to external auth provider"
+        "308":
+          description: "Redirect to the provider"
+          content:
+            text/html:
+              schema:
+                type: "string"
         "404":
-          description: "Provider identifier is unknown"
+          description: "Provider not found"
           content:
-            application/json:
+            text/html:
               schema:
-                $ref: "#/components/schemas/notification"
-        "412":
-          description: "Failed to initialze the provider"
+                type: "string"
+        "500":
+          description: "Internal server error"
           content:
-            application/json:
+            text/html:
               schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+                type: "string"
 
   /auth/{provider}/callback:
     get:
-      summary: "Callback for external authentication"
-      operationId: "ExternalCallback"
+      summary: "Callback to parse the defined provider"
+      operationId: "CallbackProvider"
       tags:
         - "auth"
       parameters:
-        - in: "path"
-          name: "provider"
-          description: "An identifier for the auth provider"
-          schema:
-            type: string
-          required: true
-        - name: state
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Auth state
-        - name: code
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Auth code
+        - $ref: "#/components/parameters/AuthProviderParam"
+        - $ref: "#/components/parameters/AuthStateParam"
+        - $ref: "#/components/parameters/AuthCodeParam"
       security: []
       responses:
-        "307":
-          description: "Redirect to root of the application"
-        "404":
-          description: "Provider identifier is unknown"
+        "308":
+          description: "Generated expiring token"
           content:
-            application/json:
+            text/html:
               schema:
-                $ref: "#/components/schemas/notification"
+                type: "string"
         "412":
           description: "Failed to initialize provider"
           content:
-            application/json:
+            text/html:
               schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
+                type: "string"
+        "404":
+          description: "Provider not found"
           content:
-            application/json:
+            text/html:
               schema:
-                $ref: "#/components/schemas/notification"
+                type: "string"
+        "500":
+          description: "Internal server error"
+          content:
+            text/html:
+              schema:
+                type: "string"
+
+  /auth/providers:
+    get:
+      summary: "Fetch the available auth providers"
+      operationId: "ListProviders"
+      tags:
+        - "auth"
+      security: []
+      responses:
+        "200":
+          $ref: "#/components/responses/ProvidersResponse"
 
   /auth/login:
     post:
@@ -120,38 +106,15 @@ paths:
       tags:
         - "auth"
       requestBody:
-        description: "The credentials to authenticate"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/auth_login"
+        $ref: "#/components/requestBodies/LoginAuthBody"
       security: []
       responses:
         "200":
-          description: "Generated token with expire date"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/auth_token"
+          $ref: "#/components/responses/LoginResponse"
         "401":
-          description: "Unauthorized with wrong credentials"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/BadCredentialsError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
   /auth/refresh:
     get:
@@ -161,29 +124,11 @@ paths:
         - "auth"
       responses:
         "200":
-          description: "Refreshed token with expire date"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/auth_token"
+          $ref: "#/components/responses/RefreshResponse"
         "401":
-          description: "Failed to generate valid token"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InvalidTokenError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
   /auth/verify:
     get:
@@ -193,29 +138,11 @@ paths:
         - "auth"
       responses:
         "200":
-          description: "Metadata of the auth token"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/auth_verify"
+          $ref: "#/components/responses/VerifyResponse"
         "401":
-          description: "Unauthorized invalid token"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InvalidTokenError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
   /profile/token:
     get:
@@ -225,29 +152,11 @@ paths:
         - "profile"
       responses:
         "200":
-          description: "Generated token never expiring"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/auth_token"
+          $ref: "#/components/responses/TokenResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
   /profile/self:
     get:
@@ -257,29 +166,11 @@ paths:
         - "profile"
       responses:
         "200":
-          description: "The current profile details"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/profile"
+          $ref: "#/components/responses/ProfileResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       summary: "Update your own profile information"
@@ -287,594 +178,201 @@ paths:
       tags:
         - "profile"
       requestBody:
-        description: "The profile data to update"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/profile"
-      security: []
+        $ref: "#/components/requestBodies/UpdateProfileBody"
       responses:
         "200":
-          description: "The updated profile details"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/profile"
+          $ref: "#/components/responses/ProfileResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "422":
-          description: "Failed to validate request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ValidationError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
-  /teams:
+  /groups:
     get:
-      summary: "Fetch all available teams"
-      operationId: "ListTeams"
+      summary: "Fetch all available groups"
+      operationId: "ListGroups"
       tags:
-        - "team"
+        - "group"
       parameters:
-        - name: search
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Search query
-          x-example: John Doe
-        - name: sort
-          in: query
-          required: false
-          schema:
-            type: string
-            default: name
-            enum:
-              - slug
-              - name
-          description: Sorting column
-          x-example: name
-        - name: order
-          in: query
-          required: false
-          schema:
-            type: string
-            default: asc
-            enum:
-              - asc
-              - desc
-          description: Sorting order
-          x-example: desc
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 100
-          description: Paging limit
-          x-example: 100
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 0
-          description: Paging offset
-          x-example: 0
+        - $ref: "#/components/parameters/SearchQueryParam"
+        - $ref: "#/components/parameters/SortColumnParam"
+        - $ref: "#/components/parameters/SortOrderParam"
+        - $ref: "#/components/parameters/PagingLimitParam"
+        - $ref: "#/components/parameters/PagingOffsetParam"
       responses:
         "200":
-          description: "A collection of teams"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/teams"
+          $ref: "#/components/responses/GroupsResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     post:
-      summary: "Create a new team"
-      operationId: "CreateTeam"
+      summary: "Create a new group"
+      operationId: "CreateGroup"
       tags:
-        - "team"
+        - "group"
       requestBody:
-        description: "The team data to create"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/team"
+        $ref: "#/components/requestBodies/CreateGroupBody"
       responses:
         "200":
-          description: "The created team data"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/team"
+          $ref: "#/components/responses/GroupResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "422":
-          description: "Failed to validate request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ValidationError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
-  /teams/{team_id}:
+  /groups/{group_id}:
     get:
-      summary: "Fetch a specific team"
-      operationId: "ShowTeam"
+      summary: "Fetch a specific group"
+      operationId: "ShowGroup"
       tags:
-        - "team"
+        - "group"
       parameters:
-        - in: "path"
-          name: "team_id"
-          description: "A team identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/GroupParam"
       responses:
         "200":
-          description: "The fetched team details"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/team"
+          $ref: "#/components/responses/GroupResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "Team not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     put:
-      summary: "Update a specific team"
-      operationId: "UpdateTeam"
+      summary: "Update a specific group"
+      operationId: "UpdateGroup"
       tags:
-        - "team"
+        - "group"
       parameters:
-        - in: "path"
-          name: "team_id"
-          description: "A team identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/GroupParam"
       requestBody:
-        description: "The team data to update"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/team"
+        $ref: "#/components/requestBodies/UpdateGroupBody"
       responses:
         "200":
-          description: "The updated team details"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/team"
+          $ref: "#/components/responses/GroupResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "Team not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "422":
-          description: "Failed to validate request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ValidationError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
-      summary: "Delete a specific team"
-      operationId: "DeleteTeam"
+      summary: "Delete a specific group"
+      operationId: "DeleteGroup"
       tags:
-        - "team"
+        - "group"
       parameters:
-        - in: "path"
-          name: "team_id"
-          description: "A team identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/GroupParam"
       responses:
         "200":
-          description: "Plain success message"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/SuccessMessage"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "Team not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "400":
-          description: "Failed to delete the team"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ActionFailedError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
-  /teams/{team_id}/users:
+  /groups/{group_id}/users:
     get:
-      summary: "Fetch all users attached to team"
-      operationId: "ListTeamUsers"
+      summary: "Fetch all users attached to group"
+      operationId: "ListGroupUsers"
       tags:
-        - "team"
+        - "group"
       parameters:
-        - in: "path"
-          name: "team_id"
-          description: "A team identifier or slug"
-          schema:
-            type: string
-          required: true
-        - name: search
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Search query
-          x-example: John Doe
-        - name: sort
-          in: query
-          required: false
-          schema:
-            type: string
-            default: username
-            enum:
-              - username
-              - email
-              - fullname
-              - admin
-              - active
-          description: Sorting column
-          x-example: name
-        - name: order
-          in: query
-          required: false
-          schema:
-            type: string
-            default: asc
-            enum:
-              - asc
-              - desc
-          description: Sorting order
-          x-example: desc
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 100
-          description: Paging limit
-          x-example: 100
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 0
-          description: Paging offset
-          x-example: 0
+        - $ref: "#/components/parameters/GroupParam"
+        - $ref: "#/components/parameters/SearchQueryParam"
+        - $ref: "#/components/parameters/SortColumnParam"
+        - $ref: "#/components/parameters/SortOrderParam"
+        - $ref: "#/components/parameters/PagingLimitParam"
+        - $ref: "#/components/parameters/PagingOffsetParam"
       responses:
         "200":
-          description: "A collection of team users"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/team_users"
+          $ref: "#/components/responses/GroupUsersResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "Team not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     post:
-      summary: "Attach a user to team"
-      operationId: "AttachTeamToUser"
+      summary: "Attach a user to group"
+      operationId: "AttachGroupToUser"
       tags:
-        - "team"
+        - "group"
       parameters:
-        - in: "path"
-          name: "team_id"
-          description: "A team identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/GroupParam"
       requestBody:
-        description: "The team user data to attach"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/team_user_params"
+        $ref: "#/components/requestBodies/GroupUserPermBody"
       responses:
         "200":
-          description: "Plain success message"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/SuccessMessage"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "Team or user not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "412":
-          description: "User is already attached"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/AlreadyAttachedError"
         "422":
-          description: "Failed to validate request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ValidationError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     put:
-      summary: "Update user perms for team"
-      operationId: "PermitTeamUser"
+      summary: "Update user perms for group"
+      operationId: "PermitGroupUser"
       tags:
-        - "team"
+        - "group"
       parameters:
-        - in: "path"
-          name: "team_id"
-          description: "A team identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/GroupParam"
       requestBody:
-        description: "The team user data to update"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/team_user_params"
+        $ref: "#/components/requestBodies/GroupUserPermBody"
       responses:
         "200":
-          description: "Plain success message"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/SuccessMessage"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "Team or user not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "412":
-          description: "User is not attached"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAttachedError"
         "422":
-          description: "Failed to validate request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ValidationError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
-      summary: "Unlink a user from team"
-      operationId: "DeleteTeamFromUser"
+      summary: "Unlink a user from group"
+      operationId: "DeleteGroupFromUser"
       tags:
-        - "team"
+        - "group"
       parameters:
-        - in: "path"
-          name: "team_id"
-          description: "A team identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/GroupParam"
       requestBody:
-        description: "The team user data to unlink"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/team_user_params"
+        $ref: "#/components/requestBodies/GroupUserDropBody"
       responses:
         "200":
-          description: "Plain success message"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/SuccessMessage"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "Team or user not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "412":
-          description: "User is not attached"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAttachedError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
   /users:
     get:
@@ -883,79 +381,18 @@ paths:
       tags:
         - "user"
       parameters:
-        - name: search
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Search query
-          x-example: John Doe
-        - name: sort
-          in: query
-          required: false
-          schema:
-            type: string
-            default: username
-            enum:
-              - username
-              - email
-              - fullname
-              - admin
-              - active
-          description: Sorting column
-          x-example: username
-        - name: order
-          in: query
-          required: false
-          schema:
-            type: string
-            default: asc
-            enum:
-              - asc
-              - desc
-          description: Sorting order
-          x-example: desc
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 100
-          description: Paging limit
-          x-example: 100
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 0
-          description: Paging offset
-          x-example: 0
+        - $ref: "#/components/parameters/SearchQueryParam"
+        - $ref: "#/components/parameters/SortColumnParam"
+        - $ref: "#/components/parameters/SortOrderParam"
+        - $ref: "#/components/parameters/PagingLimitParam"
+        - $ref: "#/components/parameters/PagingOffsetParam"
       responses:
         "200":
-          description: "A collection of users"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/users"
+          $ref: "#/components/responses/UsersResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       summary: "Create a new user"
@@ -963,43 +400,16 @@ paths:
       tags:
         - "user"
       requestBody:
-        description: "The user data to create"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/user"
+        $ref: "#/components/requestBodies/CreateUserBody"
       responses:
         "200":
-          description: "The created user data"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/user"
+          $ref: "#/components/responses/UserResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "422":
-          description: "Failed to validate request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ValidationError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
   /users/{user_id}:
     get:
@@ -1008,43 +418,16 @@ paths:
       tags:
         - "user"
       parameters:
-        - in: "path"
-          name: "user_id"
-          description: "A user identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/UserParam"
       responses:
         "200":
-          description: "The fetched user details"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/user"
+          $ref: "#/components/responses/UserResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "User not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       summary: "Update a specific user"
@@ -1052,56 +435,20 @@ paths:
       tags:
         - "user"
       parameters:
-        - in: "path"
-          name: "user_id"
-          description: "A user identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/UserParam"
       requestBody:
-        description: "The user data to update"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/user"
+        $ref: "#/components/requestBodies/UpdateUserBody"
       responses:
         "200":
-          description: "The updated user details"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/user"
+          $ref: "#/components/responses/UserResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "User not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "422":
-          description: "Failed to validate request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ValidationError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       summary: "Delete a specific user"
@@ -1109,320 +456,108 @@ paths:
       tags:
         - "user"
       parameters:
-        - in: "path"
-          name: "user_id"
-          description: "A user identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/UserParam"
       responses:
         "200":
-          description: "Plain success message"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/SuccessMessage"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "User not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "400":
-          description: "Failed to delete the user"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ActionFailedError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
-  /users/{user_id}/teams:
+  /users/{user_id}/groups:
     get:
-      summary: "Fetch all teams attached to user"
-      operationId: "ListUserTeams"
+      summary: "Fetch all groups attached to user"
+      operationId: "ListUserGroups"
       tags:
         - "user"
       parameters:
-        - in: "path"
-          name: "user_id"
-          description: "A user identifier or slug"
-          schema:
-            type: string
-          required: true
-        - name: search
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Search query
-          x-example: John Doe
-        - name: sort
-          in: query
-          required: false
-          schema:
-            type: string
-            default: name
-            enum:
-              - slug
-              - name
-          description: Sorting column
-          x-example: name
-        - name: order
-          in: query
-          required: false
-          schema:
-            type: string
-            default: asc
-            enum:
-              - asc
-              - desc
-          description: Sorting order
-          x-example: desc
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: Paging limit
-          x-example: 100
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: Paging offset
-          x-example: 0
+        - $ref: "#/components/parameters/UserParam"
+        - $ref: "#/components/parameters/SearchQueryParam"
+        - $ref: "#/components/parameters/SortColumnParam"
+        - $ref: "#/components/parameters/SortOrderParam"
+        - $ref: "#/components/parameters/PagingLimitParam"
+        - $ref: "#/components/parameters/PagingOffsetParam"
       responses:
         "200":
-          description: "A collection of user teams"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/user_teams"
+          $ref: "#/components/responses/UserGroupsResponse"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "User not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     post:
-      summary: "Attach a team to user"
-      operationId: "AttachUserToTeam"
+      summary: "Attach a group to user"
+      operationId: "AttachUserToGroup"
       tags:
         - "user"
       parameters:
-        - in: "path"
-          name: "user_id"
-          description: "A user identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/UserParam"
       requestBody:
-        description: "The user team data to attach"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/user_team_params"
+        $ref: "#/components/requestBodies/UserGroupPermBody"
       responses:
         "200":
-          description: "Plain success message"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/SuccessMessage"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "User or team not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "412":
-          description: "Team is already attached"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/AlreadyAttachedError"
         "422":
-          description: "Failed to validate request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ValidationError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     put:
-      summary: "Update team perms for user"
-      operationId: "PermitUserTeam"
+      summary: "Update group perms for user"
+      operationId: "PermitUserGroup"
       tags:
         - "user"
       parameters:
-        - in: "path"
-          name: "user_id"
-          description: "A user identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/UserParam"
       requestBody:
-        description: "The user team data to update"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/user_team_params"
+        $ref: "#/components/requestBodies/UserGroupPermBody"
       responses:
         "200":
-          description: "Plain success message"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/SuccessMessage"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "User or team not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "412":
-          description: "Team is not attached"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAttachedError"
         "422":
-          description: "Failed to validate request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/ValidationError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
-      summary: "Unlink a team from user"
-      operationId: "DeleteUserFromTeam"
+      summary: "Unlink a group from user"
+      operationId: "DeleteUserFromGroup"
       tags:
         - "user"
       parameters:
-        - in: "path"
-          name: "user_id"
-          description: "A user identifier or slug"
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/UserParam"
       requestBody:
-        description: "The user team data to unlink"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/user_team_params"
+        $ref: "#/components/requestBodies/UserGroupDropBody"
       responses:
         "200":
-          description: "Plain success message"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/SuccessMessage"
         "403":
-          description: "User is not authorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAuthorizedError"
         "404":
-          description: "User or team not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotFoundError"
         "412":
-          description: "Team is not attached"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/NotAttachedError"
         "500":
-          description: "Some internal server error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
-        default:
-          description: "Some error unrelated to the handler"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/notification"
+          $ref: "#/components/responses/InternalServerError"
 
 components:
   securitySchemes:
@@ -1436,40 +571,541 @@ components:
     Basic:
       type: http
       scheme: basic
-    Cookie:
-      type: apiKey
-      in: header
-      name: Cookie
+
+  parameters:
+    SearchQueryParam:
+      name: "search"
+      in: "query"
+      required: false
+      schema:
+        type: "string"
+      description: "Search query"
+
+    PagingLimitParam:
+      name: "limit"
+      in: "query"
+      required: false
+      schema:
+        type: "integer"
+        default: 100
+      description: "Paging limit"
+      x-example: 100
+    PagingOffsetParam:
+      name: "offset"
+      in: "query"
+      required: false
+      schema:
+        type: "integer"
+        default: 0
+      description: "Paging offset"
+      x-example: 0
+
+    SortColumnParam:
+      name: "sort"
+      in: "query"
+      required: false
+      schema:
+        type: "string"
+      description: "Sorting column"
+    SortOrderParam:
+      name: "order"
+      in: "query"
+      required: false
+      schema:
+        type: "string"
+        default: "asc"
+        enum:
+          - "asc"
+          - "desc"
+      description: "Sorting order"
+      x-example: "desc"
+
+    AuthProviderParam:
+      in: "path"
+      name: "provider"
+      description: "An identifier for the auth provider"
+      schema:
+        type: "string"
+      required: true
+      x-example: "github"
+    AuthStateParam:
+      name: "state"
+      in: "query"
+      required: false
+      schema:
+        type: "string"
+      description: "Auth state"
+    AuthCodeParam:
+      name: "code"
+      in: "query"
+      required: false
+      schema:
+        type: "string"
+      description: "Auth code"
+
+    GroupParam:
+      in: "path"
+      name: "group_id"
+      description: "A group identifier or slug"
+      schema:
+        type: "string"
+      required: true
+      x-example: "group-1"
+      x-go-name: "GroupID"
+    UserParam:
+      in: "path"
+      name: "user_id"
+      description: "A user identifier or slug"
+      schema:
+        type: "string"
+      required: true
+      x-example: "jdoe"
+      x-go-name: "UserID"
+
+  requestBodies:
+    LoginAuthBody:
+      description: "The credentials to authenticate"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: "object"
+            required:
+              - "username"
+              - "password"
+            properties:
+              username:
+                type: "string"
+              password:
+                type: "string"
+                format: "password"
+
+    UpdateProfileBody:
+      description: "The profile data to update"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+              password:
+                type: "string"
+                format: "password"
+                x-omitempty: true
+                x-nullable: true
+              email:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+              fullname:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+
+    CreateGroupBody:
+      description: "The group data to create"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              slug:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+              name:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+    UpdateGroupBody:
+      description: "The group data to update"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              slug:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+              name:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+    GroupUserPermBody:
+      description: "The group user data to permit"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: "object"
+            required:
+              - "user"
+              - "perm"
+            properties:
+              user:
+                type: "string"
+              perm:
+                type: "string"
+    GroupUserDropBody:
+      description: "The group user data to unlink"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: "object"
+            required:
+              - "user"
+            properties:
+              user:
+                type: "string"
+
+    CreateUserBody:
+      description: "The user data to create"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+              password:
+                type: "string"
+                format: "password"
+                x-omitempty: true
+                x-nullable: true
+              email:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+              fullname:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+              admin:
+                type: "boolean"
+                x-omitempty: true
+                x-nullable: true
+                default: false
+              active:
+                type: "boolean"
+                x-omitempty: true
+                x-nullable: true
+                default: true
+    UpdateUserBody:
+      description: "The user data to update"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+              password:
+                type: "string"
+                format: "password"
+                x-omitempty: true
+                x-nullable: true
+              email:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+              fullname:
+                type: "string"
+                x-omitempty: true
+                x-nullable: true
+              admin:
+                type: "boolean"
+                x-omitempty: true
+                x-nullable: true
+              active:
+                type: "boolean"
+                x-omitempty: true
+                x-nullable: true
+    UserGroupPermBody:
+      description: "The user group data to permit"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: "object"
+            required:
+              - "group"
+              - "perm"
+            properties:
+              group:
+                type: "string"
+              perm:
+                type: "string"
+    UserGroupDropBody:
+      description: "The user group data to unlink"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: "object"
+            required:
+              - "group"
+            properties:
+              group:
+                type: "string"
+
+  responses:
+    NotFoundError:
+      description: "Resource not found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+    InternalServerError:
+      description: "Some internal server error"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+
+    SuccessMessage:
+      description: "Plain success message"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+    ValidationError:
+      description: "Failed to validate request"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+    NotAuthorizedError:
+      description: "User is not authorized"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+    AlreadyAttachedError:
+      description: "Resource is already attached"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+    NotAttachedError:
+      description: "Resource is not attached"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+
+    ActionFailedError:
+      description: "Failed to execute action for resource"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+
+    InvalidTokenError:
+      description: "Failed to generate or validate token"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+
+    BadCredentialsError:
+      description: "Unauthorized with wrong credentials"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+
+    GeneralError:
+      description: "Some error unrelated to the handler"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
+
+    ProvidersResponse:
+      description: "A collection of auth providers"
+      content:
+        application/json:
+          schema:
+            type: "object"
+            required:
+              - "total"
+              - "providers"
+            properties:
+              total:
+                type: integer
+                format: int64
+              providers:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Provider"
+
+    VerifyResponse:
+      description: "Metadata of the auth token"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthVerify"
+    LoginResponse:
+      description: "Generated token with expire date"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthToken"
+    RefreshResponse:
+      description: "Refreshed token with expire date"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthToken"
+    TokenResponse:
+      description: "Generated token never expiring"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthToken"
+    ProfileResponse:
+      description: "The current profile details"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Profile"
+
+    GroupsResponse:
+      description: "A collection of groups"
+      content:
+        application/json:
+          schema:
+            type: "object"
+            required:
+              - "total"
+              - "limit"
+              - "offset"
+              - "groups"
+            properties:
+              total:
+                type: integer
+                format: int64
+              limit:
+                type: integer
+                format: int64
+              offset:
+                type: integer
+                format: int64
+              groups:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Group"
+    GroupResponse:
+      description: "The details for a group"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Group"
+    GroupUsersResponse:
+      description: "A collection of group users"
+      content:
+        application/json:
+          schema:
+            type: "object"
+            required:
+              - "total"
+              - "limit"
+              - "offset"
+              - "users"
+            properties:
+              total:
+                type: integer
+                format: int64
+              limit:
+                type: integer
+                format: int64
+              offset:
+                type: integer
+                format: int64
+              group:
+                $ref: "#/components/schemas/Group"
+                readOnly: true
+              users:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/UserGroup"
+
+    UsersResponse:
+      description: "A collection of users"
+      content:
+        application/json:
+          schema:
+            type: "object"
+            required:
+              - "total"
+              - "limit"
+              - "offset"
+              - "users"
+            properties:
+              total:
+                type: integer
+                format: int64
+              limit:
+                type: integer
+                format: int64
+              offset:
+                type: integer
+                format: int64
+              users:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/User"
+    UserResponse:
+      description: "The details for an user"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/User"
+    UserGroupsResponse:
+      description: "A collection of user groups"
+      content:
+        application/json:
+          schema:
+            type: "object"
+            required:
+              - "total"
+              - "limit"
+              - "offset"
+              - "groups"
+            properties:
+              total:
+                type: integer
+                format: int64
+              limit:
+                type: integer
+                format: int64
+              offset:
+                type: integer
+                format: int64
+              user:
+                $ref: "#/components/schemas/User"
+                readOnly: true
+              groups:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/UserGroup"
 
   schemas:
-    auth_login:
-      type: "object"
-      required:
-        - "username"
-        - "password"
-      properties:
-        username:
-          type: "string"
-        password:
-          type: "string"
-          format: "password"
-
-    auth_verify:
-      type: "object"
-      required:
-        - "username"
-      properties:
-        username:
-          type: "string"
-          readOnly: true
-        created_at:
-          type: "string"
-          format: "date-time"
-          x-omitempty: true
-          x-nullable: true
-          readOnly: true
-
-    auth_token:
+    AuthToken:
       type: "object"
       required:
         - "token"
@@ -1484,14 +1120,29 @@ components:
           x-nullable: true
           readOnly: true
 
-    profile:
+    AuthVerify:
+      type: "object"
+      required:
+        - "username"
+      properties:
+        username:
+          type: "string"
+          readOnly: true
+        created_at:
+          type: "string"
+          format: "date-time"
+          x-omitempty: true
+          x-nullable: true
+          readOnly: true
+
+    Profile:
       title: "Profile"
       description: "Model to represent profile"
       type: "object"
       properties:
         id:
           type: "string"
-          readOnly: true
+          x-go-name: "ID"
         username:
           type: "string"
           x-omitempty: true
@@ -1533,36 +1184,23 @@ components:
           x-nullable: true
           readOnly: true
           items:
-            $ref: "#/components/schemas/user_auth"
-        teams:
+            $ref: "#/components/schemas/UserAuth"
+        groups:
           type: "array"
           x-omitempty: true
           x-nullable: true
           readOnly: true
           items:
-            $ref: "#/components/schemas/user_team"
+            $ref: "#/components/schemas/UserGroup"
 
-    teams:
-      title: "Teams"
-      description: "Model to represent list of teams"
-      type: "object"
-      properties:
-        total:
-          type: integer
-          format: int64
-        teams:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/team"
-
-    team:
-      title: "Team"
-      description: "Model to represent team"
+    Group:
+      title: "Group"
+      description: "Model to represent group"
       type: "object"
       properties:
         id:
           type: "string"
-          readOnly: true
+          x-go-name: "ID"
         slug:
           type: "string"
           x-omitempty: true
@@ -1579,35 +1217,15 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-        users:
-          type: "array"
-          x-omitempty: true
-          x-nullable: true
-          readOnly: true
-          items:
-            $ref: "#/components/schemas/user_team"
 
-    users:
-      title: "Users"
-      description: "Model to represent list of users"
-      type: "object"
-      properties:
-        total:
-          type: integer
-          format: int64
-        users:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/user"
-
-    user:
+    User:
       title: "User"
       description: "Model to represent user"
       type: "object"
       properties:
         id:
           type: "string"
-          readOnly: true
+          x-go-name: "ID"
         username:
           type: "string"
           x-omitempty: true
@@ -1651,16 +1269,9 @@ components:
           x-nullable: true
           readOnly: true
           items:
-            $ref: "#/components/schemas/user_auth"
-        teams:
-          type: "array"
-          x-omitempty: true
-          x-nullable: true
-          readOnly: true
-          items:
-            $ref: "#/components/schemas/user_team"
+            $ref: "#/components/schemas/UserAuth"
 
-    user_auth:
+    UserAuth:
       title: "User Auth"
       description: "Model to represent user auth"
       type: "object"
@@ -1678,101 +1289,37 @@ components:
           format: "date-time"
           readOnly: true
 
-    user_teams:
-      title: "User Teams"
-      description: "Model to represent user teams"
-      type: "object"
-      properties:
-        user:
-          $ref: "#/components/schemas/user"
-          readOnly: true
-        total:
-          type: integer
-          format: int64
-        teams:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/user_team"
-
-    user_team_params:
-      title: "User Team Params"
-      description: "Parameters to attach or unlink user team"
-      type: "object"
-      required:
-        - "team"
-      properties:
-        team:
-          type: "string"
-        perm:
-          type: "string"
-          default: "user"
-          enum:
-            - "user"
-            - "admin"
-            - "owner"
-
-    team_users:
-      title: "Team Users"
-      description: "Model to represent team users"
-      type: "object"
-      properties:
-        team:
-          $ref: "#/components/schemas/team"
-          readOnly: true
-        total:
-          type: integer
-          format: int64
-        users:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/user_team"
-
-    team_user_params:
-      title: "Team User Params"
-      description: "Parameters to attach or unlink team user"
-      type: "object"
-      required:
-        - "user"
-      properties:
-        user:
-          type: "string"
-        perm:
-          type: "string"
-          default: "user"
-          enum:
-            - "user"
-            - "admin"
-            - "owner"
-
-    user_team:
-      title: "User Team"
-      description: "Model to represent user team"
+    UserGroup:
+      title: "User Group"
+      description: "Model to represent user group"
       type: "object"
       required:
         - "user_id"
-        - "team_id"
+        - "group_id"
       properties:
         user_id:
           type: "string"
+          x-go-name: "UserID"
         user:
           x-omitempty: true
           x-nullable: true
           readOnly: true
-          $ref: "#/components/schemas/user"
-        team_id:
+          $ref: "#/components/schemas/User"
+        group_id:
           type: "string"
-        team:
+          x-go-name: "GroupID"
+        group:
           x-omitempty: true
           x-nullable: true
           readOnly: true
-          $ref: "#/components/schemas/team"
+          $ref: "#/components/schemas/Group"
         perm:
           type: "string"
           default: "user"
           enum:
+            - "owner"
             - "user"
             - "admin"
-            - "owner"
         created_at:
           type: "string"
           format: "date-time"
@@ -1782,7 +1329,25 @@ components:
           format: "date-time"
           readOnly: true
 
-    notification:
+    Provider:
+      title: "Provider"
+      description: "Model to represent auth provider"
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          readOnly: true
+        driver:
+          type: "string"
+          readOnly: true
+        display:
+          type: "string"
+          readOnly: true
+        icon:
+          type: "string"
+          readOnly: true
+
+    Notification:
       title: "Notification"
       description: "Generic response for errors and validations"
       type: "object"
@@ -1796,9 +1361,9 @@ components:
         errors:
           type: "array"
           items:
-            $ref: "#/components/schemas/validation"
+            $ref: "#/components/schemas/Validation"
 
-    validation:
+    Validation:
       title: "Validation"
       description: "General structure to show validation errors"
       type: "object"

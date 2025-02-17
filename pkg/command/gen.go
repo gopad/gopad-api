@@ -33,7 +33,7 @@ var (
 		Args:  cobra.NoArgs,
 	}
 
-	defaultCertGenCertHosts  = []string{"gopad-api"}
+	defaultCertGenCertHosts  = []string{"gopad"}
 	defaultCertGenCertOrg    = "Gopad"
 	defaultCertGenCertName   = "API"
 	defaultCertGenEcdsaCurve = ""

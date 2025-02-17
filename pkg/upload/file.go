@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"context"
 	"io/fs"
 	"net/http"
 	"os"
@@ -43,7 +44,7 @@ func (u *FileUpload) Close() error {
 }
 
 // Upload stores an attachment within the defined S3 bucket.
-func (u *FileUpload) Upload(path, ctype string, content []byte) error {
+func (u *FileUpload) Upload(_ context.Context, path, ctype string, content []byte) error {
 	log.Debug().
 		Str("path", path).
 		Str("ctype", ctype).
@@ -54,7 +55,7 @@ func (u *FileUpload) Upload(path, ctype string, content []byte) error {
 }
 
 // Delete removes an attachment from the defined S3 bucket.
-func (u *FileUpload) Delete(path string) error {
+func (u *FileUpload) Delete(_ context.Context, path string) error {
 	log.Debug().
 		Str("path", path).
 		Msg("Delete")

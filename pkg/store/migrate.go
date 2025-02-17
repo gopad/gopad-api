@@ -78,9 +78,9 @@ var (
 			},
 		},
 		{
-			ID: "0004_create_teams_table",
+			ID: "0004_create_groups_table",
 			Migrate: func(tx *gorm.DB) error {
-				type Team struct {
+				type Group struct {
 					ID        string `gorm:"primaryKey;length:20"`
 					Scim      string `gorm:"length:255"`
 					Slug      string `gorm:"unique;length:255"`
@@ -89,85 +89,85 @@ var (
 					UpdatedAt time.Time
 				}
 
-				return tx.Migrator().CreateTable(&Team{})
+				return tx.Migrator().CreateTable(&Group{})
 			},
 			Rollback: func(tx *gorm.DB) error {
-				return tx.Migrator().DropTable("teams")
+				return tx.Migrator().DropTable("groups")
 			},
 		},
 		{
-			ID: "0005_create_user_teams_table",
+			ID: "0005_create_user_groups_table",
 			Migrate: func(tx *gorm.DB) error {
-				type UserTeam struct {
+				type UserGroup struct {
 					UserID    string `gorm:"primaryKey;autoIncrement:false;length:20"`
-					TeamID    string `gorm:"primaryKey;autoIncrement:false;length:20"`
+					GroupID   string `gorm:"primaryKey;autoIncrement:false;length:20"`
 					Perm      string `gorm:"length:64"`
 					CreatedAt time.Time
 					UpdatedAt time.Time
 				}
 
-				return tx.Migrator().CreateTable(&UserTeam{})
+				return tx.Migrator().CreateTable(&UserGroup{})
 			},
 			Rollback: func(tx *gorm.DB) error {
-				return tx.Migrator().DropTable("user_teams")
+				return tx.Migrator().DropTable("user_groups")
 			},
 		},
 		{
-			ID: "0006_create_user_teams_teams_constraint",
+			ID: "0006_create_user_groups_groups_constraint",
 			Migrate: func(tx *gorm.DB) error {
-				type UserTeam struct {
-					UserID string `gorm:"primaryKey;autoIncrement:false;length:20"`
-					TeamID string `gorm:"primaryKey;autoIncrement:false;length:20"`
+				type UserGroup struct {
+					UserID  string `gorm:"primaryKey;autoIncrement:false;length:20"`
+					GroupID string `gorm:"primaryKey;autoIncrement:false;length:20"`
 				}
 
-				type Team struct {
-					ID    string      `gorm:"primaryKey"`
-					Users []*UserTeam `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+				type Group struct {
+					ID    string       `gorm:"primaryKey"`
+					Users []*UserGroup `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 				}
 
-				return tx.Migrator().CreateConstraint(&Team{}, "Users")
+				return tx.Migrator().CreateConstraint(&Group{}, "Users")
 			},
 			Rollback: func(tx *gorm.DB) error {
-				type UserTeam struct {
-					UserID string `gorm:"primaryKey;autoIncrement:false;length:20"`
-					TeamID string `gorm:"primaryKey;autoIncrement:false;length:20"`
+				type UserGroup struct {
+					UserID  string `gorm:"primaryKey;autoIncrement:false;length:20"`
+					GroupID string `gorm:"primaryKey;autoIncrement:false;length:20"`
 				}
 
-				type Team struct {
-					ID    string      `gorm:"primaryKey"`
-					Users []*UserTeam `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+				type Group struct {
+					ID    string       `gorm:"primaryKey"`
+					Users []*UserGroup `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 				}
 
-				return tx.Migrator().DropConstraint(&Team{}, "Users")
+				return tx.Migrator().DropConstraint(&Group{}, "Users")
 			},
 		},
 		{
-			ID: "0007_create_user_teams_users_constraint",
+			ID: "0007_create_user_groups_users_constraint",
 			Migrate: func(tx *gorm.DB) error {
-				type UserTeam struct {
-					UserID string `gorm:"primaryKey;autoIncrement:false;length:20"`
-					TeamID string `gorm:"primaryKey;autoIncrement:false;length:20"`
+				type UserGroup struct {
+					UserID  string `gorm:"primaryKey;autoIncrement:false;length:20"`
+					GroupID string `gorm:"primaryKey;autoIncrement:false;length:20"`
 				}
 
 				type User struct {
-					ID    string      `gorm:"primaryKey"`
-					Teams []*UserTeam `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+					ID     string       `gorm:"primaryKey"`
+					Groups []*UserGroup `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 				}
 
-				return tx.Migrator().CreateConstraint(&User{}, "Teams")
+				return tx.Migrator().CreateConstraint(&User{}, "Groups")
 			},
 			Rollback: func(tx *gorm.DB) error {
-				type UserTeam struct {
-					UserID string `gorm:"primaryKey;autoIncrement:false;length:20"`
-					TeamID string `gorm:"primaryKey;autoIncrement:false;length:20"`
+				type UserGroup struct {
+					UserID  string `gorm:"primaryKey;autoIncrement:false;length:20"`
+					GroupID string `gorm:"primaryKey;autoIncrement:false;length:20"`
 				}
 
 				type User struct {
-					ID    string      `gorm:"primaryKey"`
-					Teams []*UserTeam `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+					ID     string       `gorm:"primaryKey"`
+					Groups []*UserGroup `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 				}
 
-				return tx.Migrator().DropConstraint(&User{}, "Teams")
+				return tx.Migrator().DropConstraint(&User{}, "Groups")
 			},
 		},
 	}

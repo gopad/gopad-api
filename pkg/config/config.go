@@ -10,12 +10,13 @@ import (
 
 // Server defines the webserver configuration.
 type Server struct {
-	Addr string `mapstructure:"addr"`
-	Host string `mapstructure:"host"`
-	Root string `mapstructure:"root"`
-	Cert string `mapstructure:"cert"`
-	Key  string `mapstructure:"key"`
-	Docs bool   `mapstructure:"docs"`
+	Addr      string `mapstructure:"addr"`
+	Host      string `mapstructure:"host"`
+	Root      string `mapstructure:"root"`
+	Cert      string `mapstructure:"cert"`
+	Key       string `mapstructure:"key"`
+	Templates string `mapstructure:"templates"`
+	Docs      bool   `mapstructure:"docs"`
 }
 
 // Metrics defines the metrics server configuration.
@@ -60,12 +61,10 @@ type Upload struct {
 	Perms    string `mapstructure:"perms"`
 }
 
-// Session defines the session handle configuration.
-type Session struct {
-	Name   string        `mapstructure:"name"`
+// Token defines the token handle configuration.
+type Token struct {
 	Secret string        `mapstructure:"secret"`
 	Expire time.Duration `mapstructure:"expire"`
-	Secure bool          `mapstructure:"secure"`
 }
 
 // Scim defines the scim provisioning configuration.
@@ -90,7 +89,7 @@ type Config struct {
 	Auth     Auth     `mapstructure:"auth"`
 	Database Database `mapstructure:"database"`
 	Upload   Upload   `mapstructure:"upload"`
-	Session  Session  `mapstructure:"session"`
+	Token    Token    `mapstructure:"token"`
 	Scim     Scim     `mapstructure:"scim"`
 	Admin    Admin    `mapstructure:"admin"`
 }
