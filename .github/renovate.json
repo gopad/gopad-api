@@ -8,7 +8,7 @@
       "matchPackagePatterns": [
         "^github.com/uptrace/bun/"
       ],
-      "groupName": "github.com/uptrace/bun dependencies"
+      "groupName": "github.com-uptrace-bun deps"
     }
   ]
 }
