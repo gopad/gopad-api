@@ -1,6 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-      "github>gopad/.github//renovate/preset"
+    "github>gopad/.github//renovate/preset"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "^github.com/uptrace/bun/"
+      ],
+      "groupName": "github.com/uptrace/bun dependencies"
+    }
   ]
 }
