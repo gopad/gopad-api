@@ -718,12 +718,16 @@ github.com/ultraware/whitespace v0.2.0 h1:TYowo2m9Nfj1baEQBjuHzvMRbp19i+RCcRYrSW
 github.com/ultraware/whitespace v0.2.0/go.mod h1:XcP1RLD81eV4BW8UhQlpaR+SDc2givTvyI8a586WjW8=
 github.com/uptrace/bun v1.2.9 h1:OOt2DlIcRUMSZPr6iXDFg/LaQd59kOxbAjpIVHddKRs=
 github.com/uptrace/bun v1.2.9/go.mod h1:r2ZaaGs9Ru5bpGTr8GQfp8jp+TlCav9grYCPOu2CJSg=
+github.com/uptrace/bun v1.2.10 h1:6TlxUQhGxiiv7MHjzxbV6ZNt/Im0PIQ3S45riAmbnGA=
+github.com/uptrace/bun v1.2.10/go.mod h1:ww5G8h59UrOnCHmZ8O1I/4Djc7M/Z3E+EWFS2KLB6dQ=
 github.com/uptrace/bun/dialect/mysqldialect v1.2.9 h1:nn3xVxTLhZh9LScwVD81yJX38DQ1LlriH8/WWEdWpdk=
 github.com/uptrace/bun/dialect/mysqldialect v1.2.9/go.mod h1:Qe9QIiyUUxcxmhxskMNV++dEWhR6UQvLV3WYiQhWyKQ=
 github.com/uptrace/bun/dialect/pgdialect v1.2.9 h1:caf5uFbOGiXvadV6pA5gn87k0awFFxL1kuuY3SpxnWk=
 github.com/uptrace/bun/dialect/pgdialect v1.2.9/go.mod h1:m7L9JtOp/Lt8HccET70ULxplMweE/u0S9lNUSxz2duo=
 github.com/uptrace/bun/dialect/sqlitedialect v1.2.9 h1:HLzGWXBh07sT8zhVPy6veYbbGrAtYq0KzyRHXBj+GjA=
 github.com/uptrace/bun/dialect/sqlitedialect v1.2.9/go.mod h1:dUR+ecoCWA0FIa9vhQVRnGtYYPpuCLJoEEtX9E1aiBU=
+github.com/uptrace/bun/dialect/sqlitedialect v1.2.10 h1:/74GDx1hnRrrmIvqpNbbFwD28sW1z+i/QjQSVy6XnnY=
+github.com/uptrace/bun/dialect/sqlitedialect v1.2.10/go.mod h1:xBx+N2q4G4s51tAxZU5vKB3Zu0bFl1uRmKqZwCPBilg=
 github.com/uptrace/bun/driver/pgdriver v1.2.9 h1:wPXQwD78mYeR7o5tQTM/tgBaVd5QWMN/Nq02h+zHlsI=
 github.com/uptrace/bun/driver/pgdriver v1.2.9/go.mod h1:YnlfL8hiQ++jSCPySK3k8BotpwbLL9SRDzssvts1Bm4=
 github.com/uptrace/bun/driver/sqliteshim v1.2.9 h1:vVBGtXFUNTlaijRQS3PTIH2QoNBr63orDd2aF6j3rBk=
