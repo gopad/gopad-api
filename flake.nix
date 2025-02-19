@@ -88,6 +88,7 @@
                   goreleaser
                   httpie
                   nixfmt-rfc-style
+                  posting
                   sqlite
                   yq-go
                 ];

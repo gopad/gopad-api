@@ -151,3 +151,7 @@ release-finish: release-reduce release-checksum
 .PHONY: watch
 watch:
 	go tool github.com/air-verse/air -c .air.toml
+
+.PHONY: posting
+posting:
+	posting default --collection posting
