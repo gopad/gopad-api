@@ -44,7 +44,7 @@ require (
 	github.com/uptrace/bun/driver/pgdriver v1.2.10
 	github.com/uptrace/bun/driver/sqliteshim v1.2.10
 	golang.org/x/crypto v0.34.0
-	golang.org/x/oauth2 v0.26.0
+	golang.org/x/oauth2 v0.27.0
 	gorm.io/gorm v1.25.12
 )
 
