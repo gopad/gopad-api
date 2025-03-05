@@ -43,7 +43,7 @@ require (
 	github.com/uptrace/bun/dialect/sqlitedialect v1.2.10
 	github.com/uptrace/bun/driver/pgdriver v1.2.10
 	github.com/uptrace/bun/driver/sqliteshim v1.2.10
-	golang.org/x/crypto v0.35.0
+	golang.org/x/crypto v0.36.0
 	golang.org/x/oauth2 v0.28.0
 	gorm.io/gorm v1.25.12
 )
@@ -286,9 +286,9 @@ require (
 	golang.org/x/exp v0.0.0-20250215185904-eff6e970281f // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250210185358-939b2ce775ac // indirect
 	golang.org/x/mod v0.23.0 // indirect
-	golang.org/x/sync v0.11.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/sync v0.12.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/tools v0.30.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
