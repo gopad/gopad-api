@@ -6,6 +6,7 @@ server:
   cert: ~
   key: ~
   templates: ~
+  frontend: ~
   docs: true
 
 metrics:
@@ -17,6 +18,10 @@ logs:
   level: info
   pretty: true
   color: true
+
+cleanup:
+  enabled: true
+  interval: 30m
 
 auth:
   config: ~
@@ -39,9 +44,11 @@ upload:
   bucket: ~
   region: us-east-1
   perms: "0755"
+  pathstyle: false
+  proxy: true
 
 token:
-  secret: TxHrYxMAg01rBeEWrHn1BjOP
+  secret: L74nhDNyckVW7bRodrCgP0hz
   expire: 1h0m0s
 
 scim:

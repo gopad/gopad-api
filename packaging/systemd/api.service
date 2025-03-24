@@ -1,0 +1,20 @@
+[Unit]
+Description=Gopad API
+Documentation=https://gopad.eu
+
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+User=gopad
+Group=gopad
+EnvironmentFile=-/etc/default/gopad-api
+EnvironmentFile=-/etc/sysconfig/gopad-api
+ExecStart=/usr/bin/gopad-api server $GOPAD_API_ARGS
+WorkingDirectory=/var/lib/gopad
+Restart=always
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

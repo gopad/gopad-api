@@ -24,6 +24,7 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.devenv.flakeModule
+        inputs.git-hooks.flakeModule
       ];
 
       systems = [
@@ -80,12 +81,14 @@
                     enable = true;
                     package = pkgs.go_1_24;
                   };
+                  javascript = {
+                    enable = true;
+                    package = pkgs.nodejs_20;
+                  };
                 };
 
                 packages = with pkgs; [
-                  cosign
-                  gnumake
-                  goreleaser
+                  go-task
                   httpie
                   nixfmt-rfc-style
                   posting
@@ -100,38 +103,17 @@
                   GOPAD_API_LOG_PRETTY = "true";
                   GOPAD_API_LOG_COLOR = "true";
 
-                  GOPAD_API_TOKEN_SECRET = "TxHrYxMAg01rBeEWrHn1BjOP";
+                  GOPAD_API_TOKEN_SECRET = "L74nhDNyckVW7bRodrCgP0hz";
                   GOPAD_API_TOKEN_EXPIRE = "1h";
-
-                  # GOPAD_API_SERVER_CERT = ".devenv/state/mkcert/localhost+1.pem";
-                  # GOPAD_API_SERVER_KEY = ".devenv/state/mkcert/localhost+1-key.pem";
 
                   GOPAD_API_DATABASE_DRIVER = "sqlite3";
                   GOPAD_API_DATABASE_NAME = "storage/gopad.sqlite3";
 
-                  # GOPAD_API_DATABASE_DRIVER = "mysql";
-                  # GOPAD_API_DATABASE_ADDRESS = "127.0.0.1";
-                  # GOPAD_API_DATABASE_PORT = "3306";
-                  # GOPAD_API_DATABASE_USERNAME = "gopad";
-                  # GOPAD_API_DATABASE_PASSWORD = "p455w0rd";
-                  # GOPAD_API_DATABASE_NAME = "gopad";
-
-                  # GOPAD_API_DATABASE_DRIVER = "postgres";
-                  # GOPAD_API_DATABASE_ADDRESS = "127.0.0.1";
-                  # GOPAD_API_DATABASE_PORT = "5432";
-                  # GOPAD_API_DATABASE_USERNAME = "gopad";
-                  # GOPAD_API_DATABASE_PASSWORD = "p455w0rd";
-                  # GOPAD_API_DATABASE_NAME = "gopad";
-
                   GOPAD_API_UPLOAD_DRIVER = "file";
                   GOPAD_API_UPLOAD_PATH = "storage/uploads/";
 
-                  # GOPAD_API_UPLOAD_DRIVER = "s3";
-                  # GOPAD_API_UPLOAD_ENDPOINT = "127.0.0.1:9000";
-                  # GOPAD_API_UPLOAD_BUCKET = "gopad";
-                  # GOPAD_API_UPLOAD_REGION = "us-east-1";
-                  # GOPAD_API_UPLOAD_ACCESS = "9VLV3OI55N1077Y9IALV";
-                  # GOPAD_API_UPLOAD_SECRET = "bwcRkw5w6uF6BWBqOtsnMbwZSIDKQopy9DSo90ab";
+                  GOPAD_API_CLEANUP_ENABLED = "true";
+                  GOPAD_API_CLEANUP_INTERVAL = "5m";
 
                   GOPAD_API_ADMIN_USERNAME = "admin";
                   GOPAD_API_ADMIN_PASSWORD = "p455w0rd";
@@ -141,8 +123,8 @@
                 services = {
                   minio = {
                     enable = true;
-                    accessKey = "9VLV3OI55N1077Y9IALV";
-                    secretKey = "bwcRkw5w6uF6BWBqOtsnMbwZSIDKQopy9DSo90ab";
+                    accessKey = "DwaIM5LU1NthbfVzulou";
+                    secretKey = "SaaiOSfh344OukVPqLT9mM5VBM3vDcLR41JzDOr5";
                     buckets = [
                       "gopad"
                     ];
@@ -164,11 +146,34 @@
 
                 processes = {
                   gopad-server = {
-                    exec = "make watch";
+                    exec = "task watch:server";
+
+                    process-compose = {
+                      environment = [
+                        "GOPAD_API_SERVER_HOST=http://localhost:5173"
+                      ];
+
+                      readiness_probe = {
+                        exec.command = "${pkgs.curl}/bin/curl -sSf http://localhost:8000/readyz";
+                        initial_delay_seconds = 2;
+                        period_seconds = 10;
+                        timeout_seconds = 4;
+                        success_threshold = 1;
+                        failure_threshold = 5;
+                      };
+
+                      availability = {
+                        restart = "on_failure";
+                      };
+                    };
+                  };
+
+                  gopad-webui = {
+                    exec = "task watch:frontend";
 
                     process-compose = {
                       readiness_probe = {
-                        exec.command = "${pkgs.curl}/bin/curl -sSf http://localhost:8000/readyz";
+                        exec.command = "${pkgs.curl}/bin/curl -sSf http://localhost:5173";
                         initial_delay_seconds = 2;
                         period_seconds = 10;
                         timeout_seconds = 4;

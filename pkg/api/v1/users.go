@@ -675,7 +675,7 @@ func listUsersSorting(request ListUsersParams) (string, string, int64, int64, st
 	order := ""
 
 	if request.Order != nil {
-		sort = string(FromPtr(request.Order))
+		order = string(FromPtr(request.Order))
 	}
 
 	return sort, order, limit, offset, search
@@ -692,7 +692,7 @@ func listUserGroupsSorting(request ListUserGroupsParams) (string, string, int64,
 	order := ""
 
 	if request.Order != nil {
-		sort = string(FromPtr(request.Order))
+		order = string(FromPtr(request.Order))
 	}
 
 	return sort, order, limit, offset, search

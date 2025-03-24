@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/json"
 	"net/http"
 	"path"
 	"time"
@@ -14,6 +15,7 @@ import (
 	v1 "github.com/gopad/gopad-api/pkg/api/v1"
 	"github.com/gopad/gopad-api/pkg/authn"
 	"github.com/gopad/gopad-api/pkg/config"
+	"github.com/gopad/gopad-api/pkg/handler"
 	"github.com/gopad/gopad-api/pkg/metrics"
 	"github.com/gopad/gopad-api/pkg/middleware/current"
 	"github.com/gopad/gopad-api/pkg/middleware/header"
@@ -46,7 +48,7 @@ func Server(
 			Int("status", status).
 			Int("size", size).
 			Dur("duration", duration).
-			Msg("request")
+			Msg("Accesslog")
 	}))
 
 	mux.Use(render.SetContentType(render.ContentTypeJSON))
@@ -65,6 +67,7 @@ func Server(
 				scim.WithRoot(
 					path.Join(
 						cfg.Server.Root,
+						"api",
 						"scim",
 						"v2",
 					),
@@ -83,10 +86,10 @@ func Server(
 					Msg("Failed to linitialize scim server")
 			}
 
-			root.Mount("/scim/v2", srv)
+			root.Mount("/api/scim/v2", srv)
 		}
 
-		root.Route("/v1", func(r chi.Router) {
+		root.Route("/api/v1", func(r chi.Router) {
 			swagger, err := v1.GetSwagger()
 
 			if err != nil {
@@ -98,8 +101,9 @@ func Server(
 
 			swagger.Servers = openapi3.Servers{
 				{
-					URL: cfg.Server.Host + path.Join(
+					URL: path.Join(
 						cfg.Server.Root,
+						"api",
 						"v1",
 					),
 				},
@@ -114,11 +118,13 @@ func Server(
 				r.Handle("/docs", oamw.SwaggerUI(oamw.SwaggerUIOpts{
 					Path: path.Join(
 						cfg.Server.Root,
+						"api",
 						"v1",
 						"docs",
 					),
-					SpecURL: cfg.Server.Host + path.Join(
+					SpecURL: path.Join(
 						cfg.Server.Root,
+						"api",
 						"v1",
 						"spec",
 					),
@@ -150,13 +156,23 @@ func Server(
 					Options: openapi3filter.Options{
 						AuthenticationFunc: apiv1.Authentication,
 					},
+					ErrorHandler: func(w http.ResponseWriter, message string, statusCode int) {
+						w.Header().Set("Content-Type", "application/json")
+						w.WriteHeader(statusCode)
+
+						_ = json.NewEncoder(w).Encode(v1.Notification{
+							Message: v1.ToPtr(message),
+							Status:  v1.ToPtr(statusCode),
+						})
+					},
 				},
 			)).Route("/", func(r chi.Router) {
 				r.Route("/auth", func(r chi.Router) {
 					r.Group(func(r chi.Router) {
+						r.Post("/redirect", wrapper.RedirectAuth)
 						r.Post("/login", wrapper.LoginAuth)
-						r.Post("/refresh", wrapper.RefreshAuth)
-						r.Post("/verify", wrapper.VerifyAuth)
+						r.Get("/refresh", wrapper.RefreshAuth)
+						r.Get("/verify", wrapper.VerifyAuth)
 					})
 
 					r.Group(func(r chi.Router) {
@@ -178,12 +194,11 @@ func Server(
 				})
 
 				r.Route("/groups", func(r chi.Router) {
-					r.Use(apiv1.AllowAdminAccessOnly)
-
 					r.Get("/", wrapper.ListGroups)
-					r.Post("/", wrapper.CreateGroup)
+					r.With(apiv1.AllowAdminAccessOnly).Post("/", wrapper.CreateGroup)
 
 					r.Route("/{group_id}", func(r chi.Router) {
+						r.Use(apiv1.AllowAdminAccessOnly)
 						r.Use(apiv1.GroupToContext)
 
 						r.Get("/", wrapper.ShowGroup)
@@ -200,12 +215,11 @@ func Server(
 				})
 
 				r.Route("/users", func(r chi.Router) {
-					r.Use(apiv1.AllowAdminAccessOnly)
-
 					r.Get("/", wrapper.ListUsers)
-					r.Post("/", wrapper.CreateUser)
+					r.With(apiv1.AllowAdminAccessOnly).Post("/", wrapper.CreateUser)
 
 					r.Route("/{user_id}", func(r chi.Router) {
+						r.Use(apiv1.AllowAdminAccessOnly)
 						r.Use(apiv1.UserToContext)
 
 						r.Get("/", wrapper.ShowUser)
@@ -225,11 +239,20 @@ func Server(
 			r.Handle("/storage/*", uploads.Handler(
 				path.Join(
 					cfg.Server.Root,
+					"api",
 					"v1",
 					"storage",
 				),
 			))
 		})
+
+		handlers := handler.New(cfg)
+		root.Get("/", handlers.Index())
+		root.Get("/favicon.svg", handlers.Favicon())
+		root.Get("/config.json", handlers.Config())
+		root.Get("/manifest.json", handlers.Manifest())
+		root.Handle("/assets/*", handlers.Assets())
+		root.NotFound(handlers.Index())
 	})
 
 	return mux

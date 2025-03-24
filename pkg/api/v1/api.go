@@ -19,11 +19,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-//go:generate go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=config.yml ../../../openapi/v1.yml
+//go:generate go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=config.yaml ../../../openapi/v1.yaml
 
 var (
 	_ ServerInterface = (*API)(nil)
+
+	// ErrUnsupportedImageFormat defines the error for unsupported image formats.
+	ErrUnsupportedImageFormat = fmt.Errorf("unsupported avatar file format")
 )
+
+func init() {
+	openapi3filter.RegisterBodyDecoder("image/jpeg", openapi3filter.FileBodyDecoder)
+	openapi3filter.RegisterBodyDecoder("image/png", openapi3filter.FileBodyDecoder)
+}
 
 // New creates a new API that adds the handler implementations.
 func New(

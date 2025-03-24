@@ -12,6 +12,8 @@ services:
       - GOPAD_API_UPLOAD_REGION=us-east-1
       - GOPAD_API_UPLOAD_ACCESS=minioadmin
       - GOPAD_API_UPLOAD_SECRET=minioadmin
+      - GOPAD_API_UPLOAD_PATHSTYLE=true
+      - GOPAD_API_UPLOAD_PROXY=true
     depends_on:
       - minio
 

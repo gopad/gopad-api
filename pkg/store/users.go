@@ -6,9 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gopad/gopad-api/pkg/model"
+	"github.com/gopad/gopad-api/pkg/secret"
 	"github.com/gopad/gopad-api/pkg/validate"
 	"github.com/uptrace/bun"
 )
@@ -26,7 +28,7 @@ func (s *Users) List(ctx context.Context, params model.ListParams) ([]*model.Use
 		Model(&records).
 		Relation("Auths")
 
-	if val, ok := s.validSort(params.Sort); ok {
+	if val, ok := s.ValidSort(params.Sort); ok {
 		q = q.Order(strings.Join(
 			[]string{
 				val,
@@ -129,6 +131,74 @@ func (s *Users) Delete(ctx context.Context, name string) error {
 	return nil
 }
 
+// ShowRedirectToken implements the details for a specific redirect token.
+func (s *Users) ShowRedirectToken(ctx context.Context, token string) (*model.UserToken, error) {
+	record := &model.UserToken{}
+	expired := time.Now().UTC().Add(-5 * time.Minute)
+
+	if err := s.client.handle.NewSelect().
+		Model(record).
+		Where("token = ? AND kind = ? AND created_at > ?", token, model.UserTokenKindRedirect, expired).
+		Scan(ctx); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return record, ErrTokenNotFound
+		}
+
+		return record, err
+	}
+
+	return record, nil
+}
+
+// CreateRedirectToken implements the create of a new redirect token.
+func (s *Users) CreateRedirectToken(ctx context.Context, username string) (*model.UserToken, error) {
+	user, err := s.Show(ctx, username)
+
+	if err != nil {
+		return nil, err
+	}
+
+	record := &model.UserToken{
+		UserID: user.ID,
+		Kind:   model.UserTokenKindRedirect,
+		Token:  secret.Generate(32),
+	}
+
+	if _, err := s.client.handle.NewInsert().
+		Model(record).
+		Exec(ctx); err != nil {
+		return nil, err
+	}
+
+	return record, nil
+}
+
+// DeleteRedirectToken implements the deletion of a redirect token.
+func (s *Users) DeleteRedirectToken(ctx context.Context, token string) error {
+	if _, err := s.client.handle.NewDelete().
+		Model((*model.UserToken)(nil)).
+		Where("token = ? AND kind = ?", token, model.UserTokenKindRedirect).
+		Exec(ctx); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// CleanupRedirectTokens implements the cleanup of expired redirect tokens.
+func (s *Users) CleanupRedirectTokens(ctx context.Context) error {
+	expired := time.Now().UTC().Add(-5 * time.Minute)
+
+	if _, err := s.client.handle.NewDelete().
+		Model((*model.UserToken)(nil)).
+		Where("kind = ? AND created_at < ?", model.UserTokenKindRedirect, expired).
+		Exec(ctx); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ListGroups implements the listing of all groups for an user.
 func (s *Users) ListGroups(ctx context.Context, params model.UserGroupParams) ([]*model.UserGroup, int64, error) {
 	records := make([]*model.UserGroup, 0)
@@ -139,7 +209,7 @@ func (s *Users) ListGroups(ctx context.Context, params model.UserGroupParams) ([
 		Relation("Group").
 		Where("user_id = ?", params.UserID)
 
-	if val, ok := s.validGroupSort(params.Sort); ok {
+	if val, ok := s.client.Groups.ValidSort(params.Sort); ok {
 		q = q.Order(strings.Join(
 			[]string{
 				val,
@@ -381,43 +451,27 @@ func (s *Users) uniqueValueIsPresent(ctx context.Context, key, id string) func(v
 	}
 }
 
-func (s *Users) validSort(val string) (string, bool) {
+// ValidSort validates the given sorting column.
+func (s *Users) ValidSort(val string) (string, bool) {
 	if val == "" {
-		return "username", true
-	}
-
-	val = strings.ToLower(val)
-
-	for _, name := range []string{
-		"username",
-		"email",
-		"fullname",
-		"admin",
-		"active",
-	} {
-		if val == name {
-			return val, true
-		}
-	}
-
-	return "username", true
-}
-
-func (s *Users) validGroupSort(val string) (string, bool) {
-	if val == "" {
-		return "group.name", true
+		return "user.username", true
 	}
 
 	val = strings.ToLower(val)
 
 	for key, name := range map[string]string{
-		"slug": "group.slug",
-		"name": "group.name",
+		"username": "user.username",
+		"email":    "user.email",
+		"fullname": "user.fullname",
+		"admin":    "user.admin",
+		"active":   "user.active",
+		"created":  "user.created_at",
+		"updated":  "user.updated_at",
 	} {
 		if val == key {
 			return name, true
 		}
 	}
 
-	return "group.name", true
+	return "user.username", true
 }

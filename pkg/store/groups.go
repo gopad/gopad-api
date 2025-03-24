@@ -27,7 +27,7 @@ func (s *Groups) List(ctx context.Context, params model.ListParams) ([]*model.Gr
 	q := s.client.handle.NewSelect().
 		Model(&records)
 
-	if val, ok := s.validSort(params.Sort); ok {
+	if val, ok := s.ValidSort(params.Sort); ok {
 		q = q.Order(strings.Join(
 			[]string{
 				val,
@@ -169,7 +169,7 @@ func (s *Groups) ListUsers(ctx context.Context, params model.UserGroupParams) ([
 		Relation("Group").
 		Where("group_id = ?", params.GroupID)
 
-	if val, ok := s.validUserSort(params.Sort); ok {
+	if val, ok := s.client.Users.ValidSort(params.Sort); ok {
 		q = q.Order(strings.Join(
 			[]string{
 				val,
@@ -458,43 +458,24 @@ func (s *Groups) slugify(ctx context.Context, column, value, id string) string {
 	return slug
 }
 
-func (s *Groups) validSort(val string) (string, bool) {
+// ValidSort validates the given sorting column.
+func (s *Groups) ValidSort(val string) (string, bool) {
 	if val == "" {
-		return "name", true
-	}
-
-	val = strings.ToLower(val)
-
-	for _, name := range []string{
-		"slug",
-		"name",
-	} {
-		if val == name {
-			return val, true
-		}
-	}
-
-	return "name", true
-}
-
-func (s *Groups) validUserSort(val string) (string, bool) {
-	if val == "" {
-		return "user.username", true
+		return "group.name", true
 	}
 
 	val = strings.ToLower(val)
 
 	for key, name := range map[string]string{
-		"username": "user.username",
-		"email":    "user.email",
-		"fullname": "user.fullname",
-		"admin":    "user.admin",
-		"active":   "user.active",
+		"slug":    "group.slug",
+		"name":    "group.name",
+		"created": "group.created_at",
+		"updated": "group.updated_at",
 	} {
 		if val == key {
 			return name, true
 		}
 	}
 
-	return "user.username", true
+	return "group.name", true
 }

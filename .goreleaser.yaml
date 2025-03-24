@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+
+before:
+  hooks:
+    - task fe:install
+    - task fe:build
+
+builds:
+  - id: api
+    main: ./cmd/gopad-api
+    binary: gopad-api
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -extldflags "-static" -X "github.com/gopad/gopad-api/pkg/version.String={{.Version}}" -X "github.com/gopad/gopad-api/pkg/version.Revision={{.Commit}}" -X "github.com/gopad/gopad-api/pkg/version.Date={{.Date}}"
+    tags:
+      - netgo
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - "386"
+      - arm64
+      - arm
+    ignore:
+      - goos: darwin
+        goarch: "386"
+      - goos: windows
+        goarch: arm
+
+archives:
+  - id: api
+    ids:
+      - api
+    name_template: "gopad-api-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}-{{ . }}{{ end }}"
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - LICENSE
+      - CHANGELOG.md
+      - src: cmd/gopad-api/README.md
+        dst: README.md
+
+nfpms:
+  - id: api
+    ids:
+      - api
+    package_name: gopad-api
+    file_name_template: "gopad-api-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}-{{ . }}{{ end }}"
+    vendor: Gopad
+    homepage: https://gopad.eu
+    maintainer: Thomas Boerger <thomas@webhippie.de>
+    description: |-
+      Server for etherpad for markdown with Go
+    license: Apache 2.0
+    formats:
+      - deb
+      - rpm
+    contents:
+      - src: packaging/systemd/api.service
+        dst: /usr/lib/systemd/system/gopad-api.service
+      - src: packaging/systemd/api.env
+        dst: /etc/sysconfig/gopad-api
+        packager: rpm
+      - src: packaging/systemd/api.env
+        dst: /etc/default/gopad-api
+        packager: deb
+      - src: packaging/config/api.yaml
+        dst: /etc/gopad/api.yaml
+        type: config|noreplace
+      - dst: /var/lib/gopad
+        type: dir
+    scripts:
+      preinstall: packaging/scripts/preinstall.sh
+      postinstall: packaging/scripts/postinstall.sh
+      preremove: packaging/scripts/preremove.sh
+      postremove: packaging/scripts/postremove.sh
+
+signs:
+  - id: archives
+    signature: "${artifact}.asc"
+    cmd: gpg2
+    artifacts: archive
+    args:
+      - --batch
+      - --armor
+      - --local-user
+      - 64430B277E1E4090BF4C00E307A9B72C9FE6469C
+      - --output
+      - ${signature}
+      - --detach-sign
+      - ${artifact}
+  - id: packages
+    signature: "${artifact}.asc"
+    cmd: gpg2
+    artifacts: package
+    args:
+      - --batch
+      - --armor
+      - --local-user
+      - 64430B277E1E4090BF4C00E307A9B72C9FE6469C
+      - --output
+      - ${signature}
+      - --detach-sign
+      - ${artifact}
+
+snapshot:
+  version_template: testing
+
+changelog:
+  disable: true
+
+checksum:
+  disable: false
+  split: true

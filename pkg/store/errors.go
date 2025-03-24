@@ -19,4 +19,7 @@ var (
 
 	// ErrUserNotFound is returned when a user was not found.
 	ErrUserNotFound = errors.New("user not found")
+
+	// ErrTokenNotFound is returned when a token was not found.
+	ErrTokenNotFound = errors.New("token not found")
 )

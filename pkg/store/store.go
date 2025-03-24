@@ -13,6 +13,7 @@ import (
 	"github.com/gopad/gopad-api/pkg/config"
 	"github.com/gopad/gopad-api/pkg/migrations"
 	"github.com/gopad/gopad-api/pkg/model"
+	"github.com/gopad/gopad-api/pkg/upload"
 	"github.com/rs/zerolog"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/mysqldialect"
@@ -34,7 +35,8 @@ var (
 
 // Store provides the general database abstraction layer.
 type Store struct {
-	scim config.Scim
+	scim   config.Scim
+	upload upload.Upload
 
 	driver          string
 	username        string
@@ -399,7 +401,7 @@ func (s *Store) open() error {
 }
 
 // NewStore initializes a new Bun
-func NewStore(cfg config.Database, scim config.Scim) (*Store, error) {
+func NewStore(cfg config.Database, scim config.Scim, uploads upload.Upload) (*Store, error) {
 	username, err := config.Value(cfg.Username)
 
 	if err != nil {
@@ -414,6 +416,7 @@ func NewStore(cfg config.Database, scim config.Scim) (*Store, error) {
 
 	client := &Store{
 		scim:     scim,
+		upload:   uploads,
 		driver:   cfg.Driver,
 		database: cfg.Name,
 		username: username,
@@ -531,8 +534,8 @@ func NewStore(cfg config.Database, scim config.Scim) (*Store, error) {
 }
 
 // MustStore simply calls NewStore and panics on an error.
-func MustStore(cfg config.Database, scim config.Scim) *Store {
-	s, err := NewStore(cfg, scim)
+func MustStore(cfg config.Database, scim config.Scim, uploads upload.Upload) *Store {
+	s, err := NewStore(cfg, scim, uploads)
 
 	if err != nil {
 		panic(err)

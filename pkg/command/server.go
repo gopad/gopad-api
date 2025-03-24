@@ -33,30 +33,35 @@ var (
 	defaultMetricsPprof     = false
 	defaultServerAddr       = "0.0.0.0:8080"
 	defaultServerHost       = "http://localhost:8080"
-	defaultServerRoot       = "/api"
+	defaultServerRoot       = "/"
 	defaultServerCert       = ""
 	defaultServerKey        = ""
 	defaultServerTemplates  = ""
+	defaultServerFrontend   = ""
 	defaultServerDocs       = true
 	defaultDatabaseDriver   = "sqlite3"
 	defaultDatabaseAddress  = ""
 	defaultDatabasePort     = ""
 	defaultDatabaseUsername = ""
 	defaultDatabasePassword = ""
-	defaultDatabaseName     = "storage/gopad.sqlite3"
+	defaultDatabaseName     = "gopad.sqlite3"
 	defaultDatabaseOptions  = make(map[string]string, 0)
 	defaultUploadDriver     = "file"
 	defaultUploadEndpoint   = ""
-	defaultUploadPath       = "storage/uploads/"
+	defaultUploadPath       = ""
 	defaultUploadAccess     = ""
 	defaultUploadSecret     = ""
 	defaultUploadBucket     = ""
 	defaultUploadRegion     = "us-east-1"
 	defaultUploadPerms      = "0755"
+	defaultUploadPathstyle  = false
+	defaultUploadProxy      = true
 	defaultTokenSecret      = secret.Generate(32)
 	defaultTokenExpire      = time.Hour * 1
 	defaultScimEnabled      = false
 	defaultScimToken        = ""
+	defaultCleanupEnabled   = true
+	defaultCleanupInterval  = 30 * time.Minute
 	defaultAdminCreate      = true
 	defaultAdminUsername    = "admin"
 	defaultAdminPassword    = "admin"
@@ -102,6 +107,10 @@ func init() {
 	serverCmd.PersistentFlags().String("server-templates", defaultServerTemplates, "Path to custom template filrs")
 	viper.SetDefault("server.templates", defaultServerTemplates)
 	_ = viper.BindPFlag("server.templates", serverCmd.PersistentFlags().Lookup("server-templates"))
+
+	serverCmd.PersistentFlags().String("server-frontend", defaultServerFrontend, "Path to custom frontend files")
+	viper.SetDefault("server.frontend", defaultServerFrontend)
+	_ = viper.BindPFlag("server.frontend", serverCmd.PersistentFlags().Lookup("server-frontend"))
 
 	serverCmd.PersistentFlags().Bool("server-docs", defaultServerDocs, "Enable OpenAPI docs")
 	viper.SetDefault("server.docs", defaultServerDocs)
@@ -167,6 +176,14 @@ func init() {
 	viper.SetDefault("upload.perms", defaultUploadPerms)
 	_ = viper.BindPFlag("upload.perms", serverCmd.PersistentFlags().Lookup("upload-perms"))
 
+	serverCmd.PersistentFlags().Bool("upload-pathstyle", defaultUploadPathstyle, "Enable S3 pathstyle access")
+	viper.SetDefault("upload.pathstyle", defaultUploadPathstyle)
+	_ = viper.BindPFlag("upload.pathstyle", serverCmd.PersistentFlags().Lookup("upload-pathstyle"))
+
+	serverCmd.PersistentFlags().Bool("upload-proxy", defaultUploadProxy, "Proxy S3 access through server")
+	viper.SetDefault("upload.proxy", defaultUploadProxy)
+	_ = viper.BindPFlag("upload.proxy", serverCmd.PersistentFlags().Lookup("upload-proxy"))
+
 	serverCmd.PersistentFlags().String("token-secret", defaultTokenSecret, "Token encryption secret")
 	viper.SetDefault("token.secret", defaultTokenSecret)
 	_ = viper.BindPFlag("token.secret", serverCmd.PersistentFlags().Lookup("token-secret"))
@@ -182,6 +199,14 @@ func init() {
 	serverCmd.PersistentFlags().String("scim-token", defaultScimToken, "Bearer token for SCIM authentication")
 	viper.SetDefault("scim.token", defaultScimToken)
 	_ = viper.BindPFlag("scim.token", serverCmd.PersistentFlags().Lookup("scim-token"))
+
+	serverCmd.PersistentFlags().Bool("cleanup-enabled", defaultCleanupEnabled, "Enable periodic cleanup tasks")
+	viper.SetDefault("cleanup.enabled", defaultCleanupEnabled)
+	_ = viper.BindPFlag("cleanup.enabled", serverCmd.PersistentFlags().Lookup("cleanup-enabled"))
+
+	serverCmd.PersistentFlags().Duration("cleanup-interval", defaultCleanupInterval, "Interval for cleanup task")
+	viper.SetDefault("cleanup.interval", defaultCleanupInterval)
+	_ = viper.BindPFlag("cleanup.interval", serverCmd.PersistentFlags().Lookup("cleanup-interval"))
 
 	serverCmd.PersistentFlags().Bool("admin-create", defaultAdminCreate, "Create an initial admin user")
 	viper.SetDefault("admin.create", defaultAdminCreate)
@@ -217,25 +242,6 @@ func serverAction(ccmd *cobra.Command, _ []string) {
 		os.Exit(1)
 	}
 
-	storage, err := store.NewStore(
-		cfg.Database,
-		cfg.Scim,
-	)
-
-	if err != nil {
-		log.Fatal().
-			Err(err).
-			Msg("Failed to setup database")
-
-		os.Exit(1)
-	}
-
-	log.Info().
-		Fields(storage.Info()).
-		Msg("Preparing database")
-
-	defer storage.Close()
-
 	uploads, err := setupUploads(cfg)
 
 	if err != nil {
@@ -251,6 +257,26 @@ func serverAction(ccmd *cobra.Command, _ []string) {
 		Msg("Preparing uploads")
 
 	defer uploads.Close()
+
+	storage, err := store.NewStore(
+		cfg.Database,
+		cfg.Scim,
+		uploads,
+	)
+
+	if err != nil {
+		log.Fatal().
+			Err(err).
+			Msg("Failed to setup database")
+
+		os.Exit(1)
+	}
+
+	log.Info().
+		Fields(storage.Info()).
+		Msg("Preparing database")
+
+	defer storage.Close()
 
 	if val, err := backoff.Retry(
 		ccmd.Context(),
@@ -437,6 +463,42 @@ func serverAction(ccmd *cobra.Command, _ []string) {
 			log.Info().
 				Err(reason).
 				Msg("Metrics shutdown gracefully")
+		})
+	}
+
+	if cfg.Cleanup.Enabled {
+		ticker := time.NewTicker(cfg.Cleanup.Interval)
+		stop := make(chan struct{})
+
+		gr.Add(func() error {
+			defer ticker.Stop()
+
+			log.Info().
+				Str("interval", cfg.Cleanup.Interval.String()).
+				Msg("Starting periodic cleanup")
+
+			for {
+				select {
+				case <-ticker.C:
+					log.Debug().
+						Msg("Running periodic cleanup")
+
+					if err := storage.Users.CleanupRedirectTokens(
+						context.Background(),
+					); err != nil {
+						log.Error().
+							Err(err).
+							Msg("Failed to cleanup redirect tokens")
+					}
+				case <-stop:
+					log.Info().
+						Msg("Shutdown periodic cleanup")
+
+					return nil
+				}
+			}
+		}, func(_ error) {
+			close(stop)
 		})
 	}
 
