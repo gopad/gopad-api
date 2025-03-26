@@ -1,7 +1,7 @@
 ---
 repository:
   name: gopad-api
-  description: "Gopad: API"
+  description: Server for Etherpad for markdown with Go
   homepage: https://gopad.eu
   topics: gopad, etherpad, api, server, golang, go
 
