@@ -14,7 +14,7 @@ export type AuthVerify = {
  * Profile
  * Model to represent profile
  */
-export type ProfileReadable = {
+export type Profile = {
     id?: string;
     username?: string;
     password?: string;
@@ -25,28 +25,15 @@ export type ProfileReadable = {
     readonly active?: boolean;
     readonly created_at?: string;
     readonly updated_at?: string;
-    readonly auths?: Array<UserAuthReadable>;
-    readonly groups?: Array<UserGroupReadable>;
-};
-
-/**
- * Profile
- * Model to represent profile
- */
-export type ProfileWritable = {
-    id?: string;
-    username?: string;
-    password?: string;
-    email?: string;
-    fullname?: string;
-    profile?: string;
+    readonly auths?: Array<UserAuth>;
+    readonly groups?: Array<UserGroup>;
 };
 
 /**
  * Group
  * Model to represent group
  */
-export type GroupReadable = {
+export type Group = {
     id?: string;
     slug?: string;
     name?: string;
@@ -55,20 +42,10 @@ export type GroupReadable = {
 };
 
 /**
- * Group
- * Model to represent group
- */
-export type GroupWritable = {
-    id?: string;
-    slug?: string;
-    name?: string;
-};
-
-/**
  * User
  * Model to represent user
  */
-export type UserReadable = {
+export type User = {
     id?: string;
     username?: string;
     password?: string;
@@ -79,54 +56,16 @@ export type UserReadable = {
     active?: boolean;
     readonly created_at?: string;
     readonly updated_at?: string;
-    readonly auths?: Array<UserAuthReadable>;
-};
-
-/**
- * User
- * Model to represent user
- */
-export type UserWritable = {
-    id?: string;
-    username?: string;
-    password?: string;
-    email?: string;
-    fullname?: string;
-    profile?: string;
-    admin?: boolean;
-    active?: boolean;
+    readonly auths?: Array<UserAuth>;
 };
 
 /**
  * User Auth
  * Model to represent user auth
  */
-export type UserAuthReadable = {
+export type UserAuth = {
     provider?: string;
     ref?: string;
-    readonly created_at?: string;
-    readonly updated_at?: string;
-};
-
-/**
- * User Auth
- * Model to represent user auth
- */
-export type UserAuthWritable = {
-    provider?: string;
-    ref?: string;
-};
-
-/**
- * User Group
- * Model to represent user group
- */
-export type UserGroupReadable = {
-    user_id: string;
-    user?: UserReadable;
-    group_id: string;
-    group?: GroupReadable;
-    perm?: 'owner' | 'user' | 'admin';
     readonly created_at?: string;
     readonly updated_at?: string;
 };
@@ -135,12 +74,14 @@ export type UserGroupReadable = {
  * User Group
  * Model to represent user group
  */
-export type UserGroupWritable = {
+export type UserGroup = {
     user_id: string;
-    user?: UserWritable;
+    user?: User;
     group_id: string;
-    group?: GroupWritable;
+    group?: Group;
     perm?: 'owner' | 'user' | 'admin';
+    readonly created_at?: string;
+    readonly updated_at?: string;
 };
 
 /**
@@ -583,7 +524,7 @@ export type ShowProfileResponses = {
     /**
      * The current profile details
      */
-    200: ProfileReadable;
+    200: Profile;
 };
 
 export type ShowProfileResponse = ShowProfileResponses[keyof ShowProfileResponses];
@@ -623,7 +564,7 @@ export type UpdateProfileResponses = {
     /**
      * The current profile details
      */
-    200: ProfileReadable;
+    200: Profile;
 };
 
 export type UpdateProfileResponse = UpdateProfileResponses[keyof UpdateProfileResponses];
@@ -677,7 +618,7 @@ export type ListGroupsResponses = {
         total: number;
         limit: number;
         offset: number;
-        groups: Array<GroupReadable>;
+        groups: Array<Group>;
     };
 };
 
@@ -718,7 +659,7 @@ export type CreateGroupResponses = {
     /**
      * The details for a group
      */
-    200: GroupReadable;
+    200: Group;
 };
 
 export type CreateGroupResponse = CreateGroupResponses[keyof CreateGroupResponses];
@@ -798,7 +739,7 @@ export type ShowGroupResponses = {
     /**
      * The details for a group
      */
-    200: GroupReadable;
+    200: Group;
 };
 
 export type ShowGroupResponse = ShowGroupResponses[keyof ShowGroupResponses];
@@ -847,7 +788,7 @@ export type UpdateGroupResponses = {
     /**
      * The details for a group
      */
-    200: GroupReadable;
+    200: Group;
 };
 
 export type UpdateGroupResponse = UpdateGroupResponses[keyof UpdateGroupResponses];
@@ -959,8 +900,8 @@ export type ListGroupUsersResponses = {
         total: number;
         limit: number;
         offset: number;
-        group?: GroupReadable;
-        users: Array<UserGroupReadable>;
+        group?: Group;
+        users: Array<UserGroup>;
     };
 };
 
@@ -1121,7 +1062,7 @@ export type ListUsersResponses = {
         total: number;
         limit: number;
         offset: number;
-        users: Array<UserReadable>;
+        users: Array<User>;
     };
 };
 
@@ -1162,7 +1103,7 @@ export type CreateUserResponses = {
     /**
      * The details for an user
      */
-    200: UserReadable;
+    200: User;
 };
 
 export type CreateUserResponse = CreateUserResponses[keyof CreateUserResponses];
@@ -1242,7 +1183,7 @@ export type ShowUserResponses = {
     /**
      * The details for an user
      */
-    200: UserReadable;
+    200: User;
 };
 
 export type ShowUserResponse = ShowUserResponses[keyof ShowUserResponses];
@@ -1291,7 +1232,7 @@ export type UpdateUserResponses = {
     /**
      * The details for an user
      */
-    200: UserReadable;
+    200: User;
 };
 
 export type UpdateUserResponse = UpdateUserResponses[keyof UpdateUserResponses];
@@ -1403,8 +1344,8 @@ export type ListUserGroupsResponses = {
         total: number;
         limit: number;
         offset: number;
-        user?: UserReadable;
-        groups: Array<UserGroupReadable>;
+        user?: User;
+        groups: Array<UserGroup>;
     };
 };
 
