@@ -84,27 +84,21 @@ jobs:
         run: |
           aws s3 sync --exclude "*" --include "gopad-api-*" dist s3://dl.gopad.eu/api/testing/
 
+      - name: Install cloudsmith
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: cloudsmith-io/cloudsmith-cli-action@v1.0.4
+        with:
+          api-key: ${{ secrets.CLOUDSMITH_API_KEY }}
+
       - name: Upload packages
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           for PACKAGE in dist/gopad-*.deb; do
-            echo "> uploading $PACKAGE"
-            curl  -sSL \
-              --header "Authorization: Bearer $BALTOREPO_TOKEN" \
-              --form "package=@$PACKAGE" \
-              --form "distribution=all" \
-              https://gopad.baltorepo.com/stable/debian/upload/
-            echo "> done"
+            cloudsmith push deb gopad/general/any-distro/any-version "${PACKAGE}"
           done
 
           for PACKAGE in dist/gopad-*.rpm; do
-            echo "> uploading $PACKAGE"
-            curl  -sSL \
-              --header "Authorization: Bearer $BALTOREPO_TOKEN" \
-              --form "package=@$PACKAGE" \
-              --form "distribution=all" \
-              https://gopad.baltorepo.com/stable/redhat/upload/
-            echo "> done"
+            cloudsmith push rpm gopad/general/any-distro/any-version "${PACKAGE}"
           done
 
 ...
