@@ -21,13 +21,10 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-// contextKey provides a type for use with context.WithValue.
-type contextKey string
-
 const (
-	BasicScopes  contextKey = "Basic.Scopes"
-	BearerScopes contextKey = "Bearer.Scopes"
-	HeaderScopes contextKey = "Header.Scopes"
+	BasicScopes  basicContextKey  = "Basic.Scopes"
+	BearerScopes bearerContextKey = "Bearer.Scopes"
+	HeaderScopes headerContextKey = "Header.Scopes"
 )
 
 // Defines values for UserGroupPerm.
@@ -37,11 +34,37 @@ const (
 	UserGroupPermUser  UserGroupPerm = "user"
 )
 
+// Valid indicates whether the value is a known member of the UserGroupPerm enum.
+func (e UserGroupPerm) Valid() bool {
+	switch e {
+	case UserGroupPermAdmin:
+		return true
+	case UserGroupPermOwner:
+		return true
+	case UserGroupPermUser:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for SortOrderParam.
 const (
 	SortOrderParamAsc  SortOrderParam = "asc"
 	SortOrderParamDesc SortOrderParam = "desc"
 )
+
+// Valid indicates whether the value is a known member of the SortOrderParam enum.
+func (e SortOrderParam) Valid() bool {
+	switch e {
+	case SortOrderParamAsc:
+		return true
+	case SortOrderParamDesc:
+		return true
+	default:
+		return false
+	}
+}
 
 // Defines values for ListGroupsParamsOrder.
 const (
@@ -49,11 +72,35 @@ const (
 	ListGroupsParamsOrderDesc ListGroupsParamsOrder = "desc"
 )
 
+// Valid indicates whether the value is a known member of the ListGroupsParamsOrder enum.
+func (e ListGroupsParamsOrder) Valid() bool {
+	switch e {
+	case ListGroupsParamsOrderAsc:
+		return true
+	case ListGroupsParamsOrderDesc:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ListGroupUsersParamsOrder.
 const (
 	ListGroupUsersParamsOrderAsc  ListGroupUsersParamsOrder = "asc"
 	ListGroupUsersParamsOrderDesc ListGroupUsersParamsOrder = "desc"
 )
+
+// Valid indicates whether the value is a known member of the ListGroupUsersParamsOrder enum.
+func (e ListGroupUsersParamsOrder) Valid() bool {
+	switch e {
+	case ListGroupUsersParamsOrderAsc:
+		return true
+	case ListGroupUsersParamsOrderDesc:
+		return true
+	default:
+		return false
+	}
+}
 
 // Defines values for ListUsersParamsOrder.
 const (
@@ -61,11 +108,35 @@ const (
 	ListUsersParamsOrderDesc ListUsersParamsOrder = "desc"
 )
 
+// Valid indicates whether the value is a known member of the ListUsersParamsOrder enum.
+func (e ListUsersParamsOrder) Valid() bool {
+	switch e {
+	case ListUsersParamsOrderAsc:
+		return true
+	case ListUsersParamsOrderDesc:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ListUserGroupsParamsOrder.
 const (
 	Asc  ListUserGroupsParamsOrder = "asc"
 	Desc ListUserGroupsParamsOrder = "desc"
 )
+
+// Valid indicates whether the value is a known member of the ListUserGroupsParamsOrder enum.
+func (e ListUserGroupsParamsOrder) Valid() bool {
+	switch e {
+	case Asc:
+		return true
+	case Desc:
+		return true
+	default:
+		return false
+	}
+}
 
 // AuthToken defines model for AuthToken.
 type AuthToken struct {
