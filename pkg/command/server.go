@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/cenkalti/backoff/v5"
+	"github.com/cenkalti/backoff/v6"
 	"github.com/gopad/gopad-api/pkg/authn"
 	"github.com/gopad/gopad-api/pkg/config"
 	"github.com/gopad/gopad-api/pkg/metrics"
