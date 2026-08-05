@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://www.schemastore.org/chart.json
+apiVersion: v2
+version: 0.0.0
+appVersion: 0.0.0
+type: application
+name: gopad-api
+description: Server for Etherpad for markdown with Go
+home: https://gopad.eu
+
+maintainers:
+  - email: thomas@webhippie.de
+    name: tboerger
+    url: https://github.com/tboerger
+
+sources:
+  - https://github.com/gopad/gopad-api
+
+...
