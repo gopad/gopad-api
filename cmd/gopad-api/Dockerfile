@@ -30,7 +30,7 @@ RUN --mount=type=cache,target=/root/go/pkg \
     --mount=type=cache,target=/root/.cache/go-build \
     task be:generate build:server GOOS=${TARGETOS} GOARCH=${TARGETARCH}
 
-FROM alpine:3.24@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
+FROM alpine:3.24@sha256:5b02b42e375f7426f8d65c3af331ca05d9878f9989230354504e0b9dfd431f60
 
 RUN apk add --no-cache ca-certificates mailcap && \
     addgroup -g 1337 gopad && \
