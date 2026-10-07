@@ -48,11 +48,11 @@ func (s *Groups) List(ctx context.Context, params model.ListParams) ([]*model.Gr
 	}
 
 	if params.Limit > 0 {
-		q = q.Limit(int(params.Limit))
+		q = q.Limit(params.Limit)
 	}
 
 	if params.Offset > 0 {
-		q = q.Offset(int(params.Offset))
+		q = q.Offset(params.Offset)
 	}
 
 	if err := q.Scan(ctx); err != nil {
@@ -190,11 +190,11 @@ func (s *Groups) ListUsers(ctx context.Context, params model.UserGroupParams) ([
 	}
 
 	if params.Limit > 0 {
-		q = q.Limit(int(params.Limit))
+		q = q.Limit(params.Limit)
 	}
 
 	if params.Offset > 0 {
-		q = q.Offset(int(params.Offset))
+		q = q.Offset(params.Offset)
 	}
 
 	if err := q.Scan(ctx); err != nil {
